@@ -1,8 +1,18 @@
-const textbox = document.getElementById("textbox");
-const log = document.getElementById("chatLog");
+const input = document.querySelector("input");
+const log = document.getElementById("values");
+let message = "";
 
-textbox.addEventListener("input", sendMessage);
+//input.addEventListener("focusin", () => {typing = true});
+input.addEventListener("input", updateValue);
+input.addEventListener("keyup", sendMessage);
 
-function sendMessage(message) {
-    log.textContent = "\n"+message.target.value;
+function updateValue(e) {
+    message = e.target.value;
+}
+
+function sendMessage(e) {
+    if (e.key=="Enter") {
+        log.textContent += message+"\n";
+        input.value = "";
+    }
 }

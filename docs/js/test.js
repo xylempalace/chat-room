@@ -1,24 +1,51 @@
-const input = document.getElementById("chatInput");
+const chatInput = document.getElementById("chatInput");
+const chatSend = document.getElementById("chatSend");
+const usernameInput = document.getElementById("usernameInput");
+const usernameSend = document.getElementById("usernameSend");
 const log = document.getElementById("values");
-let connected = true;
+let connected = false;
 let typingUsername = "";
 let message = "";
 let username = "<User>";
 
-//input.addEventListener("focusin", () => {typing = true});
-input.addEventListener("input", updateValue);
-input.addEventListener("keyup", updateValue);
+chatInput.addEventListener("input", updateValue);
+chatInput.addEventListener("keyup", updateValue);
+
+usernameInput.addEventListener("input", updateUser);
+usernameInput.addEventListener("keyup", updateUser);
+
+setDisabled(chatInput, !connected);
+setDisabled(chatSend, !connected);
+setDisabled(usernameInput, connected);
+setDisabled(usernameSend, connected);
+
+document.addEventListener("readystatechange", (e) => {
+	if (e.target.readyState === "complete") {
+		updateInputAttributes();
+	}
+	});
 
 function updateValue(e) {
 	if (e.key=="Enter") {
-        sendMessage(message);
-		input.value = "";
+        sendMessage();
     }
     message = e.target.value;
 }
 
-function sendMessage(msg) {
-    log.textContent += username+" "+msg+"\n";
+function clearMessage() {
+	chatInput.value = "";
+	message = "";
+}
+
+function sendMessage() {
+	if (message.length > 0) {
+		log.textContent += username+" "+message+"\n";
+		clearMessage();
+	}
+}
+
+function printMessage(msg) {
+	log.textContent += msg+"\n";
 }
 
 function recieveMessage(msg) {
@@ -29,10 +56,25 @@ function updateUser(e) {
 	if (e.key=="Enter") {
         setUser();
     }
-    message = e.target.value;
+    typingUsername = e.target.value;
 }
 
 function setUser() {
-	username = "<"+">";
-	connected = true;
+	if (!connected) {
+		username = "<"+usernameInput.value+">";
+		recieveMessage("Username set to "+username);
+		connected = true;
+		setDisabled(chatInput, !connected);
+		setDisabled(chatSend, !connected);
+		setDisabled(usernameInput, connected);
+		setDisabled(usernameSend, connected);
+	}
+}
+
+function setDisabled(element, state) {
+	if (state) {
+		element.setAttribute("disabled", true);
+	} else {
+		element.removeAttribute("disabled");
+	}
 }

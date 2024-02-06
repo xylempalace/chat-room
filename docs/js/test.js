@@ -23,7 +23,7 @@ document.addEventListener("readystatechange", (e) => {
 	if (e.target.readyState === "complete") {
 		updateInputAttributes();
 	}
-	});
+});
 
 function updateValue(e) {
 	if (e.key=="Enter") {

@@ -1,0 +1,31 @@
+.chatLog {
+	overflow-wrap: break-word;
+	max-height:80%;
+	min-height:80%;
+	white-space:pre-line;
+}
+
+.chatBox {
+	
+	height: 100px;
+	overflow: auto;
+	display: flex;
+	flex-direction: column-reverse;
+	overflow-y:auto;
+	width:215px;
+    float:left;
+    padding:0 0 0 5px;
+    position:relative;
+    float:left;
+	background: yellow;
+	height:100%;
+	min-height:90%;
+	
+    border-right: 1px #f8f7f3 solid;
+}
+
+html,body{
+	height:95%;
+	min-height:95%; 
+	max-height:95%;
+}

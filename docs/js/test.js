@@ -62,12 +62,14 @@ function updateUser(e) {
 function setUser() {
 	if (!connected) {
 		username = "<"+usernameInput.value+">";
-		recieveMessage("Username set to "+username);
-		connected = true;
-		setDisabled(chatInput, !connected);
-		setDisabled(chatSend, !connected);
-		setDisabled(usernameInput, connected);
-		setDisabled(usernameSend, connected);
+		if (username.length > 2) {
+			recieveMessage("Username set to "+username);
+			connected = true;
+			setDisabled(chatInput, !connected);
+			setDisabled(chatSend, !connected);
+			setDisabled(usernameInput, connected);
+			setDisabled(usernameSend, connected);
+		}
 	}
 }
 

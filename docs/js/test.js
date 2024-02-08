@@ -84,18 +84,19 @@ function updateUser(e) {
 
 function setUser() {
 	if (!connected) {
-		username = "<"+usernameInput.value+">";
-		recieveMessage("Username set to "+username);
-		connected = true;
-		setDisabled(chatInput, !connected);
-		setDisabled(chatSend, !connected);
-		setDisabled(usernameInput, connected);
-		setDisabled(usernameSend, connected);
-		addCanvas();
+		if (usernameInput.value.length > 0) {
+			username = "<"+usernameInput.value+">";
+			recieveMessage("Username set to "+username);
+			connected = true;
+			setDisabled(chatInput, !connected);
+			setDisabled(chatSend, !connected);
+			setDisabled(usernameInput, connected);
+			setDisabled(usernameSend, connected);
 
-		const testPlayer = Player(200, 200);
-		testPlayer.drawPlayer(canvas);
-		testPlayer.drawText(canvas, "Hello");
+			const testPlayer = Player(200, 200);
+			testPlayer.drawPlayer(canvas);
+			testPlayer.drawText(canvas, "Hello");
+		}
 	}
 }
 

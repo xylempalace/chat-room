@@ -7,7 +7,7 @@ app.get('/', (req, res) => {
   app.use('/static', express.static(path.join(__dirname, 'frontend')));
   console.log(path.join(__dirname, 'frontend'));
   res.set('Content-Type', 'text/html');
-  res.sendFile(__dirname + '/index.html');
+  res.sendFile(path.join(__dirname, '../frontend/index.html'));
 })
 
 app.listen(port, () => {

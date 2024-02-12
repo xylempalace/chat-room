@@ -30,7 +30,7 @@ class TextInput {
         if (hasButton) {
             this.textButton = document.createElement("button");
             this.textButton.setAttribute("class", "inputButton");
-			this.textButton.setAttribute("onclick", this.sendText);
+			this.textButton.addEventListener("click", () => {this.sendText()});
 
             this.textButton.textContent = "🠊";
             this.textDiv.append(this.textButton);
@@ -46,6 +46,7 @@ class TextInput {
 	}
 
 	sendText() {
+        console.log("send");
 		if (this.textInput.value.length > 0) {
 			eval(this.sendFunction+"(this.textInput.value, this)");
 		}

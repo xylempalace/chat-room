@@ -75,6 +75,8 @@ class Player {
 
     static playerSizeX = 100;
     static playerSizeY = 100;
+    posX;
+    posY;
 
     constructor(posX, posY) {
         this.posX = posX;
@@ -89,7 +91,7 @@ class Player {
 
     drawPlayer(cnv) {
         var ctx = cnv.getContext("2d");
-        ctx.fillRect(posX, posY, playerSizeX, playerSizeY);
+        ctx.fillRect(this.posX, this.posY, this.constructor.playerSizeX, this.constructor.playerSizeY);
     }
 }
 
@@ -112,6 +114,18 @@ document.addEventListener("readystatechange", (e) => {
     }
 
 });
+
+function connect() {
+    addCanvas();
+
+    const testPlayer = new Player(0, 0);
+    testPlayer.drawPlayer(gameCanvas);
+    testPlayer.drawText(gameCanvas, "Hello");
+
+    addSquare(50, 50, 100, 100);
+
+    connected = true;
+}
 
 function sendMessage(msg, textbox) {
     if (msg.length > 0) {
@@ -142,11 +156,8 @@ function setUser(usr, textbox) {
             recieveMessage("Username set to "+username);
             textbox.setDisabled(true);
             TextInput.findInputByID("chatInput").setDisabled(false);
-            connected = true;
-
-            const testPlayer = new Player(200, 200);
-            //testPlayer.drawPlayer(gameCanvas);
-            //testPlayer.drawText(gameCanvas, "Hello");
+            
+            connect();
         }
     }
 }
@@ -165,6 +176,7 @@ function addCanvas() {
 }
 
 function addSquare(x, y, w, h) {
+    console.log('h');
     var c = document.getElementById("gameCanvas");
     var ctx = c.getContext("2d");
     ctx.font = "30px Arial";

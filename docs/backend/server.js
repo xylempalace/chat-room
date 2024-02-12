@@ -9,10 +9,12 @@ const port = 3000
 //Import path library
 const path = require('path')
 
+//Sends index.html and coressponding css file, TODO: Send JS file as well.
 app.get('/', (req, res) => {
-  app.use('/static', express.static(path.join(__dirname, 'frontend')));
+ app.use(express.static("frontend"));
   res.set('Content-Type', 'text/html');
   res.sendFile(path.join(__dirname, '../frontend/index.html'));
+
 })
 
 app.listen(port, () => {

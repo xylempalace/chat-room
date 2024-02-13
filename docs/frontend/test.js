@@ -5,6 +5,7 @@ let connected = false;
 let typingUsername = "";
 let message = "";
 let username = "";
+let userPlayer;
 
 class TextInput {
     
@@ -83,10 +84,15 @@ class Player {
         this.posY = posY;
     }
 
-    drawText(cnv, message) {
+    sayMessage(cnv, message) {
+		var fontSize = 30;
         var ctx = cnv.getContext("2d");
-        ctx.font = "30px Arial";
-        ctx.fillText(message, posX, posY+10);
+		ctx.textAlign = 'center';
+        ctx.font = fontSize.toString()+"px Arial";
+		
+		var playerCenterX = (this.posX+(this.constructor.playerSizeX/2));
+		console.log(playerCenterX);
+        ctx.fillText(message, playerCenterX, this.posY-(this.constructor.playerSizeY*0.25));
     }
 
     drawPlayer(cnv) {
@@ -111,18 +117,16 @@ document.addEventListener("readystatechange", (e) => {
 
         let chatInput = TextInput.findInputByID("chatInput");
         chatInput.setDisabled(true);
+		
+		addCanvas();
+		drawText(100, 100, "Connecting...");
     }
 
 });
 
 function connect() {
-    addCanvas();
-
-    const testPlayer = new Player(0, 0);
-    testPlayer.drawPlayer(gameCanvas);
-    testPlayer.drawText(gameCanvas, "Hello");
-
-    addSquare(50, 50, 100, 100);
+    userPlayer = new Player(250, 250);
+    userPlayer.drawPlayer(gameCanvas);
 
     connected = true;
 }
@@ -131,6 +135,9 @@ function sendMessage(msg, textbox) {
     if (msg.length > 0) {
         log.textContent += username+" "+msg+"\n";
         textbox.clearTextbox();
+		if (connected) {
+			userPlayer.sayMessage(gameCanvas, msg);
+		}
     }
 }
 
@@ -175,10 +182,9 @@ function addCanvas() {
     document.getElementById("gameSpace").appendChild(canvas);
 }
 
-function addSquare(x, y, w, h) {
-    console.log('h');
-    var c = document.getElementById("gameCanvas");
+function drawText(x, y, msg) {
+	var c = document.getElementById("gameCanvas");
     var ctx = c.getContext("2d");
     ctx.font = "30px Arial";
-    ctx.fillText("Hello World", 10, 50);
+    ctx.fillText(msg, x, y);
 }

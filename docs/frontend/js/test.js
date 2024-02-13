@@ -5,6 +5,7 @@ let connected = false;
 let typingUsername = "";
 let message = "";
 let username = "<User>";
+let isDark = false;
 
 class TextInput {
     
@@ -30,7 +31,7 @@ class TextInput {
         if (hasButton) {
             this.textButton = document.createElement("button");
             this.textButton.setAttribute("class", "inputButton");
-			this.textButton.addEventListener("click", () => {this.sendText()});
+			this.textButton.setAttribute("onclick", this.sendText);
 
             this.textButton.textContent = "🠊";
             this.textDiv.append(this.textButton);
@@ -46,7 +47,6 @@ class TextInput {
 	}
 
 	sendText() {
-        console.log("send");
 		if (this.textInput.value.length > 0) {
 			eval(this.sendFunction+"(this.textInput.value, this)");
 		}
@@ -124,7 +124,7 @@ function printMessage(msg) {
     log.textContent += msg+"\n";
 }
 
-function receiveMessage(msg) {
+function recieveMessage(msg) {
     log.textContent += msg+"\n";
 }
 
@@ -172,5 +172,15 @@ function addSquare(x, y, w, h) {
 }
 
 function ToggleDarkMode() {
-    document.body.style.backgroundColor = "black";
+    if (!isDark) {
+        console.log(isDark);
+        document.body.style.background = "black";
+        isDark = !isDark;
+    }
+
+    else {
+        console.log(isDark);
+        document.body.style.background = "white";
+        isDark = !isDark;
+    }
 }

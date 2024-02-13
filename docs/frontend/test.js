@@ -4,7 +4,7 @@ let gameCanvas;
 let connected = false;
 let typingUsername = "";
 let message = "";
-let username = "<User>";
+let username = "";
 
 class TextInput {
     

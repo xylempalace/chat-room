@@ -3,7 +3,7 @@ const log = document.getElementById("values");
 let gameCanvas;
 let connected = false;
 let typingUsername = "";
-let message = "";
+let userMessage = "";
 let username = "";
 let userPlayer;
 
@@ -78,26 +78,66 @@ class Player {
     static playerSizeY = 100;
     posX;
     posY;
+    speechBubbles = [];
 
     constructor(posX, posY) {
         this.posX = posX;
         this.posY = posY;
     }
 
-    sayMessage(cnv, message) {
-		var fontSize = 30;
-        var ctx = cnv.getContext("2d");
-		ctx.textAlign = 'center';
-        ctx.font = fontSize.toString()+"px Arial";
-		
-		var playerCenterX = (this.posX+(this.constructor.playerSizeX/2));
-		console.log(playerCenterX);
-        ctx.fillText(message, playerCenterX, this.posY-(this.constructor.playerSizeY*0.25));
+    sayMessage(message) {
+        var newBubble = new SpeechBubble(message);
+		this.speechBubbles.push(newBubble);
+    }
+
+    drawSpeechBubbles(cnv) {
+        var curBubble;
+        for (let i = 0; i < this.speechBubbles.length; i++) {
+
+            curBubble = this.speechBubbles[i];
+            if (curBubble.isOld) {
+                this.speechBubbles.splice(i,i);
+            } else {
+
+                //Centering the bubble and making sure the bubbles aren't on top of eachother
+                var bubbleCenterX = this.posX+(this.constructor.playerSizeX/2);
+                var bubbleCenterY = this.posY-((this.constructor.playerSizeY*0.25)*(i+1));
+
+                curBubble.drawBubble(cnv, bubbleCenterX, bubbleCenterY);
+
+            }
+        }
     }
 
     drawPlayer(cnv) {
         var ctx = cnv.getContext("2d");
         ctx.fillRect(this.posX, this.posY, this.constructor.playerSizeX, this.constructor.playerSizeY);
+    }
+}
+
+class SpeechBubble {
+    static font = "30px Arial";
+    static lifeTime = 200;
+    message;
+    spawnTime;
+    deathTime;
+
+    constructor (message) {
+        this.message = message;
+        this.spawnTime = Date.now();
+        this.deathTime = this.spawnTime+this.constructor.lifeTime;
+    }
+
+    isOld() {
+        return (Date.now() > this.deathTime);
+    }
+
+    drawBubble(cnv, posX, posY) {
+        var ctx = cnv.getContext("2d");
+        ctx.textAlign = 'center';
+        ctx.font = this.speechBubbles.constructor.font;
+        
+        ctx.fillText(this.message, bubbleCenterX, bubbleCenterY);
     }
 }
 
@@ -126,8 +166,7 @@ document.addEventListener("readystatechange", (e) => {
 
 function connect() {
     userPlayer = new Player(250, 250);
-    userPlayer.drawPlayer(gameCanvas);
-
+    startAnimating();
     connected = true;
 }
 
@@ -187,4 +226,22 @@ function drawText(x, y, msg) {
     var ctx = c.getContext("2d");
     ctx.font = "30px Arial";
     ctx.fillText(msg, x, y);
+}
+
+function startAnimating() {
+    startTime = Date.now(); 
+    console.log(startTime); 
+    drawScreen();
+}
+
+function drawScreen() {
+    setTimeout(() => { 
+        requestAnimationFrame(drawScreen);
+
+        var c = document.getElementById("gameCanvas");
+        var ctx = c.getContext("2d");
+        ctx.clearRect(0, 0, c.width, c.height);
+        userPlayer.drawPlayer(gameCanvas);
+        userPlayer.drawSpeechBubbles(gameCanvas);
+    }, 500);
 }

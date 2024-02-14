@@ -10,6 +10,9 @@ let startTime = 0;
 let beginTime = 0;
 const fps = 10;
 const fpms = 1000/fps;
+const scriptStart = Date.now();
+let cameraX = 0;
+let cameraY = 0;
 let frameHist = []
 let ctx;
 
@@ -98,6 +101,7 @@ class Player {
 
     drawSpeechBubbles() {
         var curBubble;
+		let vertOffset = (this.constructor.playerSizeY*0.25);
         
         for (let i = 0; i < this.speechBubbles.length; i++) {
             
@@ -106,18 +110,20 @@ class Player {
                 this.speechBubbles.splice(i,i);
             } else {
 
-                //Centering the bubble and making sure the bubbles aren't on top of eachother
+                //Centering the bubble and making sure the bubbles aren't on top of eachother		
                 var bubbleCenterX = this.posX+(this.constructor.playerSizeX/2);
-                var bubbleCenterY = this.posY-((this.constructor.playerSizeY*0.25)  +(30*i));
+                var bubbleCenterY = this.posY-(vertOffset);
+
+				vertOffset += (curBubble.height);			
                 
-                curBubble.drawBubble(bubbleCenterX, bubbleCenterY);
+                curBubble.drawBubble(bubbleCenterX+cameraX, bubbleCenterY+cameraY);
 
             }
         }
     }
 
     drawPlayer() {
-        ctx.fillRect(this.posX, this.posY, this.constructor.playerSizeX, this.constructor.playerSizeY);
+        ctx.fillRect(this.posX+cameraX, this.posY+cameraY, this.constructor.playerSizeX, this.constructor.playerSizeY);
     }
 }
 
@@ -129,6 +135,7 @@ class SpeechBubble {
     message;
     spawnTime;
     deathTime;
+	height;
 
     constructor (message) {
         this.spawnTime = Date.now();
@@ -155,6 +162,8 @@ class SpeechBubble {
 
             this.message = lines;
         }
+		
+		this.height = this.message.length * this.constructor.fontHeight;
     }
 
     isOld() {
@@ -166,6 +175,7 @@ class SpeechBubble {
         var prevFont = ctx.font;
         ctx.textAlign = 'center';
         ctx.font = this.constructor.font;
+	
         //Test string: Howdy hi hello how are we today friends?
         for (let i = 0; i < this.message.length; i++) {
             ctx.fillText(this.message[i], posX, posY-(this.constructor.fontHeight*(this.message.length-(1+i))));
@@ -264,22 +274,21 @@ function drawText(x, y, msg) {
 
 function updateFPSGraph (newFrame, timestamp) {
     frameHist.push(frameLength);
-    drawFPSGraph(0, 0, 500, 200, 6);
+    drawFPSGraph(0, 30, 250, 100, 6);
 }
 
 function drawFPSGraph (x, y, w, h, scale) {
 
     //Bottom line
-    var prevColor = ctx.fillStyle;
-    ctx.fillStyle = "00ff00";
+    var prevColor = ctx.strokeStyle;
+    ctx.strokeStyle = "#AAAAAA";
     ctx.beginPath();
     ctx.moveTo(x, h+y);
     ctx.lineTo(x+w, h+y);
     ctx.stroke();
 
     //Target line
-    prevColor = ctx.fillStyle;
-    ctx.fillStyle = "#FFA500";
+    ctx.strokeStyle = "#FFA500";
     ctx.beginPath();
     var targetFrameH = 0.2*h;
     ctx.moveTo(x, targetFrameH+y);
@@ -287,10 +296,10 @@ function drawFPSGraph (x, y, w, h, scale) {
     ctx.stroke();
     
     //Measured line
-    ctx.fillStyle = "#000000";
+    ctx.strokeStyle = "#000000";
     ctx.beginPath(); // Start a new path
     ctx.moveTo(x, ((frameHist[frameHist.length-1]/fpms)*h)+y); // Move the pen to leftmost at the frame percentage
-    for (let i = 0; i < frameHist.length && (i+1)*scale < w; i++) {
+    for (let i = 0; i < frameHist.length && i*scale < w; i++) {
         var posY = 1-((((frameHist[frameHist.length-(i+1)]/(fpms))))*0.8);
         ctx.lineTo(x+(i*scale), (posY*h)+y); // Draw a line to previous frame interval
         ctx.stroke(); // Render the path
@@ -305,9 +314,11 @@ function startAnimating() {
 
 function drawScreen() {
     beginTime = Date.now();
+	
     ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
     userPlayer.drawPlayer(gameCanvas);
     userPlayer.drawSpeechBubbles(gameCanvas);
+	
     var fpsDecimalPlaces = 1;
     var measuredFPS = (Math.floor((1000/(Date.now()-startTime))*(fpsDecimalPlaces*10)))/(fpsDecimalPlaces*10);
     drawText(25, 25, "FPS: "+measuredFPS);
@@ -316,6 +327,7 @@ function drawScreen() {
     
     frameLength = Math.min(fpms-(Date.now()-beginTime),fpms);
     updateFPSGraph(measuredFPS, beginTime);
+	
     setTimeout(() => {
         requestAnimationFrame(drawScreen);
     }, fpms);

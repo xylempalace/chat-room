@@ -6,6 +6,8 @@
     overflow-wrap: break-word;
 
     white-space:pre-line;
+
+    color: black;
 }
 
 .inputText {
@@ -42,7 +44,7 @@
     
     border-right: 1px #f8f7f3 solid;
 
-    background: yellow;
+    background: lightgray;
 }
 
 html,body{

@@ -10,6 +10,7 @@ const sockserver = new WebSocketServer({ port: 443 })
 const port = 3000
 //Import path library
 const path = require('path')
+const { Socket } = require('dgram')
 
 //Sends index.html and coressponding css file, TODO: Send JS file as well.
 app.get('/', (req, res) => {
@@ -32,16 +33,16 @@ app.listen(port, () => {
 })
 
 sockserver.on('connection', ws => {
-console.log('New client connected!')
-ws.send('connection established')
-ws.on('close', () => console.log('Client has disconnected!'))
-ws.on('message', data => {
-  sockserver.clients.forEach(client => {
-    console.log(`distributing message: ${data}`)
-    client.send(`${data}`)
+  console.log('New client connected!')
+  ws.send('connection established')
+  ws.on('close', () => console.log('Client has disconnected!'))
+  ws.on('message', data => {
+    sockserver.clients.forEach(client => {
+      console.log(`distributing message: ${data}`)
+      client.send(`${data}`)
+    })
   })
-})
-ws.onerror = function () {
-  console.log('websocket error')
-}
+  ws.onerror = function () {
+    console.log('websocket error')
+  }
 })

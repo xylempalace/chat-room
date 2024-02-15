@@ -29,7 +29,8 @@ const mapHeight = 2000;
 const webSocket = new WebSocket('ws://localhost:443/');
 
 webSocket.onmessage = (event) => {
-    console.log(event)
+    console.log(event);
+    receiveMessage(event.data);
 };
 webSocket.addEventListener("open", () => {
     console.log("We are connected");
@@ -321,15 +322,16 @@ function connect() {
 
     startAnimating();
     connected = true;
+    webSocket.send(userPlayer.username+" has connected.");
 }
 
 function sendMessage(msg, textbox) {
     if (msg.length > 0) {
-        log.textContent += userPlayer.username+" "+msg+"\n";
+        //log.textContent += userPlayer.username+" "+msg+"\n";
         textbox.clearTextbox();
         if (connected) {
             userPlayer.sayMessage(msg);
-            webSocket.send(msg);
+            webSocket.send("<" + userPlayer.username + "> " + msg);
         }
     }
 }
@@ -352,7 +354,7 @@ function setUser(usr, textbox) {
     if (!connected) {
         if (usr.length > 0) {
             userPlayer = new Player(250, 250);
-            userPlayer.username = "<"+usr+">";
+            userPlayer.username = usr;
             receiveMessage("Username set to "+userPlayer.username);
             textbox.setDisabled(true);
             TextInput.findInputByID("chatInput").setDisabled(false);

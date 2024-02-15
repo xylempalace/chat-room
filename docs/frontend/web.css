@@ -1,8 +1,10 @@
 .chatLog {
-    overflow-wrap: break-word;
-    max-height:80%;
-    min-height:80%;
+    max-height:80%; min-height:80%;
+
     margin-bottom:2em;
+
+    overflow-wrap: break-word;
+
     white-space:pre-line;
 }
 
@@ -12,35 +14,43 @@
 
 .inputButton {
     width:2em;
+
     height:2em;
 }
 
 .inputDiv {
     min-height: min-content;
+    
     width: max-content;
 }
 
 .chatBox {
     
-    height: 100px;
-    overflow: auto;
-    display: flex;
-    flex-direction: column-reverse;
-    overflow-y:auto;
-    width:215px;
-    float:left;
-    padding:0 0 0 5px;
-    position:relative;
-    float:left;
-    background: yellow;
-    height:80%;
-    min-height:90%;
+    height: 100px; height:100%;
+
+    width: 215px;
+
+    overflow: auto; overflow-y:auto;
+
+    display: flex; flex-direction: column-reverse;
+    
+    float: left;
+    
+    position: relative;
+    
+    padding: 0 0 0 5px;
     
     border-right: 1px #f8f7f3 solid;
+
+    background: yellow;
 }
 
 html,body{
-    height:95%;
-    min-height:95%; 
-    max-height:95%;
+    height:100%; min-height:95%; max-height:100%;
+
+	overflow:hidden;
+	
+    margin:0;
+
+    background: white;
 }

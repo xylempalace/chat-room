@@ -327,7 +327,7 @@ function printMessage(msg) {
     log.textContent += msg+"\n";
 }
 
-function recieveMessage(msg) {
+function receiveMessage(msg) {
     log.textContent += msg+"\n";
 }
 
@@ -342,7 +342,7 @@ function setUser(usr, textbox) {
         if (usr.length > 0) {
             userPlayer = new Player(250, 250);
             userPlayer.username = "<"+usr+">";
-            recieveMessage("Username set to "+userPlayer.username);
+            receiveMessage("Username set to "+userPlayer.username);
             textbox.setDisabled(true);
             TextInput.findInputByID("chatInput").setDisabled(false);
             

@@ -11,6 +11,14 @@ let beginTime = 0;
 const fps = 10;
 const fpms = 1000/fps;
 let frameHist = []
+const webSocket = new WebSocket('ws://localhost:443/');
+
+webSocket.onmessage = (event) => {
+    console.log(event)
+};
+webSocket.addEventListener("open", () => {
+    console.log("We are connected");
+});
 
 class TextInput {
     
@@ -187,6 +195,7 @@ function sendMessage(msg, textbox) {
         textbox.clearTextbox();
         if (connected) {
             userPlayer.sayMessage(msg);
+            webSocket.send(msg);
         }
     }
 }

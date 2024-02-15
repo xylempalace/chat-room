@@ -1,16 +1,29 @@
+//Text info
 const textInputs = [];
 const log = document.getElementById("values");
+
+//Canvas references
 let gameCanvas;
+let ctx;
+
+//Client information
 let connected = false;
-let typingUsername = "";
-let userMessage = "";
-let username = "";
 let userPlayer;
+
+//FPS tracking and measurement, debug
 let startTime = 0;
 let beginTime = 0;
-const fps = 10;
+const fps = 30;
 const fpms = 1000/fps;
-let frameHist = []
+const scriptStart = Date.now();
+
+//Camera properties
+let cameraX = 0;
+let cameraY = 0;
+let cameraW;
+let cameraH;
+const mapWidth = 2000;
+const mapHeight = 2000;
 
 class TextInput {
     
@@ -76,27 +89,113 @@ class TextInput {
     }
 }
 
+class DebugGraph {
+    
+    static frameHist = [];
+    
+    static updateFPSGraph(newData) {
+        DebugGraph.frameHist.push(newData);
+    }
+    
+    static drawFPSGraph (x, y, w, h, scale) {
+
+        //Bottom line
+        let prevColor = ctx.strokeStyle;
+        ctx.strokeStyle = "#AAAAAA";
+        ctx.beginPath();
+        ctx.moveTo(x, h+y);
+        ctx.lineTo(x+w, h+y);
+        ctx.stroke();
+
+        //Target line
+        ctx.strokeStyle = "#FFA500";
+        ctx.beginPath();
+        let targetFrameH = 0.2*h;
+        ctx.moveTo(x, targetFrameH+y);
+        ctx.lineTo(x+w, targetFrameH+y);
+        ctx.stroke();
+        
+        //Measured line
+        ctx.strokeStyle = "#000000";
+        ctx.beginPath(); // Start a new path
+        let posY = 1-((((DebugGraph.frameHist[DebugGraph.frameHist.length-1]/(fpms))))*0.8);
+        posY = Math.max(posY, 0);
+        posY = Math.min(posY, 1);
+        ctx.moveTo(x, (posY*h)+y); // Move the pen to leftmost at the frame percentage
+        for (let i = 0; i < DebugGraph.frameHist.length && i*scale < w; i++) {
+            posY = 1-((((DebugGraph.frameHist[DebugGraph.frameHist.length-(i+1)]/(fpms))))*0.8);
+            posY = Math.max(posY, 0);
+            posY = Math.min(posY, 1);
+            ctx.lineTo(x+(i*scale), (posY*h)+y); // Draw a line to previous frame interval
+            ctx.stroke(); // Render the path
+        }
+        
+        ctx.strokeStyle = prevColor;
+    }
+}
+
 class Player {
 
     static playerSizeX = 100;
     static playerSizeY = 100;
+    static playerMoveSpeed = 15;
     posX;
     posY;
+    destinationX;
+    destinationY;
+    velX = 0;
+    velY = 0;
+    username;
     speechBubbles = [];
 
-    constructor(posX, posY) {
+    constructor(posX, posY, username) {
         this.posX = posX;
         this.posY = posY;
+        this.username = username;
+    }
+    
+    warpTo(posX, posY) {
+        this.posX = posX;
+        this.posY = posY;
+    }
+    
+    walkTo(posX, posY) {
+        this.destinationX = posX;
+        this.destinationY = posY;
+        let angle = Math.atan2(posY-this.posY, posX-this.posX);
+        this.velX = Math.cos(angle)*this.constructor.playerMoveSpeed;
+        this.velY = Math.sin(angle)*this.constructor.playerMoveSpeed;
+    }
+    
+    update(deltaTime) {
+        if (this.velX != 0 && this.velY != 0) {
+            let nextX = this.posX + (this.velX*deltaTime);
+            let nextY = this.posY + (this.velY*deltaTime);
+            
+            if (Math.abs(nextX-this.destinationX) > Math.abs(this.posX-this.destinationX)) {
+                this.velX = 0;
+                this.posX = this.destinationX;
+            } else {
+                this.posX = nextX;
+            }
+            
+            if (Math.abs(nextY-this.destinationY) > Math.abs(this.posY-this.destinationY)) {
+                this.velY = 0;
+                this.posY = this.destinationY;
+            } else {
+                this.posY = nextY;
+            }
+        }
     }
 
     sayMessage(message) {
         var newBubble = new SpeechBubble(message);
         this.speechBubbles.unshift(newBubble);
-        //drawText(50, 50, newBubble.message);
     }
 
-    drawSpeechBubbles(cnv) {
+    drawSpeechBubbles() {
         var curBubble;
+        let vertOffset = (this.constructor.playerSizeY * 0.75);
         
         for (let i = 0; i < this.speechBubbles.length; i++) {
             
@@ -105,53 +204,86 @@ class Player {
                 this.speechBubbles.splice(i,i);
             } else {
 
-                //Centering the bubble and making sure the bubbles aren't on top of eachother
-                var bubbleCenterX = this.posX+(this.constructor.playerSizeX/2);
-                var bubbleCenterY = this.posY-((this.constructor.playerSizeY*0.25)  +(30*i));
+                //Centering the bubble and making sure the bubbles aren't on top of eachother       
+                var bubbleCenterX = this.posX;
+                var bubbleCenterY = this.posY-(vertOffset);
+
+                vertOffset += (curBubble.height);           
                 
-                curBubble.drawBubble(cnv, bubbleCenterX, bubbleCenterY);
+                curBubble.drawBubble(bubbleCenterX+cameraX, bubbleCenterY+cameraY);
 
             }
         }
     }
 
-    drawPlayer(cnv) {
-        var ctx = cnv.getContext("2d");
-        ctx.fillRect(this.posX, this.posY, this.constructor.playerSizeX, this.constructor.playerSizeY);
+    drawPlayer() {
+        let screenX = this.posX+cameraX-(this.constructor.playerSizeX/2);
+        let screenY = this.posY+cameraY-(this.constructor.playerSizeY/2);
+        ctx.fillRect(screenX, screenY, this.constructor.playerSizeX, this.constructor.playerSizeY);
     }
 }
 
 class SpeechBubble {
     static font = "30px Arial";
+    static fontHeight = 30;
     static lifeTime = 5000;
+    static maxWidth = 200;
     message;
     spawnTime;
     deathTime;
+    height;
 
     constructor (message) {
-        this.message = message;
         this.spawnTime = Date.now();
         this.deathTime = this.spawnTime+this.constructor.lifeTime;
+        if (ctx.measureText(message) < this.constructor.maxWidth) {
+            this.message[0] = message;
+        } else {
+            let words = message.split(" ");
+            let lines = [];
+            let currentLine = words[0];
+
+            for (var i = 1; i < words.length; i++) {
+                var word = words[i];
+                var width = ctx.measureText(currentLine + " " + word).width;
+                if (width < this.constructor.maxWidth) {
+                    currentLine += " " + word;
+                } else {
+                    lines.push(currentLine);
+                    currentLine = word;
+                }
+            }
+
+            lines.push(currentLine);
+
+            this.message = lines;
+        }
+        
+        this.height = this.message.length * this.constructor.fontHeight;
     }
 
     isOld() {
         return (Date.now() > this.deathTime);
     }
 
-    drawBubble(cnv, posX, posY) {
-        var ctx = cnv.getContext("2d");
+    drawBubble(posX, posY) {
         var prevAlign = ctx.textAlign;
         var prevFont = ctx.font;
         ctx.textAlign = 'center';
-        //ctx.font = this.speechBubbles.constructor.font;
-        
-        ctx.fillText(this.message, posX, posY);
-        
+        ctx.font = this.constructor.font;
+    
+        //Test string: Howdy hi hello how are we today friends?
+        for (let i = 0; i < this.message.length; i++) {
+            ctx.fillText(this.message[i], posX, posY-(this.constructor.fontHeight*(this.message.length-(1+i))));
+        } //Issue with this implementation, boxes will overlap, move bubbles in player class
+
         ctx.textAlign = prevAlign;
         ctx.font = prevFont;
     }
 }
 
+
+//Called when the page is finished loading
 document.addEventListener("readystatechange", (e) => {
     if (e.target.readyState === "complete") {
         const foundInputs = document.getElementsByClassName("inputDiv");
@@ -176,14 +308,14 @@ document.addEventListener("readystatechange", (e) => {
 });
 
 function connect() {
-    userPlayer = new Player(250, 250);
+
     startAnimating();
     connected = true;
 }
 
 function sendMessage(msg, textbox) {
     if (msg.length > 0) {
-        log.textContent += username+" "+msg+"\n";
+        log.textContent += userPlayer.username+" "+msg+"\n";
         textbox.clearTextbox();
         if (connected) {
             userPlayer.sayMessage(msg);
@@ -195,7 +327,7 @@ function printMessage(msg) {
     log.textContent += msg+"\n";
 }
 
-function recieveMessage(msg) {
+function receiveMessage(msg) {
     log.textContent += msg+"\n";
 }
 
@@ -203,14 +335,14 @@ function updateUser(e) {
     if (e.key=="Enter") {
         setUser();
     }
-    typingUsername = e.target.value;
 }
 
 function setUser(usr, textbox) {
     if (!connected) {
         if (usr.length > 0) {
-            username = "<"+usr+">";
-            recieveMessage("Username set to "+username);
+            userPlayer = new Player(250, 250);
+            userPlayer.username = "<"+usr+">";
+            receiveMessage("Username set to "+userPlayer.username);
             textbox.setDisabled(true);
             TextInput.findInputByID("chatInput").setDisabled(false);
             
@@ -228,51 +360,26 @@ function addCanvas() {
     canvas.style.position = "absolute";
     canvas.style.border = "1px solid";
     canvas.style.borderColor = "black";
+    canvas.addEventListener("mouseup", (e) => {
+        canvasClick(canvas, e)
+    });
     gameCanvas = canvas;
+    ctx = gameCanvas.getContext("2d");
     document.getElementById("gameSpace").appendChild(canvas);
 }
 
+function canvasClick(canvas, e) {
+    let canvasRect = canvas.getBoundingClientRect();
+    let x = e.clientX - canvasRect.left;
+    let y = e.clientY - canvasRect.top;
+    if (connected) {
+        userPlayer.walkTo(x, y);
+    }
+}
+
 function drawText(x, y, msg) {
-    var c = document.getElementById("gameCanvas");
-    var ctx = c.getContext("2d");
     ctx.font = "30px Arial";
     ctx.fillText(msg, x, y);
-}
-
-function updateFPSGraph (newFrame, timestamp) {
-    frameHist.push(frameLength);
-    drawFPSGraph(0, 0, 500, 200, 6);
-}
-
-function drawFPSGraph (x, y, w, h, scale) {
-    var c = document.getElementById("gameCanvas");
-    var ctx = c.getContext("2d");
-
-    var prevColor = ctx.fillStyle;
-    ctx.fillStyle = "00ff00";
-    ctx.beginPath();
-    ctx.moveTo(x, h+y);
-    ctx.lineTo(x+w, h+y);
-    ctx.stroke();
-
-    prevColor = ctx.fillStyle;
-    ctx.fillStyle = "#FFA500";
-    ctx.beginPath();
-    var targetFrameH = 1-(0.8*h);
-    ctx.moveTo(x, targetFrameH+y);
-    ctx.lineTo(x+w, targetFrameH+y);
-    ctx.stroke();
-    
-    ctx.fillStyle = "#000000";
-    ctx.beginPath(); // Start a new path
-    ctx.moveTo(x, ((frameHist[frameHist.length-1]/fpms)*h)+y); // Move the pen to leftmost at the frame percentage
-    for (let i = 0; i < frameHist.length && (i+1)*scale < w; i++) {
-        var posY = 1-((((frameHist[frameHist.length-(i+1)]/(fpms))))*0.8);
-        console.log(posY);
-        ctx.lineTo(x+(i*scale), (posY*h)+y); // Draw a line to previous frame interval
-        ctx.stroke(); // Render the path
-    }
-    
 }
 
 function startAnimating() {
@@ -280,24 +387,34 @@ function startAnimating() {
     drawScreen();
 }
 
+function truncateNumber(num, decimalPlaces) {
+    return Math.floor(num * (decimalPlaces * 10)) / (decimalPlaces * 10);
+}
+
 function drawScreen() {
-    beginTime = Date.now();
-    var c = document.getElementById("gameCanvas");
-    var ctx = c.getContext("2d");
-    ctx.clearRect(0, 0, c.width, c.height);
-    userPlayer.drawPlayer(gameCanvas);
-    userPlayer.drawSpeechBubbles(gameCanvas);
-    var fpsDecimalPlaces = 1;
-    var measuredFPS = (Math.floor((1000/(Date.now()-startTime))*(fpsDecimalPlaces*10)))/(fpsDecimalPlaces*10);
-    drawText(25, 25, "FPS: "+measuredFPS);
     
-    startTime = Date.now();
-    
-    frameLength = Math.min(fpms-(Date.now()-beginTime),fpms);
-    updateFPSGraph(measuredFPS, beginTime);
+    //Waits fpms miliseconds before starting the next frame
     setTimeout(() => {
+        beginTime = Date.now();
         requestAnimationFrame(drawScreen);
     }, fpms);
     
+    ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+    userPlayer.drawPlayer(gameCanvas);
+    userPlayer.drawSpeechBubbles(gameCanvas);
+    userPlayer.update((Date.now()-startTime)/100);
+    
+    startTime = Date.now();
+    var fpsDecimalPlaces = 1;
+    var measuredFPS = ((startTime-beginTime))*(fpsDecimalPlaces*10);
+    drawText(25, 25, "FPS: " + truncateNumber(measuredFPS, fpsDecimalPlaces));
+    drawText(25, 50, "Target MSPF: "+ truncateNumber(fpms, fpsDecimalPlaces)); //Target miliseconds per frame
+    
+    frameLength = Math.min(fpms-(Date.now()-beginTime),fpms);
+    cameraX += 20*((Date.now()-startTime)/100);
+
+    //Updates FPS graph
+    DebugGraph.updateFPSGraph(frameLength);
+    DebugGraph.drawFPSGraph(0, 30, 250, 100, 3);    
     
 }

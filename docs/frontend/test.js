@@ -18,12 +18,50 @@ const fpms = 1000/fps;
 const scriptStart = Date.now();
 
 //Camera properties
-let cameraX = 0;
-let cameraY = 0;
-let cameraW;
-let cameraH;
-const mapWidth = 2000;
-const mapHeight = 2000;
+let activeCamera;
+let cameraList = [];
+
+let otherPlayers = [];
+
+class Vector2 {
+    
+    x;
+    y;
+    
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+    
+    get screenPos() {
+        let v = new Vector2(activeCamera.pos.x + this.x/* - (activeCamera.width/2)*/, activeCamera.pos.y + this.y/* - (activeCamera.height/2)*/);
+        return v;
+    }
+    
+    get normalized() {
+        return Math.atan2(this.y, this.x);
+    }
+
+    static get zero() {
+        return new Vector2(0,0);
+    }
+}
+
+class GameObject {
+    pos;
+    id;
+
+    constructor (id, pos) {
+        this.id = id;
+        this.pos = pos;
+    }
+
+    get x () {return this.pos.x;}
+    get y () {return this.pos.y;}
+
+    set x (v) {this.pos.x = v;}
+    set y (v) {this.pos.y = v;}
+}
 
 class TextInput {
     
@@ -134,56 +172,93 @@ class DebugGraph {
     }
 }
 
-class Player {
+class Camera extends GameObject {
+    moveZoneWidth;
+    moveZoneHeight;
+    width;
+    height;
+    id;
+    
+    constructor(id, pos, mzw, mzh) {
+        super("CAMERA-"+id, pos);
+        this.moveZoneWidth = mzw;
+        this.moveZoneHeight = mzh;
+        if (gameCanvas != null) {
+            this.width = gameCanvas.width;
+            this.height = gameCanvas.height;
+        }
+    }
+    
+    warpTo (pos) {
+        this.pos = pos;
+    }
+    
+    follow (pos) {
 
+        if (pos.x > (this.width * (1 - this.moveZoneWidth)) - this.pos.x) {
+            this.pos.x -= pos.x - ((this.width * (1 - this.moveZoneWidth)) - this.pos.x);
+        } else if (pos.x < (this.width * this.moveZoneWidth) - this.pos.x) {
+            this.pos.x -= pos.x - ((this.width * this.moveZoneWidth) - this.pos.x);
+        }
+        
+        if (pos.y > (this.height * (1 - this.moveZoneHeight)) - this.pos.y) {
+            this.pos.y -= pos.y - ((this.height * (1-this.moveZoneHeight)) - this.pos.y);
+        } else if (pos.y < (this.height * this.moveZoneHeight) - this.pos.y) {
+            this.pos.y -= pos.y - ((this.height * this.moveZoneHeight) - this.pos.y);
+        }
+    }
+}
+
+class World {
+    static spawnPos = new Vector2(250, 250);
+}
+
+class Player extends GameObject {
     static playerSizeX = 100;
     static playerSizeY = 100;
     static playerMoveSpeed = 15;
-    posX;
-    posY;
-    destinationX;
-    destinationY;
+    destination = Vector2.zero;
     velX = 0;
     velY = 0;
     username;
     speechBubbles = [];
+    color;
 
-    constructor(posX, posY, username) {
-        this.posX = posX;
-        this.posY = posY;
+    constructor(id, pos, username, color) {
+        super ("PLAYER-"+username, pos);
         this.username = username;
+        this.color = color;
     }
     
-    warpTo(posX, posY) {
-        this.posX = posX;
-        this.posY = posY;
+    warpTo(pos) {
+        this.pos = pos;
     }
     
-    walkTo(posX, posY) {
-        this.destinationX = posX;
-        this.destinationY = posY;
-        let angle = Math.atan2(posY-this.posY, posX-this.posX);
+    walkTo(pos) {
+        this.destination.x = pos.x - activeCamera.pos.x;
+        this.destination.y = pos.y - activeCamera.pos.y;
+        let angle = Math.atan2(pos.y-this.pos.y, pos.x-this.pos.x);
         this.velX = Math.cos(angle)*this.constructor.playerMoveSpeed;
         this.velY = Math.sin(angle)*this.constructor.playerMoveSpeed;
     }
     
     update(deltaTime) {
         if (this.velX != 0 && this.velY != 0) {
-            let nextX = this.posX + (this.velX*deltaTime);
-            let nextY = this.posY + (this.velY*deltaTime);
+            let nextX = this.x + (this.velX*deltaTime);
+            let nextY = this.y + (this.velY*deltaTime);
             
-            if (Math.abs(nextX-this.destinationX) > Math.abs(this.posX-this.destinationX)) {
+            if (Math.abs(nextX-this.destination.x) > Math.abs(this.pos.x-this.destination.x)) {
                 this.velX = 0;
-                this.posX = this.destinationX;
+                this.pos.x = this.destination.x;
             } else {
-                this.posX = nextX;
+                this.pos.x = nextX;
             }
             
-            if (Math.abs(nextY-this.destinationY) > Math.abs(this.posY-this.destinationY)) {
+            if (Math.abs(nextY-this.destination.y) > Math.abs(this.pos.y-this.destination.y)) {
                 this.velY = 0;
-                this.posY = this.destinationY;
+                this.pos.y = this.destination.y;
             } else {
-                this.posY = nextY;
+                this.pos.y = nextY;
             }
         }
     }
@@ -205,21 +280,35 @@ class Player {
             } else {
 
                 //Centering the bubble and making sure the bubbles aren't on top of eachother       
-                var bubbleCenterX = this.posX;
-                var bubbleCenterY = this.posY-(vertOffset);
+                var bubbleCenterX = this.pos.x;
+                var bubbleCenterY = this.pos.y-(vertOffset);
 
                 vertOffset += (curBubble.height);           
                 
-                curBubble.drawBubble(bubbleCenterX+cameraX, bubbleCenterY+cameraY);
+                curBubble.drawBubble(bubbleCenterX+activeCamera.pos.x, bubbleCenterY+activeCamera.pos.y);
 
             }
         }
     }
 
     drawPlayer() {
-        let screenX = this.posX+cameraX-(this.constructor.playerSizeX/2);
-        let screenY = this.posY+cameraY-(this.constructor.playerSizeY/2);
+        let screenX = this.pos.screenPos.x-(this.constructor.playerSizeX/2);
+        let screenY = this.pos.screenPos.y-(this.constructor.playerSizeY/2);
+
+        let prevColor = ctx.strokeStyle;
+        ctx.fillStyle = this.color;
         ctx.fillRect(screenX, screenY, this.constructor.playerSizeX, this.constructor.playerSizeY);
+        ctx.fillStyle = prevColor;
+        
+        var prevAlign = ctx.textAlign;
+        var prevFont = ctx.font;
+        ctx.textAlign = 'center';
+        ctx.font = this.constructor.font;
+    
+        ctx.fillText("<" + this.username + ">", this.pos.screenPos.x, this.pos.screenPos.y + (this.constructor.playerSizeY*.75));
+
+        ctx.textAlign = prevAlign;
+        ctx.font = prevFont;
     }
 }
 
@@ -282,7 +371,6 @@ class SpeechBubble {
     }
 }
 
-
 //Called when the page is finished loading
 document.addEventListener("readystatechange", (e) => {
     if (e.target.readyState === "complete") {
@@ -306,12 +394,6 @@ document.addEventListener("readystatechange", (e) => {
     }
 
 });
-
-function connect() {
-
-    startAnimating();
-    connected = true;
-}
 
 function sendMessage(msg, textbox) {
     if (msg.length > 0) {
@@ -340,15 +422,22 @@ function updateUser(e) {
 function setUser(usr, textbox) {
     if (!connected) {
         if (usr.length > 0) {
-            userPlayer = new Player(250, 250);
-            userPlayer.username = "<"+usr+">";
+            userPlayer = new Player(usr, World.spawnPos, usr, "#FF0000");
             receiveMessage("Username set to "+userPlayer.username);
+            cameraList.push(new Camera("playerCam", Vector2.zero, 0.2, 0.2));
+            activeCamera = cameraList[cameraList.length-1];
             textbox.setDisabled(true);
             TextInput.findInputByID("chatInput").setDisabled(false);
             
             connect();
         }
     }
+}
+
+function connect() {
+    startAnimating();
+    otherPlayers.push(new Player("Gheist", new Vector2(50, 50), "Gheist", "#55DCAA"));
+    connected = true;
 }
 
 function addCanvas() {
@@ -363,6 +452,10 @@ function addCanvas() {
     canvas.addEventListener("mouseup", (e) => {
         canvasClick(canvas, e)
     });
+    
+    cameraList.push(new Camera("default", Vector2.zero, 0.2, 0.2));
+    activeCamera = cameraList[0];
+    
     gameCanvas = canvas;
     ctx = gameCanvas.getContext("2d");
     document.getElementById("gameSpace").appendChild(canvas);
@@ -373,7 +466,7 @@ function canvasClick(canvas, e) {
     let x = e.clientX - canvasRect.left;
     let y = e.clientY - canvasRect.top;
     if (connected) {
-        userPlayer.walkTo(x, y);
+        userPlayer.walkTo(new Vector2(x, y));
     }
 }
 
@@ -399,10 +492,18 @@ function drawScreen() {
         requestAnimationFrame(drawScreen);
     }, fpms);
     
+    activeCamera.follow(userPlayer.pos);
+
     ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
     userPlayer.drawPlayer(gameCanvas);
     userPlayer.drawSpeechBubbles(gameCanvas);
-    userPlayer.update((Date.now()-startTime)/100);
+    userPlayer.update(fpms/(Date.now()-startTime));
+    
+    otherPlayers.forEach((element) => {
+        element.drawPlayer(gameCanvas);
+        element.drawSpeechBubbles(gameCanvas);
+        element.update((Date.now()-startTime)/fpms);
+    });
     
     startTime = Date.now();
     var fpsDecimalPlaces = 1;
@@ -411,7 +512,6 @@ function drawScreen() {
     drawText(25, 50, "Target MSPF: "+ truncateNumber(fpms, fpsDecimalPlaces)); //Target miliseconds per frame
     
     frameLength = Math.min(fpms-(Date.now()-beginTime),fpms);
-    cameraX += 20*((Date.now()-startTime)/100);
 
     //Updates FPS graph
     DebugGraph.updateFPSGraph(frameLength);

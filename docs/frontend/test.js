@@ -428,17 +428,12 @@ function ToggleDarkMode() {
 
     const chatBoxReference = document.getElementById("chatBox");
     if (!isDark) {
-        /* changes color of webpage's background */
-        document.body.style.background = "grey";
-
-        /* changes color of the chatbox itself */
-        chatBoxReference.style.background = "black";
-
-        /* changes color of text in chat box */
-        log.style.color = "white";
-
-        /* enables dark mode */
+        /* enables dark mode flag */
         isDark = !isDark;
+
+        /* changes color of webpage's background */
+        document.body.style.background = rgb(54, 54, 54);
+
     }
 
     else {
@@ -447,9 +442,6 @@ function ToggleDarkMode() {
 
         /* changes color of the chatbox itself */
         chatBoxReference.style.background = "lightgrey";
-
-        /* changes color of text in chat box */
-        log.style.color = "black";
 
         /* disables off dark mode */
         isDark = !isDark;

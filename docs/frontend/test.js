@@ -34,17 +34,26 @@ class Vector2 {
     }
     
     get screenPos() {
-        let v = new Vector2(activeCamera.pos.x + this.x/* - (activeCamera.width/2)*/, activeCamera.pos.y + this.y/* - (activeCamera.height/2)*/);
+        let v = new Vector2(
+        (this.x + (activeCamera.width/2)) - activeCamera.pos.x , 
+        (this.y + (activeCamera.height/2)) - activeCamera.pos.y
+        );
         return v;
     }
     
     get normalized() {
-        return Math.atan2(this.y, this.x);
+        let a = Math.atan2(this.y, this.x);
+        return new Vector2(Math.cos(a), Math.sin(a));
+    }
+
+    get toString() {
+        return "X: " + truncateNumber(this.x, 1) + "   Y: " + truncateNumber(this.y, 1);
     }
 
     static get zero() {
         return new Vector2(0,0);
     }
+
 }
 
 class GameObject {
@@ -175,20 +184,26 @@ class DebugGraph {
 }
 
 class Camera extends GameObject {
-    moveZoneWidth;
-    moveZoneHeight;
+    moveDist;
     width;
     height;
     id;
     
-    constructor(id, pos, mzw, mzh) {
+    halfWidth;
+    halfHeight;
+    
+    constructor(id, pos, mDist, mzh) {
         super("CAMERA-"+id, pos);
-        this.moveZoneWidth = mzw;
-        this.moveZoneHeight = mzh;
+    
         if (gameCanvas != null) {
             this.width = gameCanvas.width;
             this.height = gameCanvas.height;
+            this.halfWidth = this.width / 2;
+            this.halfHeight = this.height / 2;
         }
+        
+        this.moveDist = mDist * Math.min(this.width, this.height);
+        receiveMessage(this.moveDist);
     }
     
     warpTo (pos) {
@@ -196,18 +211,24 @@ class Camera extends GameObject {
     }
     
     follow (pos) {
-
-        if (pos.x > (this.width * (1 - this.moveZoneWidth)) - this.pos.x) {
-            this.pos.x -= pos.x - ((this.width * (1 - this.moveZoneWidth)) - this.pos.x);
-        } else if (pos.x < (this.width * this.moveZoneWidth) - this.pos.x) {
-            this.pos.x -= pos.x - ((this.width * this.moveZoneWidth) - this.pos.x);
-        }
+        let dif = new Vector2(
+            pos.x - (this.pos.x),
+            pos.y - (this.pos.y)
+        );
         
-        if (pos.y > (this.height * (1 - this.moveZoneHeight)) - this.pos.y) {
-            this.pos.y -= pos.y - ((this.height * (1-this.moveZoneHeight)) - this.pos.y);
-        } else if (pos.y < (this.height * this.moveZoneHeight) - this.pos.y) {
-            this.pos.y -= pos.y - ((this.height * this.moveZoneHeight) - this.pos.y);
+        let sqrHypotenuse = (dif.x * dif.x) + (dif.y * dif.y);
+        if (sqrHypotenuse > this.moveDist * this.moveDist) {
+            this.x += dif.normalized.x * Math.abs(dif.x/10);
+            this.y += dif.normalized.y * Math.abs(dif.y/10);
         }
+    }
+    
+    get centerPos () {
+        let cPos = new Vector2 (
+            this.pos.x + this.halfWidth,
+            this.pos.y + this.halfHeight
+        )
+        return cPos;
     }
 }
 
@@ -237,11 +258,14 @@ class Player extends GameObject {
     }
     
     walkTo(pos) {
-        this.destination.x = pos.x - activeCamera.pos.x;
-        this.destination.y = pos.y - activeCamera.pos.y;
-        let angle = Math.atan2(pos.y-this.pos.y, pos.x-this.pos.x);
+        this.destination = pos;
+        let angle = Math.atan2(this.destination.y-this.pos.y, this.destination.x-this.pos.x);
         this.velX = Math.cos(angle)*this.constructor.playerMoveSpeed;
         this.velY = Math.sin(angle)*this.constructor.playerMoveSpeed;
+        
+        receiveMessage("Vel X: " + truncateNumber(this.velX,1) + "   Vel Y: " + truncateNumber(this.velY,1));
+        receiveMessage("Angle: " + truncateNumber(angle,1));
+        receiveMessage("Cam X: " + truncateNumber(activeCamera.x,1) + "   Cam Y: " + truncateNumber(activeCamera.y,1)+"\n");
     }
     
     update(deltaTime) {
@@ -249,6 +273,9 @@ class Player extends GameObject {
             let nextX = this.x + (this.velX*deltaTime);
             let nextY = this.y + (this.velY*deltaTime);
             
+            //receiveMessage("Next: " + (nextX - this.destination.x) + "    Cur: " + (this.pos.x - this.destination.x));
+
+            // checks if current location is further than your "destination" 
             if (Math.abs(nextX-this.destination.x) > Math.abs(this.pos.x-this.destination.x)) {
                 this.velX = 0;
                 this.pos.x = this.destination.x;
@@ -287,7 +314,7 @@ class Player extends GameObject {
 
                 vertOffset += (curBubble.height);           
                 
-                curBubble.drawBubble(bubbleCenterX+activeCamera.pos.x, bubbleCenterY+activeCamera.pos.y);
+                curBubble.drawBubble(bubbleCenterX+this.pos.x, bubbleCenterY+activeCamera.pos.y);
 
             }
         }
@@ -426,7 +453,7 @@ function setUser(usr, textbox) {
         if (usr.length > 0) {
             userPlayer = new Player(usr, World.spawnPos, usr, "#FF0000");
             receiveMessage("Username set to "+userPlayer.username);
-            cameraList.push(new Camera("playerCam", Vector2.zero, 0.2, 0.2));
+            cameraList.push(new Camera("playerCam", Vector2.zero, 0));
             activeCamera = cameraList[cameraList.length-1];
             textbox.setDisabled(true);
             TextInput.findInputByID("chatInput").setDisabled(false);
@@ -438,7 +465,11 @@ function setUser(usr, textbox) {
 
 function connect() {
     startAnimating();
-    otherPlayers.push(new Player("Gheist", new Vector2(50, 50), "Gheist", "#55DCAA"));
+    otherPlayers.push(new Player("(0, 0)", new Vector2(0, 0), "(0, 0)", "#00FF00"));
+    otherPlayers.push(new Player("(0, 300)", new Vector2(0, 300), "(0, 300)", "#FF0000"));
+    otherPlayers.push(new Player("(0, -300)", new Vector2(0, -300), "(0, -300)", "#FFFF00"));
+    otherPlayers.push(new Player("(300, 0)", new Vector2(300, 0), "(300, 0)", "#0000FF"));
+    otherPlayers.push(new Player("(-300, 0)", new Vector2(-300, 0), "(-300, 0)", "#00FFFF"));
     connected = true;
 }
 
@@ -455,7 +486,7 @@ function addCanvas() {
         canvasClick(canvas, e)
     });
     
-    cameraList.push(new Camera("default", Vector2.zero, 0.2, 0.2));
+    cameraList.push(new Camera("default", Vector2.zero, 0.01));
     activeCamera = cameraList[0];
     
     gameCanvas = canvas;
@@ -464,12 +495,18 @@ function addCanvas() {
 }
 
 function canvasClick(canvas, e) {
+    
     let canvasRect = canvas.getBoundingClientRect();
-    let x = e.clientX - canvasRect.left;
-    let y = e.clientY - canvasRect.top;
     if (connected) {
-        userPlayer.walkTo(new Vector2(x, y));
+        
+        let worldClick = new Vector2(
+            (e.clientX + activeCamera.pos.x) - (canvasRect.left + activeCamera.halfWidth), 
+            (e.clientY + activeCamera.pos.y) - (canvasRect.top + activeCamera.halfHeight)
+        );
+
+        userPlayer.walkTo(worldClick);
     }
+    
 }
 
 function drawText(x, y, msg) {
@@ -499,7 +536,7 @@ function drawScreen() {
     ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
     userPlayer.drawPlayer(gameCanvas);
     userPlayer.drawSpeechBubbles(gameCanvas);
-    userPlayer.update(fpms/(Date.now()-startTime));
+    userPlayer.update((Date.now()-startTime) / fpms);
     
     otherPlayers.forEach((element) => {
         element.drawPlayer(gameCanvas);

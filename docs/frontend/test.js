@@ -23,6 +23,14 @@ let cameraList = [];
 
 let otherPlayers = [];
 
+addEventListener("resize", (event) => {
+    cameraList.forEach((element) => {
+        gameCanvas.width  = document.getElementById('gameSpace').clientWidth*0.8;
+        gameCanvas.height = document.getElementById('gameSpace').clientHeight;
+        element.resize();
+    })
+});
+
 class Vector2 {
     
     x;
@@ -188,11 +196,12 @@ class Camera extends GameObject {
     width;
     height;
     id;
+    scale;
     
     halfWidth;
     halfHeight;
     
-    constructor(id, pos, mDist, mzh) {
+    constructor(id, pos, mDist) {
         super("CAMERA-"+id, pos);
     
         if (gameCanvas != null) {
@@ -220,6 +229,15 @@ class Camera extends GameObject {
         if (sqrHypotenuse > this.moveDist * this.moveDist) {
             this.x += dif.normalized.x * Math.abs(dif.x/10);
             this.y += dif.normalized.y * Math.abs(dif.y/10);
+        }
+    }
+
+    resize () {
+        if (gameCanvas != null) {
+            this.width = gameCanvas.width;
+            this.height = gameCanvas.height;
+            this.halfWidth = this.width / 2;
+            this.halfHeight = this.height / 2;
         }
     }
     

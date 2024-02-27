@@ -24,25 +24,35 @@ app.get('/web.css', (req, res) => {
 })
 
 app.get('/test.js', (req, res) => {
-  res.set('Content-Type', 'text/javascript');
+ res.set('Content-Type', 'text/javascript');
   res.sendFile(path.join(__dirname, '../frontend/test.js'));
 })
 
+app.get('/favicon.ico', (req, res) => {
+  res.set('Content-Type', '	image/vnd.microsoft.icon');
+  res.sendFile(path.join(__dirname, '../images/favicon.ico'));
+})
+
+app.get('/lemEngine.js', (req, res) => {
+  res.set('Content-Type', 'text/javascript');
+   res.sendFile(path.join(__dirname, '../frontend/lemEngine.js'));
+ })
+
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
+  console.log(`Example app listening on port ${port}`);
 })
 
 sockserver.on('connection', ws => {
-  console.log('New client connected!')
-  ws.send('connection established')
-  ws.on('close', () => console.log('Client has disconnected!'))
+  console.log('New client connected!');
+  ws.send('connection established');
+  ws.on('close', () => console.log('Client has disconnected!'));
   ws.on('message', data => {
     sockserver.clients.forEach(client => {
-      console.log(`distributing message: ${data}`)
-      client.send(`${data}`)
+      console.log(`distributing message: ${data}`);
+      client.send(`${data}`);
     })
   })
   ws.onerror = function () {
-    console.log('websocket error')
+    console.log('websocket error');
   }
 })

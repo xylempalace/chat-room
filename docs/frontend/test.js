@@ -297,7 +297,9 @@ function sendMessage(msg, textbox) {
         textbox.clearTextbox();
         if (connected) {
             userPlayer.sayMessage(msg);
-            webSocket.send("<" + userPlayer.username + "> " + msg);
+            webSocket.send(JSON.stringify({
+                msg: `${msg}`
+            }));
         }
     }
 }
@@ -343,7 +345,9 @@ function connect() {
     otherPlayers.push(new Player("(-" + centerDist + ", 0)", new Vector2(-centerDist, 0), "(-" + centerDist + ", 0)", "#00FFFF"));
     connected = true;
 
-    webSocket.send(userPlayer.username+" has connected.");
+    webSocket.send(JSON.stringify({
+        msg: userPlayer.username+" has connected."
+    }));
 }
 
 function startAnimating() {

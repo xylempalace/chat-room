@@ -8,6 +8,17 @@ let connected = false;
 let userPlayer;
 let otherPlayers = [];
 
+// WebSocket Stuff
+const webSocket = new WebSocket('ws://localhost:443/');
+
+webSocket.onmessage = (event) => {
+    console.log(event);
+    receiveMessage(event.data);
+};
+webSocket.addEventListener("open", () => {
+    console.log("We are connected");
+});
+
 class TextInput {
     
     textInput;
@@ -282,10 +293,11 @@ document.addEventListener("readystatechange", (e) => {
 
 function sendMessage(msg, textbox) {
     if (msg.length > 0) {
-        log.textContent += userPlayer.username+" "+msg+"\n";
+        //log.textContent += userPlayer.username+" "+msg+"\n";
         textbox.clearTextbox();
         if (connected) {
             userPlayer.sayMessage(msg);
+            webSocket.send("<" + userPlayer.username + "> " + msg);
         }
     }
 }
@@ -330,6 +342,8 @@ function connect() {
     otherPlayers.push(new Player("(" + centerDist + ", 0)", new Vector2(centerDist, 0), "(" + centerDist + ", 0)", "#0000FF"));
     otherPlayers.push(new Player("(-" + centerDist + ", 0)", new Vector2(-centerDist, 0), "(-" + centerDist + ", 0)", "#00FFFF"));
     connected = true;
+
+    webSocket.send(userPlayer.username+" has connected.");
 }
 
 function startAnimating() {

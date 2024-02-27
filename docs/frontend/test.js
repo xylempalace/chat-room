@@ -1,6 +1,7 @@
 //Text info
 const textInputs = [];
 const log = document.getElementById("values");
+let isDark = false;
 
 //Canvas references
 let gameCanvas;
@@ -9,6 +10,7 @@ let ctx;
 //Client information
 let connected = false;
 let userPlayer;
+let otherPlayers = [];
 
 //FPS tracking and measurement, debug
 let startTime = 0;
@@ -20,8 +22,6 @@ const scriptStart = Date.now();
 //Camera properties
 let activeCamera;
 let cameraList = [];
-
-let otherPlayers = [];
 
 addEventListener("resize", (event) => {
     cameraList.forEach((element) => {
@@ -80,7 +80,22 @@ class GameObject {
     set y (v) {this.pos.y = v;}
 }
 
-let isDark = false;
+class Sprite {
+    id;
+    image;
+    centeredOffset;
+
+    constructor (image) {
+        this.id = image;
+        this.image = new Image();
+        this.image.src = './sprites/'+image; // Is this dangerous, given a custom input, eg "../[FILE NAME]", could a user potentially access files not intended?
+
+        this.centeredOffset = new Vector2(
+            -(this.image.width  / 2),
+            -(this.image.height / 2)
+        )
+    }
+}
 
 class TextInput {
     
@@ -212,7 +227,6 @@ class Camera extends GameObject {
         }
         
         this.moveDist = mDist * Math.min(this.width, this.height);
-        receiveMessage(this.moveDist);
     }
     
     warpTo (pos) {
@@ -254,6 +268,19 @@ class World {
     static spawnPos = new Vector2(250, 250);
 }
 
+class Cosmetic extends GameObject {
+    order;
+    halfHeight;
+    halfWidth;
+    img;
+    player;
+
+    constructor(id, image, player) {
+        super("COSMET-" + id, player.pos);
+        this.img = image;
+    }
+}
+
 class Player extends GameObject {
     static playerSizeX = 100;
     static playerSizeY = 100;
@@ -264,11 +291,16 @@ class Player extends GameObject {
     username;
     speechBubbles = [];
     color;
+    cosmetics = [];
 
     constructor(id, pos, username, color) {
         super ("PLAYER-"+username, pos);
         this.username = username;
         this.color = color;
+    }
+
+    setCosmetics(cosmeticArr) {
+        this.cosmetics = cosmeticArr;
     }
     
     warpTo(pos) {
@@ -280,18 +312,12 @@ class Player extends GameObject {
         let angle = Math.atan2(this.destination.y-this.pos.y, this.destination.x-this.pos.x);
         this.velX = Math.cos(angle)*this.constructor.playerMoveSpeed;
         this.velY = Math.sin(angle)*this.constructor.playerMoveSpeed;
-        
-        receiveMessage("Vel X: " + truncateNumber(this.velX,1) + "   Vel Y: " + truncateNumber(this.velY,1));
-        receiveMessage("Angle: " + truncateNumber(angle,1));
-        receiveMessage("Cam X: " + truncateNumber(activeCamera.x,1) + "   Cam Y: " + truncateNumber(activeCamera.y,1)+"\n");
     }
     
     update(deltaTime) {
         if (this.velX != 0 && this.velY != 0) {
             let nextX = this.x + (this.velX*deltaTime);
             let nextY = this.y + (this.velY*deltaTime);
-            
-            //receiveMessage("Next: " + (nextX - this.destination.x) + "    Cur: " + (this.pos.x - this.destination.x));
 
             // checks if current location is further than your "destination" 
             if (Math.abs(nextX-this.destination.x) > Math.abs(this.pos.x-this.destination.x)) {
@@ -317,7 +343,7 @@ class Player extends GameObject {
 
     drawSpeechBubbles() {
         var curBubble;
-        let vertOffset = (this.constructor.playerSizeY * 0.75);
+        let vertOffset = (this.constructor.playerSizeY * 1.25);
         
         for (let i = 0; i < this.speechBubbles.length; i++) {
             
@@ -327,12 +353,12 @@ class Player extends GameObject {
             } else {
 
                 //Centering the bubble and making sure the bubbles aren't on top of eachother       
-                var bubbleCenterX = this.pos.x;
-                var bubbleCenterY = this.pos.y-(vertOffset);
+                var bubbleCenterX = this.pos.screenPos.x;
+                var bubbleCenterY = this.pos.screenPos.y-(vertOffset);
 
                 vertOffset += (curBubble.height);           
                 
-                curBubble.drawBubble(bubbleCenterX+this.pos.x, bubbleCenterY+activeCamera.pos.y);
+                curBubble.drawBubble(bubbleCenterX, bubbleCenterY);
 
             }
         }
@@ -346,6 +372,8 @@ class Player extends GameObject {
         ctx.fillStyle = this.color;
         ctx.fillRect(screenX, screenY, this.constructor.playerSizeX, this.constructor.playerSizeY);
         ctx.fillStyle = prevColor;
+
+        //ctx.drawImage(img, this.pos.screenPos.x - (img.width / 2), this.pos.screenPos.y - (img.height / 2));
         
         var prevAlign = ctx.textAlign;
         var prevFont = ctx.font;
@@ -372,6 +400,8 @@ class SpeechBubble {
     constructor (message) {
         this.spawnTime = Date.now();
         this.deathTime = this.spawnTime+this.constructor.lifeTime;
+
+        // Checks if textbox is too long for one line, and, if so, breaks up into multiple lines
         if (ctx.measureText(message) < this.constructor.maxWidth) {
             this.message[0] = message;
         } else {
@@ -398,20 +428,21 @@ class SpeechBubble {
         this.height = this.message.length * this.constructor.fontHeight;
     }
 
+    //Returns true if the bubble is past its expiry time
     isOld() {
         return (Date.now() > this.deathTime);
     }
 
+    // Draws the current bubble object at the given coordinates
     drawBubble(posX, posY) {
         var prevAlign = ctx.textAlign;
         var prevFont = ctx.font;
         ctx.textAlign = 'center';
         ctx.font = this.constructor.font;
     
-        //Test string: Howdy hi hello how are we today friends?
         for (let i = 0; i < this.message.length; i++) {
             ctx.fillText(this.message[i], posX, posY-(this.constructor.fontHeight*(this.message.length-(1+i))));
-        } //Issue with this implementation, boxes will overlap, move bubbles in player class
+        }
 
         ctx.textAlign = prevAlign;
         ctx.font = prevFont;
@@ -484,10 +515,12 @@ function setUser(usr, textbox) {
 function connect() {
     startAnimating();
     otherPlayers.push(new Player("(0, 0)", new Vector2(0, 0), "(0, 0)", "#00FF00"));
-    otherPlayers.push(new Player("(0, 300)", new Vector2(0, 300), "(0, 300)", "#FF0000"));
-    otherPlayers.push(new Player("(0, -300)", new Vector2(0, -300), "(0, -300)", "#FFFF00"));
-    otherPlayers.push(new Player("(300, 0)", new Vector2(300, 0), "(300, 0)", "#0000FF"));
-    otherPlayers.push(new Player("(-300, 0)", new Vector2(-300, 0), "(-300, 0)", "#00FFFF"));
+
+    let centerDist = 500;
+    otherPlayers.push(new Player("(0, " + centerDist + ")", new Vector2(0, centerDist), "(0, " + centerDist + ")", "#FF0000"));
+    otherPlayers.push(new Player("(0, -" + centerDist + ")", new Vector2(0, -centerDist), "(0, -" + centerDist + ")", "#FFFF00"));
+    otherPlayers.push(new Player("(" + centerDist + ", 0)", new Vector2(centerDist, 0), "(" + centerDist + ", 0)", "#0000FF"));
+    otherPlayers.push(new Player("(-" + centerDist + ", 0)", new Vector2(-centerDist, 0), "(-" + centerDist + ", 0)", "#00FFFF"));
     connected = true;
 }
 

@@ -8,8 +8,20 @@ let connected = false;
 let userPlayer;
 let otherPlayers = [];
 
+//Tilemap
+const backgroundTiles = [
+    new Sprite("tiles/floor.png"),
+    new Sprite("tiles/wall.png"),
+];
+const backgroundMap = new TileMap(new Vector2(0,0), backgroundTiles, 16, 4, 4, [
+    1, 1, 1, 1,
+    1, 0, 0, 1,
+    1, 0, 0, 1,
+    1, 1, 1, 1,
+]);
+
 // WebSocket Stuff
-const webSocket = new WebSocket('ws://localhost:443/');
+/*const webSocket = new WebSocket('ws://localhost:443/');
 
 webSocket.onmessage = (event) => {
     console.log(event);
@@ -17,7 +29,7 @@ webSocket.onmessage = (event) => {
 };
 webSocket.addEventListener("open", () => {
     console.log("We are connected");
-});
+});*/
 
 class TextInput {
     
@@ -334,7 +346,7 @@ function setUser(usr, textbox) {
 
 function connect() {
     
-    otherPlayers.push(new Player("(0, 0)", new Vector2(0, 0), "(0, 0)", "#00FF00"));
+    //otherPlayers.push(new Player("(0, 0)", new Vector2(0, 0), "(0, 0)", "#00FF00"));
 
     let centerDist = 500;
     otherPlayers.push(new Player("(0, " + centerDist + ")", new Vector2(0, centerDist), "(0, " + centerDist + ")", "#FF0000"));
@@ -343,7 +355,7 @@ function connect() {
     otherPlayers.push(new Player("(-" + centerDist + ", 0)", new Vector2(-centerDist, 0), "(-" + centerDist + ", 0)", "#00FFFF"));
     connected = true;
 
-    webSocket.send(userPlayer.username+" has connected.");
+    //webSocket.send(userPlayer.username+" has connected.");
 }
 
 function startAnimating() {
@@ -355,6 +367,9 @@ function update() {
     activeCamera.follow(userPlayer.pos);
 
     ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+
+    backgroundMap.draw();
+
     userPlayer.drawPlayer(gameCanvas);
     userPlayer.drawSpeechBubbles(gameCanvas);
     userPlayer.update((Date.now()-startTime) / fpms);

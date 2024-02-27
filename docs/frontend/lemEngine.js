@@ -93,21 +93,48 @@ class Sprite {
             -(this.image.height / 2)
         )
     }
+
+    draw (pos) {
+        //printMessage(x + ", " + y);
+        ctx.drawImage(this.image, pos.x, pos.y);
+    }
 }
 
 class TileMap {
+    pos;
     tiles = [];
     map = [];
     cols;
     rows;
     tileSize;
 
-    constructor (tiles, tileSize, cols, rows, map) {
+    constructor (pos, tiles, tileSize, cols, rows, map) {
+        this.pos = pos;
         this.tiles = tiles;
         this.tileSize = tileSize;
         this.cols = cols;
         this.rows = rows;
         this.map = map;
+    }
+
+    draw () {
+        let offsetPos = new Vector2(
+            this.pos.x - this.rows * this.tileSize / 2,
+            this.pos.y - this.cols * this.tileSize / 2
+        )
+        
+        for (let i = 0; i < this.cols; i++) {
+            for (let k = 0; k < this.rows; k++) {
+                if (i == 1 && k == 1) {
+                    console.log(this.map[(i*this.rows) + k]);
+                }
+                
+                this.tiles[this.map[(i*this.rows) + k]].draw(new Vector2(
+                    offsetPos.x + (k * this.tileSize),
+                    offsetPos.y + (i * this.tileSize)).screenPos
+                )
+            }
+        }
     }
 }
 

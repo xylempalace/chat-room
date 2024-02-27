@@ -298,6 +298,7 @@ function sendMessage(msg, textbox) {
         if (connected) {
             userPlayer.sayMessage(msg);
             webSocket.send(JSON.stringify({
+                id: userPlayer.username,
                 msg: `${msg}`
             }));
         }
@@ -346,6 +347,7 @@ function connect() {
     connected = true;
 
     webSocket.send(JSON.stringify({
+        id: userPlayer.username,
         msg: userPlayer.username+" has connected."
     }));
 }

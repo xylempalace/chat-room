@@ -46,12 +46,17 @@ app.listen(port, () => {
 sockserver.on('connection', ws => {
   console.log('New client connected!'); 
   ws.on('close', () => console.log('Client has disconnected!'));
-  ws.on('message', (data) => {
+  ws.on('message', (client, data) => {
     var obj = JSON.parse(data);
-    sockserver.clients.forEach(client => {
-      console.log(`distributing message: ${obj.msg}`);
-      client.send(`${obj.msg}`);
-    })
+
+    if ("msg" in obj) {
+      sockserver.clients.forEach(client => {
+        console.log(`distributing message: ${obj.msg}`);
+        client.send(`${obj.msg}`);
+      });
+    } else if ("id" in obj) {
+      clients[obj.id] = client;
+    }
   })
   ws.onerror = function () {
     console.log('websocket error');

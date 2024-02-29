@@ -12,8 +12,24 @@ let otherPlayers = [];
 const webSocket = new WebSocket('ws://localhost:443/');
 
 webSocket.onmessage = (event) => {
-    console.log(event);
-    receiveMessage(event.data);
+    var obj = JSON.parse(event.data);
+
+    if ("msg" in obj) {
+        receiveMessage(obj.msg);
+    } else if ("posX" in obj && userPlayer.username != obj.id) {
+        let p = otherPlayers.find((element) => {
+            console.log(`${element.username}    obj id: ${obj.id}    Equal: ${element.username == obj.id}`);
+            return element.username == obj.id;
+        })
+        console.log(p);
+
+        if (p != null) {
+            p.pos.x = obj.posX;
+            p.pos.y = obj.posY; 
+        } else {
+            otherPlayers.push(new Player(obj.id, new Vector2(obj.posX, obj.posY), obj.id, "#FF0000"));
+        }
+    }
 };
 webSocket.addEventListener("open", () => {
     console.log("We are connected");
@@ -323,6 +339,9 @@ function setUser(usr, textbox) {
     if (!connected) {
         if (usr.length > 0) {
             userPlayer = new Player(usr, World.spawnPos, usr, "#FF0000");
+            console.log(JSON.stringify({
+                id: `${userPlayer.username}`
+            }));
             receiveMessage("Username set to "+userPlayer.username);
             cameraList.push(new Camera("playerCam", Vector2.zero, 0));
             activeCamera = cameraList[cameraList.length-1];
@@ -345,11 +364,7 @@ function connect() {
     otherPlayers.push(new Player("(" + centerDist + ", 0)", new Vector2(centerDist, 0), "(" + centerDist + ", 0)", "#0000FF"));
     otherPlayers.push(new Player("(-" + centerDist + ", 0)", new Vector2(-centerDist, 0), "(-" + centerDist + ", 0)", "#00FFFF"));
     connected = true;
-
-    webSocket.send(JSON.stringify({
-        id: userPlayer.username,
-        msg: userPlayer.username+" has connected."
-    }));
+    serverUpdate();
 }
 
 function startAnimating() {
@@ -370,6 +385,17 @@ function update() {
         element.drawSpeechBubbles(gameCanvas);
         element.update((Date.now()-startTime)/fpms);
     });
+}
+
+function serverUpdate() {
+    setTimeout(() => {
+        serverUpdate();
+    }, 20);
+    webSocket.send(JSON.stringify({
+        id: userPlayer.username,
+        posX: userPlayer.pos.x,
+        posY: userPlayer.pos.y
+    }));
 }
 
 function rgb(r, g, b){

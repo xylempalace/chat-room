@@ -56,10 +56,10 @@ sockserver.on('connection', ws => {
 
   ws.on('message', (str) => {
     var obj = JSON.parse(str);
+    console.log(obj);
 
     if ("posX" in obj) {
       sockserver.clients.forEach(client => {
-        console.log(`distributing message: ${obj.id} has connected!`);
         client.send(JSON.stringify({
           id: obj.id,
           posX: obj.posX,

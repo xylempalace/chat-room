@@ -16,8 +16,19 @@ webSocket.onmessage = (event) => {
 
     if ("msg" in obj) {
         receiveMessage(obj.msg);
-    } else if ("posX" in obj) {
-        otherPlayers
+    } else if ("posX" in obj && userPlayer.username != obj.id) {
+        let p = otherPlayers.find((element) => {
+            console.log(`${element.username}    obj id: ${obj.id}    Equal: ${element.username == obj.id}`);
+            return element.username == obj.id;
+        })
+        console.log(p);
+
+        if (p != null) {
+            p.pos.x = obj.posX;
+            p.pos.y = obj.posY; 
+        } else {
+            otherPlayers.push(new Player(obj.id, new Vector2(obj.posX, obj.posY), obj.id, "#FF0000"));
+        }
     }
 };
 webSocket.addEventListener("open", () => {
@@ -329,9 +340,6 @@ function setUser(usr, textbox) {
         if (usr.length > 0) {
             userPlayer = new Player(usr, World.spawnPos, usr, "#FF0000");
             console.log(JSON.stringify({
-                id: `${userPlayer.username}`
-            }));
-            webSocket.send(JSON.stringify({
                 id: `${userPlayer.username}`
             }));
             receiveMessage("Username set to "+userPlayer.username);

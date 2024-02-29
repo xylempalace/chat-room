@@ -1,5 +1,16 @@
+html,body{
+    height:100%; min-height:95%; max-height:100%;
+
+    overflow-x: auto;
+    overflow-y: auto;
+    
+    margin:0;
+
+    background: white;
+}
+
 .chatLog {
-    max-height:80%; min-height:80%;
+    height: fit-content;
 
     margin-bottom:2em;
 
@@ -10,6 +21,25 @@
     color: black;
 }
 
+.chatBox { 
+    height: -webkit-fill-available;
+
+    width: 215px;
+
+    overflow: auto;
+
+    display: block; 
+    
+    padding: 5px;
+
+    border: 3px black solid;
+
+    border-width: thin;
+
+    background: lightgray;
+}
+
+/* username and chatbox thingies */
 .inputText {
     height:1.5em;
 }
@@ -26,40 +56,10 @@
     width: max-content;
 }
 
-.chatBox {
-    
-    height: 100px; height:10%;
+.gameCanvas {
+    background-color: lightgray;
 
-    width: 215px;
+    position: "relative";
 
-    overflow: auto; overflow-y:auto;
-
-    display: flex; flex-direction: column-reverse;
-    
-    float: left;
-    
-    position: relative;
-
-    margin-bottom: 2em;
-    
-    padding: 0 0 0 5px;
-
-    border: 3px black solid;
-
-    border-width: thin;
-/*    
-    border-top: 3px black solid; border-bottom: 3px black solid; border-right: 2px black solid; border-left: black solid;  
-*/
-
-    background: lightgray;
-}
-
-html,body{
-    height:100%; min-height:95%; max-height:100%;
-
-	overflow:hidden;
-	
-    margin:0;
-
-    background: white;
+    border: 0.5rem outset rgb(189, 188, 188);
 }

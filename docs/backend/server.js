@@ -11,9 +11,22 @@ const port = 3000
 //Import path library
 const path = require('path')
 
-const Filter = require('bad-words');
+const {
+	RegExpMatcher,
+	TextCensor,
+	englishDataset,
+	englishRecommendedTransformers,
+} = require('obscenity');
+
+const matcher = new RegExpMatcher({
+	...englishDataset.build(),
+	...englishRecommendedTransformers,
+});
+
+const censor = new TextCensor();
+const input = 'fuck you little bitch';
  
-let filter = new Filter();
+
 
 var clients = [];
 
@@ -54,8 +67,11 @@ sockserver.on('connection', ws => {
     var obj = JSON.parse(str);
 
     if ("msg" in obj) {
-      console.log(filter.clean(obj.msg));
+     // console.log(filter.clean(obj.msg));
       sockserver.clients.forEach(client => {
+        const matches = matcher.getAllMatches(obj.msg);
+        var newmsg = (censor.applyTo(obj.msg, matches));
+        obj.msg = newmsg; 
         console.log(`distributing message: ${obj.msg}`);
         client.send(`${obj.msg}`);
       });

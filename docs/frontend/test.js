@@ -43,14 +43,28 @@ const webSocket = new WebSocket('ws://localhost:443/');
 webSocket.onmessage = (event) => {
     var obj = JSON.parse(event.data);
 
-    if ("msg" in obj) {
-        receiveMessage(obj.msg);
-    } else if ("posX" in obj && userPlayer.username != obj.id) {
-        let p = otherPlayers.find((element) => {
-            console.log(`${element.username}    obj id: ${obj.id}    Equal: ${element.username == obj.id}`);
+    if ("expired" in obj) {
+        let p = otherPlayers.findIndex((element) => {
             return element.username == obj.id;
         })
-        console.log(p);
+        console.log("Splicing" + p + obj.id);
+        otherPlayers = otherPlayers.splice(p, 1);
+        console.log("Spliced");
+    } else if ("msg" in obj) {
+        receiveMessage(`<${obj.id}> ${obj.msg}`);
+        let p = otherPlayers.find((element) => {
+            return element.username == obj.id;
+        })
+
+        if (p != null) {
+            p.sayMessage(obj.msg);
+        }
+    } else if ("joinMsg" in obj) {
+        receiveMessage(obj.joinMsg);
+    } else if ("posX" in obj && userPlayer.username != obj.id) {
+        let p = otherPlayers.find((element) => {
+            return element.username == obj.id;
+        })
 
         if (p != null) {
             p.pos.x = obj.posX;
@@ -369,7 +383,7 @@ function setUser(usr, textbox) {
     if (!connected) {
         if (usr.length > 0) {
             userPlayer = new Player(usr, World.spawnPos, usr, "#FF0000");
-            console.log(JSON.stringify({
+            webSocket.send(JSON.stringify({
                 id: `${userPlayer.username}`
             }));
             receiveMessage("Username set to "+userPlayer.username);

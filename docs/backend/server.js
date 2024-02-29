@@ -15,7 +15,7 @@ const Filter = require('bad-words');
  
 let filter = new Filter();
 
-var clients = [];
+var clients = {};
 
 //Sends index.html and coressponding css file, TODO: Send JS file as well.
 app.get('/', (req, res) => {
@@ -87,12 +87,17 @@ sockserver.on('connection', ws => {
 
   ws.on('close', () => {
     console.log('Client has disconnected!');
+    sockserver.clients.forEach(client => {
+      client.send(JSON.stringify({
+        id: clients[ws.client],
+        expired: true
+      })); 
+    });
   });
 
   ws.on('message', (str) => {
     var obj = JSON.parse(str);
-    console.log(obj);
-
+  
     if ("posX" in obj) {
       sockserver.clients.forEach(client => {
         client.send(JSON.stringify({
@@ -103,21 +108,18 @@ sockserver.on('connection', ws => {
       });
     } else if ("msg" in obj) {
       sockserver.clients.forEach(client => {
-        console.log(`distributing message: ${obj.msg}`);
         client.send(JSON.stringify({
           id: obj.id,
           msg: obj.msg
         }));
       });
     } else if ("id" in obj) {
-      //clients[obj.id] = client;
-      clients.push(obj.id);
+      console.log(ws.client);
+      clients[ws.client] = obj.id;
       sockserver.clients.forEach(client => {
-        console.log(`distributing message: ${obj.id} has connected!`);
-        client.send(`${obj.id} has connected!`);
         client.send(JSON.stringify({
           id: obj.id,
-          msg: `${obj.id} has connected!`
+          joinMsg: `${obj.id} has connected!`
         }));
       });
     }

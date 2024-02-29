@@ -11,7 +11,7 @@ const port = 3000
 //Import path library
 const path = require('path')
 
-var clients = {};
+var clients = [];
 
 //Sends index.html and coressponding css file, TODO: Send JS file as well.
 app.get('/', (req, res) => {
@@ -46,8 +46,8 @@ app.listen(port, () => {
 sockserver.on('connection', ws => {
   console.log('New client connected!'); 
   ws.on('close', () => console.log('Client has disconnected!'));
-  ws.on('message', (client, data) => {
-    var obj = JSON.parse(data);
+  ws.on('message', (str) => {
+    var obj = JSON.parse(str);
 
     if ("msg" in obj) {
       sockserver.clients.forEach(client => {
@@ -55,7 +55,12 @@ sockserver.on('connection', ws => {
         client.send(`${obj.msg}`);
       });
     } else if ("id" in obj) {
-      clients[obj.id] = client;
+      //clients[obj.id] = client;
+      clients.push(obj.id);
+      sockserver.clients.forEach(client => {
+        console.log(`distributing message: ${obj.id} has connected!`);
+        client.send(`${obj.id} has connected!`);
+      });
     }
   })
   ws.onerror = function () {

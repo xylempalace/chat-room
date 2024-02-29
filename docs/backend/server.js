@@ -11,6 +11,10 @@ const port = 3000
 //Import path library
 const path = require('path')
 
+const Filter = require('bad-words');
+ 
+let filter = new Filter();
+
 var clients = [];
 
 //Sends index.html and coressponding css file, TODO: Send JS file as well.
@@ -50,6 +54,7 @@ sockserver.on('connection', ws => {
     var obj = JSON.parse(str);
 
     if ("msg" in obj) {
+      console.log(filter.clean(obj.msg));
       sockserver.clients.forEach(client => {
         console.log(`distributing message: ${obj.msg}`);
         client.send(`${obj.msg}`);

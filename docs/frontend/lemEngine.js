@@ -5,7 +5,7 @@ let ctx;
 //FPS tracking and measurement, debug
 let startTime = 0;
 let beginTime = 0;
-const fps = 30;
+const fps = 60;
 const fpms = 1000/fps;
 const scriptStart = Date.now();
 
@@ -93,21 +93,88 @@ class Sprite {
             -(this.image.height / 2)
         )
     }
+
+    draw (pos, size) {
+        //printMessage(x + ", " + y);
+        ctx.drawImage(this.image, pos.x, pos.y, size, size);
+    }
+}
+
+class NineSlicedSprite extends Sprite {
+    sliceCoords = [];
+    segments = [];
+    
+    constructor (image, sc) {
+        super(image);
+        this.sliceCoords = sc
+        let w = this.image.width;
+        let h = this.image.height;
+        let r = this.image.width - sc[2];
+        let b = this.image.height - sc[3];
+        this.segments = [
+            [0    , 0    , sc[0], sc[1]], [sc[0], 0    , r   , sc[1]], [r    , 0    , w    , sc[1]], 
+            [0    , sc[1], sc[0], b    ], [sc[0], sc[1], r   , b    ], [r    , sc[1], w    , b    ],
+            [0    , b    , sc[0], h    ], [sc[0], b    , r   , h    ], [r    , b    , w    , h    ],
+        ];
+    }
+    
+    draw (pos, size) {
+        let s = size / 3;
+        foreach ((element) => {
+            ctx.drawImage(this.image, element[0], element[1], element[2], element[3], pos.x + element[0], pos.y + element[1], s * element[2], s * element[3]);
+        })
+    }
+}
+
+class Tile {
+    tileRules = []
+}
+
+class TileRule {
+    image;
+    conditions = [];
+    
+    constructor (image, conds) {
+        this.image = image;
+    }
 }
 
 class TileMap {
+    pos;
     tiles = [];
     map = [];
     cols;
     rows;
     tileSize;
 
-    constructor (tiles, tileSize, cols, rows, map) {
+    constructor (pos, tiles, tileSize, cols, rows, map) {
+        this.pos = pos;
         this.tiles = tiles;
         this.tileSize = tileSize;
         this.cols = cols;
         this.rows = rows;
         this.map = map;
+    }
+
+    draw () {
+        let offsetPos = new Vector2(
+            this.pos.x - this.rows * this.tileSize / 2,
+            this.pos.y - this.cols * this.tileSize / 2
+        )
+        
+        for (let i = 0; i < this.cols; i++) {
+            for (let k = 0; k < this.rows; k++) {
+                if (i == 1 && k == 1) {
+                    console.log(this.map[(i*this.rows) + k]);
+                }
+                
+                this.tiles[this.map[(i*this.rows) + k]].draw(new Vector2(
+                    offsetPos.x + (k * this.tileSize),
+                    offsetPos.y + (i * this.tileSize)).screenPos,
+                    this.tileSize * activeCamera.zoom
+                )
+            }
+        }
     }
 }
 
@@ -164,12 +231,21 @@ class Camera extends GameObject {
     id;
     zoom;
     
+    useLimits = false;
+    limits;
+    
     halfWidth;
     halfHeight;
     
-    constructor(id, pos, mDist) {
+    constructor(id, pos, mDist, limits) {
         super("CAMERA-"+id, pos);
     
+        
+        if (limits.length == 4) {
+            this.useLimits = true;
+            this.limits = limits;
+        }
+
         this.resize();
         
         this.moveDist = (mDist * Math.min(this.width, this.height)) / this.zoom;
@@ -186,12 +262,18 @@ class Camera extends GameObject {
         );
         
         let sqrHypotenuse = (dif.x * dif.x) + (dif.y * dif.y);
+        let nextPosition = new Vector2(
+            this.x + dif.normalized.x * Math.abs(dif.x/10),
+            this.y + dif.normalized.y * Math.abs(dif.y/10)
+        )
+        
         if (sqrHypotenuse > this.moveDist * this.moveDist) {
-            this.x += dif.normalized.x * Math.abs(dif.x/10);
-            this.y += dif.normalized.y * Math.abs(dif.y/10);
+            this.pos = this.moveInBounds(nextPosition);
         }
+        
+        
     }
-
+    
     resize () {
         if (gameCanvas != null) {
             this.width = gameCanvas.width;
@@ -199,12 +281,24 @@ class Camera extends GameObject {
             this.halfWidth = this.width / 2;
             this.halfHeight = this.height / 2;
             
-            if (this.width <= this.height) {
+            if (this.width >= this.height) {
                 this.zoom = this.width  / 1000;
             } else {
-                this.zoom = this.height / 750;
+                this.zoom = this.height / 1000;
             }
         }
+    }
+    
+    moveInBounds (pos) {
+        let output = pos;
+        if (this.useLimits) {
+            if (pos.x - this.halfWidth / this.zoom < this.limits[0]) {output.x = this.limits[0] + (this.halfWidth / this.zoom);}
+            else if (pos.x + this.halfWidth / this.zoom > this.limits[2]) {output.x = this.limits[2] - (this.halfWidth / this.zoom);}
+            
+            if (pos.y - this.halfHeight / this.zoom < this.limits[1]) {output.y = this.limits[1] + (this.halfHeight / this.zoom);}
+            else if (pos.y + this.halfHeight / this.zoom > this.limits[3]) {output.y = this.limits[3] - (this.halfHeight / this.zoom);}
+        }
+        return output;
     }
     
     get centerPos () {
@@ -229,7 +323,7 @@ function addCanvas() {
         canvasClick(canvas, e)
     });
     
-    cameraList.push(new Camera("default", Vector2.zero, 0.01));
+    cameraList.push(new Camera("default", Vector2.zero, 0.01, []));
     activeCamera = cameraList[0];
     
     gameCanvas = canvas;

@@ -8,6 +8,35 @@ let connected = false;
 let userPlayer;
 let otherPlayers = [];
 
+//Tilemap
+const backgroundTiles = [
+    new Sprite("tiles/floor.png"),
+    new Sprite("tiles/wall.png"),
+    new Sprite("tiles/grass.png"),
+    new Sprite("tiles/pathCenter.png"),
+    new Sprite("tiles/pathNorth.png"),
+    new Sprite("tiles/pathSouth.png"),
+];
+const backgroundMap = new TileMap(new Vector2(0,0), backgroundTiles, 64, 16, 16, [
+    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+    2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 
+    2, 2, 2, 2, 1, 0, 0, 0, 0, 0, 0, 1, 2, 2, 2, 2, 
+    4, 4, 4, 4, 1, 0, 0, 0, 0, 0, 0, 1, 2, 2, 2, 2, 
+    3, 3, 3, 3, 1, 0, 0, 0, 0, 0, 0, 1, 2, 2, 2, 2, 
+    3, 3, 3, 3, 1, 0, 0, 0, 0, 0, 0, 1, 2, 2, 2, 2, 
+    5, 5, 5, 5, 1, 0, 0, 0, 0, 0, 0, 1, 2, 2, 2, 2, 
+    2, 2, 2, 2, 1, 0, 0, 0, 0, 0, 0, 1, 2, 2, 2, 2, 
+    2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 
+    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+]);
+const SpeechBubbleSprite = new NineSlicedSprite("speechBubble.png"  , [16, 16, 16, 24]);
+
 // WebSocket Stuff
 const webSocket = new WebSocket('ws://localhost:443/');
 
@@ -31,6 +60,7 @@ webSocket.onmessage = (event) => {
         }
     }
 };
+
 webSocket.addEventListener("open", () => {
     console.log("We are connected");
 });
@@ -100,7 +130,7 @@ class TextInput {
 }
 
 class World {
-    static spawnPos = new Vector2(250, 250);
+    static spawnPos = new Vector2(0, 0);
 }
 
 class Cosmetic extends GameObject {
@@ -117,9 +147,9 @@ class Cosmetic extends GameObject {
 }
 
 class Player extends GameObject {
-    static playerSizeX = 100;
-    static playerSizeY = 100;
-    static playerMoveSpeed = 15;
+    static playerSizeX = 50;
+    static playerSizeY = 50;
+    static playerMoveSpeed = 5;
     destination = Vector2.zero;
     velX = 0;
     velY = 0;
@@ -178,7 +208,7 @@ class Player extends GameObject {
 
     drawSpeechBubbles() {
         var curBubble;
-        let vertOffset = (this.constructor.playerSizeY * 1.25);
+        let vertOffset = (this.constructor.playerSizeY * 1.1 * activeCamera.zoom);
         
         for (let i = 0; i < this.speechBubbles.length; i++) {
             
@@ -212,10 +242,10 @@ class Player extends GameObject {
 
         ctx.fillStyle = "#000000";
         ctx.textAlign = 'center';
-        ctx.scale *= activeCamera.zoom;
+        ctx.scale(activeCamera.zoom, activeCamera.zoom);
         ctx.font = this.constructor.font;
     
-        ctx.fillText("<" + this.username + ">", this.pos.screenPos.x, this.pos.screenPos.y + (this.constructor.playerSizeY * .75 * activeCamera.zoom));
+        ctx.fillText("<" + this.username + ">", this.pos.screenPos.x / activeCamera.zoom, (this.pos.screenPos.y + (this.constructor.playerSizeY * 1.1 * activeCamera.zoom)) / activeCamera.zoom);
 
         ctx.restore();
     }
@@ -275,6 +305,7 @@ class SpeechBubble {
         ctx.font = this.constructor.font;
     
         for (let i = 0; i < this.message.length; i++) {
+            
             ctx.fillText(this.message[i], posX, posY-(this.constructor.fontHeight*(this.message.length-(1+i))));
         }
 
@@ -309,7 +340,6 @@ document.addEventListener("readystatechange", (e) => {
 
 function sendMessage(msg, textbox) {
     if (msg.length > 0) {
-        //log.textContent += userPlayer.username+" "+msg+"\n";
         textbox.clearTextbox();
         if (connected) {
             userPlayer.sayMessage(msg);
@@ -343,7 +373,7 @@ function setUser(usr, textbox) {
                 id: `${userPlayer.username}`
             }));
             receiveMessage("Username set to "+userPlayer.username);
-            cameraList.push(new Camera("playerCam", Vector2.zero, 0));
+            cameraList.push(new Camera("playerCam", Vector2.zero, 0.1, [-512, -512, 512, 512]));
             activeCamera = cameraList[cameraList.length-1];
             textbox.setDisabled(true);
             TextInput.findInputByID("chatInput").setDisabled(false);
@@ -356,7 +386,7 @@ function setUser(usr, textbox) {
 
 function connect() {
     
-    otherPlayers.push(new Player("(0, 0)", new Vector2(0, 0), "(0, 0)", "#00FF00"));
+    //otherPlayers.push(new Player("(0, 0)", new Vector2(0, 0), "(0, 0)", "#00FF00"));
 
     let centerDist = 500;
     otherPlayers.push(new Player("(0, " + centerDist + ")", new Vector2(0, centerDist), "(0, " + centerDist + ")", "#FF0000"));
@@ -376,6 +406,9 @@ function update() {
     activeCamera.follow(userPlayer.pos);
 
     ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+
+    backgroundMap.draw();
+
     userPlayer.drawPlayer(gameCanvas);
     userPlayer.drawSpeechBubbles(gameCanvas);
     userPlayer.update((Date.now()-startTime) / fpms);

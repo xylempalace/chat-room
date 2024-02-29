@@ -41,7 +41,42 @@ app.get('/favicon.ico', (req, res) => {
 app.get('/lemEngine.js', (req, res) => {
   res.set('Content-Type', 'text/javascript');
    res.sendFile(path.join(__dirname, '../frontend/lemEngine.js'));
- })
+})
+
+app.get('/sprites/tiles/floor.png', (req, res) => {
+  res.set('Content-Type', 'image/png');
+   res.sendFile(path.join(__dirname, '../frontend/sprites/tiles/floor.png'));
+})
+
+app.get('/sprites/tiles/wall.png', (req, res) => {
+  res.set('Content-Type', 'image/png');
+   res.sendFile(path.join(__dirname, '../frontend/sprites/tiles/wall.png'));
+})
+
+app.get('/sprites/tiles/grass.png', (req, res) => {
+  res.set('Content-Type', 'image/png');
+   res.sendFile(path.join(__dirname, '../frontend/sprites/tiles/grass.png'));
+})
+
+app.get('/sprites/tiles/pathCenter.png', (req, res) => {
+  res.set('Content-Type', 'image/png');
+   res.sendFile(path.join(__dirname, '../frontend/sprites/tiles/pathCenter.png'));
+})
+
+app.get('/sprites/tiles/pathNorth.png', (req, res) => {
+  res.set('Content-Type', 'image/png');
+   res.sendFile(path.join(__dirname, '../frontend/sprites/tiles/pathNorth.png'));
+})
+
+app.get('/sprites/tiles/pathSouth.png', (req, res) => {
+  res.set('Content-Type', 'image/png');
+   res.sendFile(path.join(__dirname, '../frontend/sprites/tiles/pathSouth.png'));
+})
+
+app.get('/sprites/speechBubble.png', (req, res) => {
+  res.set('Content-Type', 'image/png');
+   res.sendFile(path.join(__dirname, '../frontend/sprites/speechBubble.png'));
+})
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);

@@ -41,8 +41,38 @@ const SpeechBubbleSprite = new NineSlicedSprite("speechBubble.png"  , [16, 16, 1
 const webSocket = new WebSocket('ws://localhost:443/');
 
 webSocket.onmessage = (event) => {
-    console.log(event);
-    receiveMessage(event.data);
+    var obj = JSON.parse(event.data);
+
+    if ("expired" in obj) {
+        let p = otherPlayers.findIndex((element) => {
+            return element.username == obj.id;
+        })
+        console.log("Splicing" + p + obj.id);
+        otherPlayers = otherPlayers.splice(p, 1);
+        console.log("Spliced");
+    } else if ("msg" in obj) {
+        receiveMessage(`<${obj.id}> ${obj.msg}`);
+        let p = otherPlayers.find((element) => {
+            return element.username == obj.id;
+        })
+
+        if (p != null) {
+            p.sayMessage(obj.msg);
+        }
+    } else if ("joinMsg" in obj) {
+        receiveMessage(obj.joinMsg);
+    } else if ("posX" in obj && userPlayer.username != obj.id) {
+        let p = otherPlayers.find((element) => {
+            return element.username == obj.id;
+        })
+
+        if (p != null) {
+            p.pos.x = obj.posX;
+            p.pos.y = obj.posY; 
+        } else {
+            otherPlayers.push(new Player(obj.id, new Vector2(obj.posX, obj.posY), obj.id, "#FF0000"));
+        }
+    }
 };
 
 webSocket.addEventListener("open", () => {
@@ -327,7 +357,10 @@ function sendMessage(msg, textbox) {
         textbox.clearTextbox();
         if (connected) {
             userPlayer.sayMessage(msg);
-            webSocket.send("<" + userPlayer.username + "> " + msg);
+            webSocket.send(JSON.stringify({
+                id: userPlayer.username,
+                msg: `${msg}`
+            }));
         }
     }
 }
@@ -350,6 +383,9 @@ function setUser(usr, textbox) {
     if (!connected) {
         if (usr.length > 0) {
             userPlayer = new Player(usr, World.spawnPos, usr, "#FF0000");
+            webSocket.send(JSON.stringify({
+                id: `${userPlayer.username}`
+            }));
             receiveMessage("Username set to "+userPlayer.username);
             cameraList.push(new Camera("playerCam", Vector2.zero, 0.1, [-512, -512, 512, 512]));
             activeCamera = cameraList[cameraList.length-1];
@@ -372,8 +408,7 @@ function connect() {
     otherPlayers.push(new Player("(" + centerDist + ", 0)", new Vector2(centerDist, 0), "(" + centerDist + ", 0)", "#0000FF"));
     otherPlayers.push(new Player("(-" + centerDist + ", 0)", new Vector2(-centerDist, 0), "(-" + centerDist + ", 0)", "#00FFFF"));
     connected = true;
-
-    webSocket.send(userPlayer.username+" has connected.");
+    serverUpdate();
 }
 
 function startAnimating() {
@@ -397,6 +432,17 @@ function update() {
         element.drawSpeechBubbles(gameCanvas);
         element.update((Date.now()-startTime)/fpms);
     });
+}
+
+function serverUpdate() {
+    setTimeout(() => {
+        serverUpdate();
+    }, 20);
+    webSocket.send(JSON.stringify({
+        id: userPlayer.username,
+        posX: userPlayer.pos.x,
+        posY: userPlayer.pos.y
+    }));
 }
 
 function rgb(r, g, b){

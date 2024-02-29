@@ -45,14 +45,30 @@ app.listen(port, () => {
 
 sockserver.on('connection', ws => {
   console.log('New client connected!'); 
-  ws.on('close', () => console.log('Client has disconnected!'));
+
+  ws.on('close', () => {
+    console.log('Client has disconnected!');
+  });
+
   ws.on('message', (str) => {
     var obj = JSON.parse(str);
 
-    if ("msg" in obj) {
+    if ("posX" in obj) {
+      sockserver.clients.forEach(client => {
+        console.log(`distributing message: ${obj.id} has connected!`);
+        client.send(JSON.stringify({
+          id: obj.id,
+          posX: obj.posX,
+          posY: obj.posY
+        }));
+      });
+    } else if ("msg" in obj) {
       sockserver.clients.forEach(client => {
         console.log(`distributing message: ${obj.msg}`);
-        client.send(`${obj.msg}`);
+        client.send(JSON.stringify({
+          id: obj.id,
+          msg: obj.msg
+        }));
       });
     } else if ("id" in obj) {
       //clients[obj.id] = client;
@@ -60,9 +76,14 @@ sockserver.on('connection', ws => {
       sockserver.clients.forEach(client => {
         console.log(`distributing message: ${obj.id} has connected!`);
         client.send(`${obj.id} has connected!`);
+        client.send(JSON.stringify({
+          id: obj.id,
+          msg: `${obj.id} has connected!`
+        }));
       });
     }
   })
+
   ws.onerror = function () {
     console.log('websocket error');
   }

@@ -1,10 +1,17 @@
-html,body{
-    height:100%; min-height:95%; max-height:100%;
+html{
+    height: 100%;
 
-    overflow-x: auto;
-    overflow-y: auto;
+    overflow: hidden;
+
+    border: 300px yellow thin;
+}
+
+body{
+    height:100%; min-height:95%; max-height:100%;
     
-    margin:0;
+    overflow: hidden;
+    
+    margin: 0px;
 
     background: white;
 }
@@ -28,13 +35,18 @@ html,body{
 
     overflow: auto;
 
-    display: block; 
+    /* flex direction puts the text near the bottom */
+    display: flex; flex-direction: column-reverse;
+
+    position: relative; align-items: center;
+
+    float: left;
     
     padding: 5px;
 
-    border: 3px black solid;
+    border: 0.5rem rgb(105, 100, 100) solid;
 
-    border-width: thin;
+    margin-right: 5px;
 
     background: lightgray;
 }
@@ -56,10 +68,8 @@ html,body{
     width: max-content;
 }
 
-.gameCanvas {
-    background-color: lightgray;
-
-    position: "relative";
-
-    border: 0.5rem outset rgb(189, 188, 188);
+.darkModeButton {
+    position: absolute; 
+    
+    bottom: 0; right: 0;
 }

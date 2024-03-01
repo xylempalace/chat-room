@@ -1,78 +1,53 @@
 // Text Info
 const textInputs = [];
 const log = document.getElementById("values");
-
-//Canvas references
-let gameCanvas;
-let ctx;
+let isDark = false;
 
 //Client information
 let connected = false;
 let userPlayer;
-
-//FPS tracking and measurement, debug
-let startTime = 0;
-let beginTime = 0;
-const fps = 30;
-const fpms = 1000/fps;
-const scriptStart = Date.now();
-
-//Camera properties
-let activeCamera;
-let cameraList = [];
-
 let otherPlayers = [];
 
-class Vector2 {
-    
-    x;
-    y;
-    
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-    }
-    
-    get screenPos() {
-        let v = new Vector2(
-        (this.x + (activeCamera.width/2)) - activeCamera.pos.x , 
-        (this.y + (activeCamera.height/2)) - activeCamera.pos.y
-        );
-        return v;
-    }
-    
-    get normalized() {
-        let a = Math.atan2(this.y, this.x);
-        return new Vector2(Math.cos(a), Math.sin(a));
-    }
+//Tilemap
+const backgroundTiles = [
+    new Sprite("tiles/floor.png"),
+    new Sprite("tiles/wall.png"),
+    new Sprite("tiles/grass.png"),
+    new Sprite("tiles/pathCenter.png"),
+    new Sprite("tiles/pathNorth.png"),
+    new Sprite("tiles/pathSouth.png"),
+];
+const backgroundMap = new TileMap(new Vector2(0,0), backgroundTiles, 64, 16, 16, [
+    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+    2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 
+    2, 2, 2, 2, 1, 0, 0, 0, 0, 0, 0, 1, 2, 2, 2, 2, 
+    4, 4, 4, 4, 1, 0, 0, 0, 0, 0, 0, 1, 2, 2, 2, 2, 
+    3, 3, 3, 3, 1, 0, 0, 0, 0, 0, 0, 1, 2, 2, 2, 2, 
+    3, 3, 3, 3, 1, 0, 0, 0, 0, 0, 0, 1, 2, 2, 2, 2, 
+    5, 5, 5, 5, 1, 0, 0, 0, 0, 0, 0, 1, 2, 2, 2, 2, 
+    2, 2, 2, 2, 1, 0, 0, 0, 0, 0, 0, 1, 2, 2, 2, 2, 
+    2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 
+    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+]);
+const SpeechBubbleSprite = new NineSlicedSprite("speechBubble.png"  , [16, 16, 16, 24]);
 
-    get toString() {
-        return "X: " + truncateNumber(this.x, 1) + "   Y: " + truncateNumber(this.y, 1);
-    }
+// WebSocket Stuff
+const webSocket = new WebSocket('ws://localhost:443/');
 
-    static get zero() {
-        return new Vector2(0,0);
-    }
+webSocket.onmessage = (event) => {
+    console.log(event);
+    receiveMessage(event.data);
+};
 
-}
-
-class GameObject {
-    pos;
-    id;
-
-    constructor (id, pos) {
-        this.id = id;
-        this.pos = pos;
-    }
-
-    get x () {return this.pos.x;}
-    get y () {return this.pos.y;}
-
-    set x (v) {this.pos.x = v;}
-    set y (v) {this.pos.y = v;}
-}
-
-let isDark = false;
+webSocket.addEventListener("open", () => {
+    console.log("We are connected");
+});
 
 class TextInput {
     
@@ -138,119 +113,43 @@ class TextInput {
     }
 }
 
-class DebugGraph {
-    
-    static frameHist = [];
-    
-    static updateFPSGraph(newData) {
-        DebugGraph.frameHist.push(newData);
-    }
-    
-    static drawFPSGraph (x, y, w, h, scale) {
-
-        //Bottom line
-        let prevColor = ctx.strokeStyle;
-        ctx.strokeStyle = "#AAAAAA";
-        ctx.beginPath();
-        ctx.moveTo(x, h+y);
-        ctx.lineTo(x+w, h+y);
-        ctx.stroke();
-
-        //Target line
-        ctx.strokeStyle = "#FFA500";
-        ctx.beginPath();
-        let targetFrameH = 0.2*h;
-        ctx.moveTo(x, targetFrameH+y);
-        ctx.lineTo(x+w, targetFrameH+y);
-        ctx.stroke();
-        
-        //Measured line
-        ctx.strokeStyle = "#000000";
-        ctx.beginPath(); // Start a new path
-        let posY = 1-((((DebugGraph.frameHist[DebugGraph.frameHist.length-1]/(fpms))))*0.8);
-        posY = Math.max(posY, 0);
-        posY = Math.min(posY, 1);
-        ctx.moveTo(x, (posY*h)+y); // Move the pen to leftmost at the frame percentage
-        for (let i = 0; i < DebugGraph.frameHist.length && i*scale < w; i++) {
-            posY = 1-((((DebugGraph.frameHist[DebugGraph.frameHist.length-(i+1)]/(fpms))))*0.8);
-            posY = Math.max(posY, 0);
-            posY = Math.min(posY, 1);
-            ctx.lineTo(x+(i*scale), (posY*h)+y); // Draw a line to previous frame interval
-            ctx.stroke(); // Render the path
-        }
-        
-        ctx.strokeStyle = prevColor;
-    }
-}
-
-class Camera extends GameObject {
-    moveDist;
-    width;
-    height;
-    id;
-    
-    halfWidth;
-    halfHeight;
-    
-    constructor(id, pos, mDist, mzh) {
-        super("CAMERA-"+id, pos);
-    
-        if (gameCanvas != null) {
-            this.width = gameCanvas.width;
-            this.height = gameCanvas.height;
-            this.halfWidth = this.width / 2;
-            this.halfHeight = this.height / 2;
-        }
-        
-        this.moveDist = mDist * Math.min(this.width, this.height);
-        receiveMessage(this.moveDist);
-    }
-    
-    warpTo (pos) {
-        this.pos = pos;
-    }
-    
-    follow (pos) {
-        let dif = new Vector2(
-            pos.x - (this.pos.x),
-            pos.y - (this.pos.y)
-        );
-        
-        let sqrHypotenuse = (dif.x * dif.x) + (dif.y * dif.y);
-        if (sqrHypotenuse > this.moveDist * this.moveDist) {
-            this.x += dif.normalized.x * Math.abs(dif.x/10);
-            this.y += dif.normalized.y * Math.abs(dif.y/10);
-        }
-    }
-    
-    get centerPos () {
-        let cPos = new Vector2 (
-            this.pos.x + this.halfWidth,
-            this.pos.y + this.halfHeight
-        )
-        return cPos;
-    }
-}
-
 class World {
-    static spawnPos = new Vector2(250, 250);
+    static spawnPos = new Vector2(0, 0);
+}
+
+class Cosmetic extends GameObject {
+    order;
+    halfHeight;
+    halfWidth;
+    img;
+    player;
+
+    constructor(id, image, player) {
+        super("COSMET-" + id, player.pos);
+        this.img = image;
+    }
 }
 
 class Player extends GameObject {
-    static playerSizeX = 100;
-    static playerSizeY = 100;
-    static playerMoveSpeed = 15;
+    static playerSizeX = 50;
+    static playerSizeY = 50;
+    static playerMoveSpeed = 5;
     destination = Vector2.zero;
     velX = 0;
     velY = 0;
     username;
     speechBubbles = [];
     color;
+    cosmetics = [];
 
     constructor(id, pos, username, color) {
         super ("PLAYER-"+username, pos);
         this.username = username;
         this.color = color;
+    }
+
+    setCosmetics(cosmeticArr) {
+        this.cosmetics = cosmeticArr;
     }
     
     warpTo(pos) {
@@ -273,8 +172,6 @@ class Player extends GameObject {
             let nextX = this.x + (this.velX*deltaTime);
             let nextY = this.y + (this.velY*deltaTime);
             
-            //receiveMessage("Next: " + (nextX - this.destination.x) + "    Cur: " + (this.pos.x - this.destination.x));
-
             // Checks if current X position is further than your "destination"
             // Stops you if it is, keeps moving forward otherwise
             if (Math.abs(nextX-this.destination.x) > Math.abs(this.pos.x-this.destination.x)) {
@@ -300,7 +197,7 @@ class Player extends GameObject {
 
     drawSpeechBubbles() {
         var curBubble;
-        let vertOffset = (this.constructor.playerSizeY * 0.75);
+        let vertOffset = (this.constructor.playerSizeY * 1.1 * activeCamera.zoom);
         
         for (let i = 0; i < this.speechBubbles.length; i++) {
             
@@ -310,35 +207,36 @@ class Player extends GameObject {
             } else {
 
                 //Centering the bubble and making sure the bubbles aren't on top of eachother       
-                var bubbleCenterX = this.pos.x;
-                var bubbleCenterY = this.pos.y-(vertOffset);
+                var bubbleCenterX = this.pos.screenPos.x;
+                var bubbleCenterY = this.pos.screenPos.y-(vertOffset);
 
                 vertOffset += (curBubble.height);           
                 
-                curBubble.drawBubble(bubbleCenterX+this.pos.x, bubbleCenterY+activeCamera.pos.y);
+                curBubble.drawBubble(bubbleCenterX, bubbleCenterY);
 
             }
         }
     }
 
     drawPlayer() {
-        let screenX = this.pos.screenPos.x-(this.constructor.playerSizeX/2);
-        let screenY = this.pos.screenPos.y-(this.constructor.playerSizeY/2);
+        ctx.save();
 
-        let prevColor = ctx.strokeStyle;
         ctx.fillStyle = this.color;
-        ctx.fillRect(screenX, screenY, this.constructor.playerSizeX, this.constructor.playerSizeY);
-        ctx.fillStyle = prevColor;
-        
-        var prevAlign = ctx.textAlign;
-        var prevFont = ctx.font;
+        ctx.fillRect(
+            this.pos.screenPos.x - (this.constructor.playerSizeX * activeCamera.zoom) / 2, 
+            this.pos.screenPos.y - (this.constructor.playerSizeY * activeCamera.zoom) / 2, 
+            this.constructor.playerSizeX * activeCamera.zoom, 
+            this.constructor.playerSizeY * activeCamera.zoom
+        );
+
+        ctx.fillStyle = "#000000";
         ctx.textAlign = 'center';
+        ctx.scale(activeCamera.zoom, activeCamera.zoom);
         ctx.font = this.constructor.font;
     
-        ctx.fillText("<" + this.username + ">", this.pos.screenPos.x, this.pos.screenPos.y + (this.constructor.playerSizeY*.75));
+        ctx.fillText("<" + this.username + ">", this.pos.screenPos.x / activeCamera.zoom, (this.pos.screenPos.y + (this.constructor.playerSizeY * 1.1 * activeCamera.zoom)) / activeCamera.zoom);
 
-        ctx.textAlign = prevAlign;
-        ctx.font = prevFont;
+        ctx.restore();
     }
 }
 
@@ -355,6 +253,8 @@ class SpeechBubble {
     constructor (message) {
         this.spawnTime = Date.now();
         this.deathTime = this.spawnTime+this.constructor.lifeTime;
+
+        // Checks if textbox is too long for one line, and, if so, breaks up into multiple lines
         if (ctx.measureText(message) < this.constructor.maxWidth) {
             this.message[0] = message;
         } else {
@@ -381,20 +281,22 @@ class SpeechBubble {
         this.height = this.message.length * this.constructor.fontHeight;
     }
 
+    //Returns true if the bubble is past its expiry time
     isOld() {
         return (Date.now() > this.deathTime);
     }
 
+    // Draws the current bubble object at the given coordinates
     drawBubble(posX, posY) {
         var prevAlign = ctx.textAlign;
         var prevFont = ctx.font;
         ctx.textAlign = 'center';
         ctx.font = this.constructor.font;
     
-        //Test string: Howdy hi hello how are we today friends?
         for (let i = 0; i < this.message.length; i++) {
+            
             ctx.fillText(this.message[i], posX, posY-(this.constructor.fontHeight*(this.message.length-(1+i))));
-        } //Issue with this implementation, boxes will overlap, move bubbles in player class
+        }
 
         ctx.textAlign = prevAlign;
         ctx.font = prevFont;
@@ -427,10 +329,10 @@ document.addEventListener("readystatechange", (e) => {
 
 function sendMessage(msg, textbox) {
     if (msg.length > 0) {
-        log.textContent += userPlayer.username+" "+msg+"\n";
         textbox.clearTextbox();
         if (connected) {
             userPlayer.sayMessage(msg);
+            webSocket.send("<" + userPlayer.username + "> " + msg);
         }
     }
 }
@@ -454,62 +356,29 @@ function setUser(usr, textbox) {
         if (usr.length > 0) {
             userPlayer = new Player(usr, World.spawnPos, usr, "#FF0000");
             receiveMessage("Username set to "+userPlayer.username);
-            cameraList.push(new Camera("playerCam", Vector2.zero, 0.1));
+            cameraList.push(new Camera("playerCam", Vector2.zero, 0.1, [-512, -512, 512, 512]));
             activeCamera = cameraList[cameraList.length-1];
             textbox.setDisabled(true);
             TextInput.findInputByID("chatInput").setDisabled(false);
             
             connect();
+            startAnimating();
         }
     }
 }
 
 function connect() {
-    startAnimating();
-    otherPlayers.push(new Player("Ghost", new Vector2(0, 0), "Ghost", "#55DCAA"));
+    
+    //otherPlayers.push(new Player("(0, 0)", new Vector2(0, 0), "(0, 0)", "#00FF00"));
+
+    let centerDist = 500;
+    otherPlayers.push(new Player("(0, " + centerDist + ")", new Vector2(0, centerDist), "(0, " + centerDist + ")", "#FF0000"));
+    otherPlayers.push(new Player("(0, -" + centerDist + ")", new Vector2(0, -centerDist), "(0, -" + centerDist + ")", "#FFFF00"));
+    otherPlayers.push(new Player("(" + centerDist + ", 0)", new Vector2(centerDist, 0), "(" + centerDist + ", 0)", "#0000FF"));
+    otherPlayers.push(new Player("(-" + centerDist + ", 0)", new Vector2(-centerDist, 0), "(-" + centerDist + ", 0)", "#00FFFF"));
     connected = true;
-}
 
-function addCanvas() {
-    var canvas = document.createElement('canvas');
-    canvas.id     = "gameCanvas";
-    canvas.width  = document.getElementById('gameSpace').clientWidth*0.8;
-    canvas.height = document.getElementById('gameSpace').clientHeight;
-
-
-
-    canvas.className = "gameCanvas";
-    canvas.addEventListener("mouseup", (e) => {
-        canvasClick(canvas, e)
-    });
-    
-    cameraList.push(new Camera("default", Vector2.zero, 0.01));
-    activeCamera = cameraList[0];
-    
-    gameCanvas = canvas;
-    ctx = gameCanvas.getContext("2d");
-    document.getElementById("gameSpace").appendChild(canvas);
-}
-
-function canvasClick(canvas, e) {
-
-    if (userPlayer.pos.x <= 0) {
-        userPlayer.warpTo(new Vector2(100, 100));
-    }
-    else {
-        userPlayer.warpTo(new Vector2(-100, 100));
-    }
-    
-    let canvasRect = canvas.getBoundingClientRect();
-    if (connected) {
-        userPlayer.walkTo(new Vector2((e.clientX + activeCamera.pos.x) - (canvasRect.left + activeCamera.halfWidth), (e.clientY + activeCamera.pos.y) - (canvasRect.top + activeCamera.halfHeight)));
-    }
-    
-}
-
-function drawText(x, y, msg) {
-    ctx.font = "30px Arial";
-    ctx.fillText(msg, x, y);
+    webSocket.send(userPlayer.username+" has connected.");
 }
 
 function startAnimating() {
@@ -517,21 +386,13 @@ function startAnimating() {
     drawScreen();
 }
 
-function truncateNumber(num, decimalPlaces) {
-    return Math.floor(num * (decimalPlaces * 10)) / (decimalPlaces * 10);
-}
-
-function drawScreen() {
-    
-    //Waits fpms miliseconds before starting the next frame
-    setTimeout(() => {
-        beginTime = Date.now();
-        requestAnimationFrame(drawScreen);
-    }, fpms);
-    
+function update() {
     activeCamera.follow(userPlayer.pos);
 
     ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+
+    backgroundMap.draw();
+
     userPlayer.drawPlayer(gameCanvas);
     userPlayer.drawSpeechBubbles(gameCanvas);
     userPlayer.update((Date.now()-startTime) / fpms);
@@ -541,18 +402,6 @@ function drawScreen() {
         element.drawSpeechBubbles(gameCanvas);
         element.update((Date.now()-startTime)/fpms);
     });
-    
-    startTime = Date.now();
-    var fpsDecimalPlaces = 1;
-    var measuredFPS = ((startTime-beginTime))*(fpsDecimalPlaces*10);
-    drawText(25, 25, "FPS: " + truncateNumber(measuredFPS, fpsDecimalPlaces));
-    drawText(25, 50, "Target MSPF: "+ truncateNumber(fpms, fpsDecimalPlaces)); //Target miliseconds per frame
-    
-    frameLength = Math.min(fpms-(Date.now()-beginTime),fpms);
-
-    //Updates FPS graph
-    DebugGraph.updateFPSGraph(frameLength);
-    DebugGraph.drawFPSGraph(0, 30, 250, 100, 3); 
 }
 
 function rgb(r, g, b){

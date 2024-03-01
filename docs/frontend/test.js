@@ -47,9 +47,10 @@ webSocket.onmessage = (event) => {
         let p = otherPlayers.findIndex((element) => {
             return element.username == obj.id;
         })
-        console.log("Splicing" + p + obj.id);
-        otherPlayers = otherPlayers.splice(p, 1);
-        console.log("Spliced");
+        console.log(`Splicing ${p} ${otherPlayers[p].username} ${obj.id} ${otherPlayers.length}`);
+        otherPlayers[p].expired = true;
+        otherPlayers.splice(p, 1);
+        console.log(`Spliced  ${otherPlayers.length}`);
     } else if ("msg" in obj) {
         receiveMessage(`<${obj.id}> ${obj.msg}`);
         let p = otherPlayers.find((element) => {
@@ -164,6 +165,7 @@ class Player extends GameObject {
     static playerSizeX = 50;
     static playerSizeY = 50;
     static playerMoveSpeed = 5;
+    expired = false;
     destination = Vector2.zero;
     velX = 0;
     velY = 0;
@@ -221,47 +223,51 @@ class Player extends GameObject {
     }
 
     drawSpeechBubbles() {
-        var curBubble;
-        let vertOffset = (this.constructor.playerSizeY * 1.1 * activeCamera.zoom);
-        
-        for (let i = 0; i < this.speechBubbles.length; i++) {
+        if (!this.expired) {
+            var curBubble;
+            let vertOffset = (this.constructor.playerSizeY * 1.1 * activeCamera.zoom);
             
-            curBubble = this.speechBubbles[i];
-            if (curBubble.isOld()) {
-                this.speechBubbles.splice(i,i);
-            } else {
-
-                //Centering the bubble and making sure the bubbles aren't on top of eachother       
-                var bubbleCenterX = this.pos.screenPos.x;
-                var bubbleCenterY = this.pos.screenPos.y-(vertOffset);
-
-                vertOffset += (curBubble.height);           
+            for (let i = 0; i < this.speechBubbles.length; i++) {
                 
-                curBubble.drawBubble(bubbleCenterX, bubbleCenterY);
+                curBubble = this.speechBubbles[i];
+                if (curBubble.isOld()) {
+                    this.speechBubbles.splice(i,i);
+                } else {
 
+                    //Centering the bubble and making sure the bubbles aren't on top of eachother       
+                    var bubbleCenterX = this.pos.screenPos.x;
+                    var bubbleCenterY = this.pos.screenPos.y-(vertOffset);
+
+                    vertOffset += (curBubble.height);           
+                    
+                    curBubble.drawBubble(bubbleCenterX, bubbleCenterY);
+
+                }
             }
         }
     }
 
     drawPlayer() {
-        ctx.save();
+        if (!this.expired) {
+            ctx.save();
 
-        ctx.fillStyle = this.color;
-        ctx.fillRect(
-            this.pos.screenPos.x - (this.constructor.playerSizeX * activeCamera.zoom) / 2, 
-            this.pos.screenPos.y - (this.constructor.playerSizeY * activeCamera.zoom) / 2, 
-            this.constructor.playerSizeX * activeCamera.zoom, 
-            this.constructor.playerSizeY * activeCamera.zoom
-        );
+            ctx.fillStyle = this.color;
+            ctx.fillRect(
+                this.pos.screenPos.x - (this.constructor.playerSizeX * activeCamera.zoom) / 2, 
+                this.pos.screenPos.y - (this.constructor.playerSizeY * activeCamera.zoom) / 2, 
+                this.constructor.playerSizeX * activeCamera.zoom, 
+                this.constructor.playerSizeY * activeCamera.zoom
+            );
 
-        ctx.fillStyle = "#000000";
-        ctx.textAlign = 'center';
-        ctx.scale(activeCamera.zoom, activeCamera.zoom);
-        ctx.font = this.constructor.font;
-    
-        ctx.fillText("<" + this.username + ">", this.pos.screenPos.x / activeCamera.zoom, (this.pos.screenPos.y + (this.constructor.playerSizeY * 1.1 * activeCamera.zoom)) / activeCamera.zoom);
+            ctx.fillStyle = "#000000";
+            ctx.textAlign = 'center';
+            ctx.scale(activeCamera.zoom, activeCamera.zoom);
+            ctx.font = this.constructor.font;
+        
+            ctx.fillText("<" + this.username + ">", this.pos.screenPos.x / activeCamera.zoom, (this.pos.screenPos.y + (this.constructor.playerSizeY * 1.1 * activeCamera.zoom)) / activeCamera.zoom);
 
-        ctx.restore();
+            ctx.restore();
+        }
     }
 }
 

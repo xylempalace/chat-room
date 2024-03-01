@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="web.css">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <title>Lexicomm</title> <!-- Temp title, lexicon + communication -->
+    <meta charset="utf-8">
+</head>
+
+<body>
+    <div style="width:100%; height: 100%;">
+
+        <div id = "chatBox" class="chatBox" style="height: 90%; border: 0.2vmin solid black;">            
+            <div><p id="values" class="chatLog"></p></div>
+            <div> <label for="tiles">Tile: </label> <select name="tiles" id="selectTile"></select>
+            <div> <input id = "confirm" type="button" value = "Export"> </div>
+            <div> <input id = "rows" type="number" placeholder = "Rows"><input id = "cols" type="number" placeholder = "Cols"> </div>
+            <div> <input id = "zoom_in" type="button" value = "+"><input id = "zoom_out" type="button" value = "-"> </div>
+            <div id="importInput" class="inputDiv" style="position: absolute; bottom: 0;" placeholder="Import" func="sendMessage" hasButton=true reqConnection=false></div>
+            </div>
+
+    </div>
+    <div id = "gameSpace" style= "height: 90%; width:100%;"> </div>
+    <script src="lemEngine.js"></script>
+    <script src="tilemapEditor.js"></script>
+</body>
+ 
+</html>

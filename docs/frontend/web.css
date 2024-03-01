@@ -1,5 +1,5 @@
 .chatLog {
-    max-height:80%; min-height:80%;
+    height: fit-content;
 
     margin-bottom:2em;
 

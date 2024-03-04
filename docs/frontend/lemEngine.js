@@ -95,7 +95,6 @@ class Sprite {
     }
 
     draw (pos, size) {
-        //printMessage(x + ", " + y);
         ctx.drawImage(this.image, pos.x, pos.y, size, size);
     }
 }
@@ -171,7 +170,7 @@ class TileMap {
                 this.tiles[this.map[(i*this.rows) + k]].draw(new Vector2(
                     offsetPos.x + (k * this.tileSize),
                     offsetPos.y + (i * this.tileSize)).screenPos,
-                    this.tileSize * activeCamera.zoom
+                    (this.tileSize + 1)* activeCamera.zoom
                 )
             }
         }

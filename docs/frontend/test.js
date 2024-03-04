@@ -41,8 +41,39 @@ const SpeechBubbleSprite = new NineSlicedSprite("speechBubble.png"  , [16, 16, 1
 const webSocket = new WebSocket('ws://localhost:443/');
 
 webSocket.onmessage = (event) => {
-    console.log(event);
-    receiveMessage(event.data);
+    var obj = JSON.parse(event.data);
+
+    if ("expired" in obj) {
+        let p = otherPlayers.findIndex((element) => {
+            return element.username == obj.id;
+        })
+        console.log(`Splicing ${p} ${otherPlayers[p].username} ${obj.id} ${otherPlayers.length}`);
+        otherPlayers[p].expired = true;
+        otherPlayers.splice(p, 1);
+        console.log(`Spliced  ${otherPlayers.length}`);
+    } else if ("msg" in obj) {
+        receiveMessage(`<${obj.id}> ${obj.msg}`);
+        let p = otherPlayers.find((element) => {
+            return element.username == obj.id;
+        })
+
+        if (p != null) {
+            p.sayMessage(obj.msg);
+        }
+    } else if ("joinMsg" in obj) {
+        receiveMessage(obj.joinMsg);
+    } else if ("posX" in obj && userPlayer.username != obj.id) {
+        let p = otherPlayers.find((element) => {
+            return element.username == obj.id;
+        })
+
+        if (p != null) {
+            p.pos.x = obj.posX;
+            p.pos.y = obj.posY; 
+        } else {
+            otherPlayers.push(new Player(obj.id, new Vector2(obj.posX, obj.posY), obj.id, "#FF0000"));
+        }
+    }
 };
 
 webSocket.addEventListener("open", () => {
@@ -134,6 +165,7 @@ class Player extends GameObject {
     static playerSizeX = 50;
     static playerSizeY = 50;
     static playerMoveSpeed = 5;
+    expired = false;
     destination = Vector2.zero;
     velX = 0;
     velY = 0;
@@ -196,47 +228,51 @@ class Player extends GameObject {
     }
 
     drawSpeechBubbles() {
-        var curBubble;
-        let vertOffset = (this.constructor.playerSizeY * 1.1 * activeCamera.zoom);
-        
-        for (let i = 0; i < this.speechBubbles.length; i++) {
+        if (!this.expired) {
+            var curBubble;
+            let vertOffset = (this.constructor.playerSizeY * 1.1 * activeCamera.zoom);
             
-            curBubble = this.speechBubbles[i];
-            if (curBubble.isOld()) {
-                this.speechBubbles.splice(i,i);
-            } else {
-
-                //Centering the bubble and making sure the bubbles aren't on top of eachother       
-                var bubbleCenterX = this.pos.screenPos.x;
-                var bubbleCenterY = this.pos.screenPos.y-(vertOffset);
-
-                vertOffset += (curBubble.height);           
+            for (let i = 0; i < this.speechBubbles.length; i++) {
                 
-                curBubble.drawBubble(bubbleCenterX, bubbleCenterY);
+                curBubble = this.speechBubbles[i];
+                if (curBubble.isOld()) {
+                    this.speechBubbles.splice(i,i);
+                } else {
 
+                    //Centering the bubble and making sure the bubbles aren't on top of eachother       
+                    var bubbleCenterX = this.pos.screenPos.x;
+                    var bubbleCenterY = this.pos.screenPos.y-(vertOffset);
+
+                    vertOffset += (curBubble.height);           
+                    
+                    curBubble.drawBubble(bubbleCenterX, bubbleCenterY);
+
+                }
             }
         }
     }
 
     drawPlayer() {
-        ctx.save();
+        if (!this.expired) {
+            ctx.save();
 
-        ctx.fillStyle = this.color;
-        ctx.fillRect(
-            this.pos.screenPos.x - (this.constructor.playerSizeX * activeCamera.zoom) / 2, 
-            this.pos.screenPos.y - (this.constructor.playerSizeY * activeCamera.zoom) / 2, 
-            this.constructor.playerSizeX * activeCamera.zoom, 
-            this.constructor.playerSizeY * activeCamera.zoom
-        );
+            ctx.fillStyle = this.color;
+            ctx.fillRect(
+                this.pos.screenPos.x - (this.constructor.playerSizeX * activeCamera.zoom) / 2, 
+                this.pos.screenPos.y - (this.constructor.playerSizeY * activeCamera.zoom) / 2, 
+                this.constructor.playerSizeX * activeCamera.zoom, 
+                this.constructor.playerSizeY * activeCamera.zoom
+            );
 
-        ctx.fillStyle = "#000000";
-        ctx.textAlign = 'center';
-        ctx.scale(activeCamera.zoom, activeCamera.zoom);
-        ctx.font = this.constructor.font;
-    
-        ctx.fillText("<" + this.username + ">", this.pos.screenPos.x / activeCamera.zoom, (this.pos.screenPos.y + (this.constructor.playerSizeY * 1.1 * activeCamera.zoom)) / activeCamera.zoom);
+            ctx.fillStyle = "#000000";
+            ctx.textAlign = 'center';
+            ctx.scale(activeCamera.zoom, activeCamera.zoom);
+            ctx.font = this.constructor.font;
+        
+            ctx.fillText("<" + this.username + ">", this.pos.screenPos.x / activeCamera.zoom, (this.pos.screenPos.y + (this.constructor.playerSizeY * 1.1 * activeCamera.zoom)) / activeCamera.zoom);
 
-        ctx.restore();
+            ctx.restore();
+        }
     }
 }
 
@@ -332,7 +368,10 @@ function sendMessage(msg, textbox) {
         textbox.clearTextbox();
         if (connected) {
             userPlayer.sayMessage(msg);
-            webSocket.send("<" + userPlayer.username + "> " + msg);
+            webSocket.send(JSON.stringify({
+                id: userPlayer.username,
+                msg: `${msg}`
+            }));
         }
     }
 }
@@ -355,6 +394,9 @@ function setUser(usr, textbox) {
     if (!connected) {
         if (usr.length > 0) {
             userPlayer = new Player(usr, World.spawnPos, usr, "#FF0000");
+            webSocket.send(JSON.stringify({
+                id: `${userPlayer.username}`
+            }));
             receiveMessage("Username set to "+userPlayer.username);
             cameraList.push(new Camera("playerCam", Vector2.zero, 0.1, [-512, -512, 512, 512]));
             activeCamera = cameraList[cameraList.length-1];
@@ -377,8 +419,7 @@ function connect() {
     otherPlayers.push(new Player("(" + centerDist + ", 0)", new Vector2(centerDist, 0), "(" + centerDist + ", 0)", "#0000FF"));
     otherPlayers.push(new Player("(-" + centerDist + ", 0)", new Vector2(-centerDist, 0), "(-" + centerDist + ", 0)", "#00FFFF"));
     connected = true;
-
-    webSocket.send(userPlayer.username+" has connected.");
+    serverUpdate();
 }
 
 function startAnimating() {
@@ -402,6 +443,17 @@ function update() {
         element.drawSpeechBubbles(gameCanvas);
         element.update((Date.now()-startTime)/fpms);
     });
+}
+
+function serverUpdate() {
+    setTimeout(() => {
+        serverUpdate();
+    }, 20);
+    webSocket.send(JSON.stringify({
+        id: userPlayer.username,
+        posX: userPlayer.pos.x,
+        posY: userPlayer.pos.y
+    }));
 }
 
 function rgb(r, g, b){

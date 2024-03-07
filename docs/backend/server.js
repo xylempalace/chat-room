@@ -7,6 +7,13 @@ const app = express()
 const { WebSocketServer } = require('ws')
 const sockserver = new WebSocketServer({ port: 443 })
 
+sockserver.getUniqueID = function () {
+  function s4() {
+      return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+  }
+  return s4() + s4() + '-' + s4();
+};
+
 const port = 3000
 //Import path library
 const path = require('path')
@@ -24,87 +31,54 @@ const matcher = new RegExpMatcher({
 	...englishRecommendedTransformers,
 });
 
-const strategy = asteriskCensorStrategy();
+const strategy = asteriskCensorStrategy();  
 const censor = new TextCensor().setStrategy(strategy);
+
+const files = {
+  '/' : ['text/html', '../frontend/index.html'],
+  '/web.css' : ['text/css', '../frontend/web.css'],
+  '/test.js' : ['text/javascript', '../frontend/test.js'],
+  '/favicon.ico' : ['image/vnd.microsoft.icon', '../images/favicon.ico'],
+  '/lemEngine.js' : ['text/javascript', '../frontend/lemEngine.js'],
+  '/sprites/tiles/floor.png' : ['image/png', '../frontend/sprites/tiles/floor.png'],
+  '/sprites/tiles/wall.png' : ['image/png', '../frontend/sprites/tiles/wall.png'],
+  '/sprites/tiles/grass.png' : ['image/png', '../frontend/sprites/tiles/grass.png'],
+  '/sprites/tiles/pathCenter.png' : ['image/png', '../frontend/sprites/tiles/pathCenter.png'],
+  '/sprites/tiles/pathNorth.png' : ['image/png', '../frontend/sprites/tiles/pathNorth.png'],
+  '/sprites/tiles/pathSouth.png' : ['image/png', '../frontend/sprites/tiles/pathSouth.png'],
+  '/sprites/speechBubble.png' : ['image/png', '../frontend/sprites/speechBubble.png'],
+};
 
 var clients = {};
 
 //Sends index.html and coressponding css file, TODO: Send JS file as well.
-app.get('/', (req, res) => {
-  res.set('Content-Type', 'text/html');
-  res.sendFile(path.join(__dirname, '../frontend/index.html'));
-})
-
-app.get('/web.css', (req, res) => {
-  res.set('Content-Type', 'text/css');
-  res.sendFile(path.join(__dirname, '../frontend/web.css'));
-})
-
-app.get('/test.js', (req, res) => {
- res.set('Content-Type', 'text/javascript');
-  res.sendFile(path.join(__dirname, '../frontend/test.js'));
-})
-
-app.get('/favicon.ico', (req, res) => {
-  res.set('Content-Type', '	image/vnd.microsoft.icon');
-  res.sendFile(path.join(__dirname, '../images/favicon.ico'));
-})
-
-app.get('/lemEngine.js', (req, res) => {
-  res.set('Content-Type', 'text/javascript');
-   res.sendFile(path.join(__dirname, '../frontend/lemEngine.js'));
-})
-
-app.get('/sprites/tiles/floor.png', (req, res) => {
-  res.set('Content-Type', 'image/png');
-   res.sendFile(path.join(__dirname, '../frontend/sprites/tiles/floor.png'));
-})
-
-app.get('/sprites/tiles/wall.png', (req, res) => {
-  res.set('Content-Type', 'image/png');
-   res.sendFile(path.join(__dirname, '../frontend/sprites/tiles/wall.png'));
-})
-
-app.get('/sprites/tiles/grass.png', (req, res) => {
-  res.set('Content-Type', 'image/png');
-   res.sendFile(path.join(__dirname, '../frontend/sprites/tiles/grass.png'));
-})
-
-app.get('/sprites/tiles/pathCenter.png', (req, res) => {
-  res.set('Content-Type', 'image/png');
-   res.sendFile(path.join(__dirname, '../frontend/sprites/tiles/pathCenter.png'));
-})
-
-app.get('/sprites/tiles/pathNorth.png', (req, res) => {
-  res.set('Content-Type', 'image/png');
-   res.sendFile(path.join(__dirname, '../frontend/sprites/tiles/pathNorth.png'));
-})
-
-app.get('/sprites/tiles/pathSouth.png', (req, res) => {
-  res.set('Content-Type', 'image/png');
-   res.sendFile(path.join(__dirname, '../frontend/sprites/tiles/pathSouth.png'));
-})
-
-app.get('/sprites/speechBubble.png', (req, res) => {
-  res.set('Content-Type', 'image/png');
-   res.sendFile(path.join(__dirname, '../frontend/sprites/speechBubble.png'));
-})
+app.get('/*', (req, res) => {
+  try {
+    var stuff = files[req.url];
+    res.set('Content-Type', stuff[0]);
+    res.sendFile(path.join(__dirname, stuff[1]));
+  } catch (err) {
+    console.log(req.url);
+    console.log(err);
+  }
+});
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
-})
+});
 
 sockserver.on('connection', ws => {
   console.log('New client connected!'); 
 
   ws.on('close', () => {
-    console.log('Client has disconnected!');
+    console.log(`${clients[ws.id]}(${ws.id}) has disconnected!`);
     sockserver.clients.forEach(client => {
       client.send(JSON.stringify({
-        id: clients[ws.client],
+        id: clients[ws.id],
         expired: true
       })); 
     });
+    delete clients[ws.id];
   });
 
   ws.on('message', (str) => {
@@ -130,14 +104,36 @@ sockserver.on('connection', ws => {
         }));
       });
     } else if ("id" in obj) {
-      console.log(ws.client);
-      clients[ws.client] = obj.id;
-      sockserver.clients.forEach(client => {
-        client.send(JSON.stringify({
-          id: obj.id,
-          joinMsg: `${obj.id} has connected!`
+      var validName = true;
+      for (const [key, value] of Object.entries(clients)) {
+        if (obj.id == value) {
+          validName = false;
+          ws.send(JSON.stringify({
+            invalidName: true
+          }));
+          break;
+        }
+      }
+
+      if (validName) {
+        var haveId = true
+        while (haveId) {
+          ws.id = sockserver.getUniqueID();
+          haveId = clients.hasOwnProperty(ws.id)
+        }
+        console.log(`username: ${obj.id} uid: ${ws.id}`);
+        clients[ws.id] = obj.id;
+        ws.send(JSON.stringify({
+          invalidName: false,
+          usr: obj.id
         }));
-      });
+        sockserver.clients.forEach(client => {
+          client.send(JSON.stringify({
+            id: obj.id,
+            joinMsg: `${obj.id} has connected!`
+          }));
+        });
+      }
     }
   })
 

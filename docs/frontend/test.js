@@ -76,6 +76,10 @@ webSocket.onmessage = (event) => {
         if (p != null) {
             p.sayMessage(obj.msg);
         }
+
+        if (userPlayer.username == obj.id) {
+            userPlayer.sayMessage(obj.msg);
+        }
     } else if ("joinMsg" in obj) {
         receiveMessage(obj.joinMsg);
     } else if ("posX" in obj && connected && userPlayer.username != obj.id) {
@@ -389,7 +393,6 @@ function sendMessage(msg, textbox) {
     if (msg.length > 0) {
         textbox.clearTextbox();
         if (connected) {
-            userPlayer.sayMessage(msg);
             webSocket.send(JSON.stringify({
                 id: userPlayer.username,
                 msg: `${msg}`

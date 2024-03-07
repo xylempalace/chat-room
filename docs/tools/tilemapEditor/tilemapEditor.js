@@ -86,6 +86,10 @@ const tilePalette = [
     new Sprite("tiles/pathEast.png"),
     new Sprite("tiles/pathWest.png"),
     new Sprite("tiles/pathNone.png"),
+	new Sprite("tiles/pathNorthEast.png"),
+	new Sprite("tiles/pathNorthWest.png"),
+    new Sprite("tiles/pathSouthEast.png"),
+    new Sprite("tiles/pathSouthWest.png"),
 ];
 
 const tilesForEditor = [
@@ -99,10 +103,17 @@ const tilesForEditor = [
     new Tile("Path", [
         new TileRule(tilePalette[4]), 
         new TileRule(tilePalette[9], [0, -1, 0, -1, 0, -1, 0, -1, 0]),
+		
         new TileRule(tilePalette[5], [0, -1, 0, 0, 0, 0, 0, 1, 0]), 
         new TileRule(tilePalette[6], [0, 1, 0, 0, 0, 0, 0, -1, 0]), 
         new TileRule(tilePalette[7], [0, 0, 0, 1, 0, -1, 0, 0, 0]), 
         new TileRule(tilePalette[8], [0, 0, 0, -1, 0, 1, 0, 0, 0]), 
+		
+		new TileRule(tilePalette[10], [0, -1, 0, 1, 0, -1, 0, 1, 0]), 
+        new TileRule(tilePalette[11], [0, -1, 0, -1, 0, 1, 0, 1, 0]), 
+        new TileRule(tilePalette[12], [0, 1, 0, 1, 0, -1, 0, -1, 0]), 
+        new TileRule(tilePalette[13], [0, 1, 0, -1, 0, 1, 0, -1, 0]), 
+		
         new TileRule(tilePalette[4], [0, 1, 0, 1, 0, 1, 0, 1, 0]),]),
 ]
 
@@ -249,6 +260,7 @@ document.addEventListener("readystatechange", (e) => {
         }
 
         addCanvas();
+        targetMSPF = 3;
         gameCanvas.addEventListener("mouseup", (e) => {
             drawing = false;
         });
@@ -333,7 +345,7 @@ function update() {
         }
 
         updateMap();
-        
+        log.textContent = map.map;
         map.draw();
         
     }

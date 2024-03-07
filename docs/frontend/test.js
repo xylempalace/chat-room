@@ -5,35 +5,30 @@ let isDark = false;
 
 //Client information
 let connected = false;
+let loginState = "username";
 let userPlayer;
 let otherPlayers = [];
 
 //Tilemap
 const backgroundTiles = [
+    0,
     new Sprite("tiles/floor.png"),
     new Sprite("tiles/wall.png"),
     new Sprite("tiles/grass.png"),
     new Sprite("tiles/pathCenter.png"),
     new Sprite("tiles/pathNorth.png"),
     new Sprite("tiles/pathSouth.png"),
+    new Sprite("tiles/pathEast.png"),
+    new Sprite("tiles/pathWest.png"),
+    new Sprite("tiles/pathNone.png"),
+	new Sprite("tiles/pathNorthEast.png"),
+	new Sprite("tiles/pathNorthWest.png"),
+    new Sprite("tiles/pathSouthEast.png"),
+    new Sprite("tiles/pathSouthWest.png"),
 ];
-const backgroundMap = new TileMap(new Vector2(0,0), backgroundTiles, 64, 16, 16, [
-    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
-    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
-    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
-    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
-    2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 
-    2, 2, 2, 2, 1, 0, 0, 0, 0, 0, 0, 1, 2, 2, 2, 2, 
-    4, 4, 4, 4, 1, 0, 0, 0, 0, 0, 0, 1, 2, 2, 2, 2, 
-    3, 3, 3, 3, 1, 0, 0, 0, 0, 0, 0, 1, 2, 2, 2, 2, 
-    3, 3, 3, 3, 1, 0, 0, 0, 0, 0, 0, 1, 2, 2, 2, 2, 
-    5, 5, 5, 5, 1, 0, 0, 0, 0, 0, 0, 1, 2, 2, 2, 2, 
-    2, 2, 2, 2, 1, 0, 0, 0, 0, 0, 0, 1, 2, 2, 2, 2, 
-    2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 
-    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
-    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
-    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
-    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+
+const backgroundMap = new TileMap(new Vector2(0,0), backgroundTiles, 64, 32, 32, [
+    11,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,13,5,4,7,7,7,7,7,7,7,7,7,7,7,4,4,4,4,4,4,7,7,7,7,7,7,7,7,7,7,7,4,6,5,6,3,3,3,3,3,3,3,3,3,3,3,10,4,4,4,7,12,3,3,3,3,3,1,3,3,3,3,3,5,6,5,6,3,3,3,3,3,3,3,3,3,9,3,3,5,4,12,3,3,3,3,3,3,3,3,3,3,1,3,3,5,6,5,6,3,3,3,3,3,3,3,3,3,3,3,11,4,6,3,3,9,3,3,3,3,3,3,1,3,3,3,3,5,6,5,6,1,3,3,3,3,3,3,3,3,3,3,5,4,6,3,3,3,3,3,3,3,3,3,1,1,1,3,3,5,6,10,12,1,1,3,3,3,3,3,3,3,3,3,5,4,6,3,3,3,3,3,3,3,3,3,1,1,1,1,3,5,6,2,2,2,1,3,3,3,3,3,3,3,3,3,10,4,6,3,3,3,3,3,3,3,3,1,1,1,1,1,3,5,6,2,2,2,1,3,3,3,3,3,3,3,3,3,3,5,4,13,3,3,3,3,3,3,3,1,1,1,3,1,3,5,6,1,1,1,1,3,3,3,3,3,3,3,3,3,3,10,4,6,3,3,3,3,3,3,3,1,1,1,1,1,3,5,6,1,1,1,1,3,3,3,3,3,3,3,3,3,3,3,5,6,3,3,3,3,3,3,3,1,3,1,1,3,3,5,6,1,1,1,3,3,3,3,3,3,3,3,11,8,8,8,4,4,8,8,8,13,3,3,3,3,3,1,3,3,3,5,6,2,2,2,3,3,3,3,3,3,3,3,5,4,7,7,4,4,7,7,4,6,3,3,3,1,3,3,3,1,3,5,6,2,2,2,1,3,3,3,3,3,3,3,5,6,3,3,10,12,3,3,5,6,3,3,3,3,3,1,3,3,3,5,6,2,2,2,1,3,3,3,3,3,3,3,5,6,3,2,1,1,2,3,5,6,3,3,3,3,3,3,3,3,3,5,6,2,2,2,3,3,3,3,3,3,3,3,5,4,13,1,1,1,1,11,4,6,3,3,3,3,3,3,3,3,3,5,6,11,13,1,3,3,3,3,3,3,3,3,5,4,12,1,1,1,1,10,4,6,2,3,2,3,2,3,2,3,2,5,6,5,6,3,3,3,3,3,3,3,3,3,5,6,3,2,1,1,2,3,5,6,3,3,3,3,3,3,3,3,3,5,6,5,6,3,3,3,3,3,3,3,3,3,5,6,3,3,11,13,3,3,5,6,3,3,3,3,3,3,3,3,3,5,6,5,6,3,3,3,3,3,3,3,3,3,5,4,8,8,4,4,8,8,4,4,13,3,3,3,3,3,3,3,3,5,6,5,6,3,3,11,4,4,4,13,3,3,10,7,7,7,7,7,7,7,4,4,6,3,3,3,3,3,3,3,3,5,6,5,6,3,11,12,1,1,1,10,13,3,3,3,3,3,3,2,3,3,10,4,4,13,3,3,3,3,3,3,3,5,6,5,6,3,4,1,11,4,13,1,4,3,3,3,3,3,3,3,3,3,3,10,4,4,8,8,13,3,3,3,3,5,6,5,6,3,4,1,4,2,4,1,4,3,3,3,3,3,3,2,3,3,3,3,10,7,4,4,4,8,13,3,3,5,6,5,6,3,4,1,10,4,12,1,4,3,3,3,3,3,3,3,3,3,3,3,3,3,5,4,4,4,6,3,3,5,6,5,6,3,10,13,1,1,1,11,12,3,3,3,3,3,3,2,3,3,3,3,3,3,10,4,4,4,6,3,3,5,6,5,6,3,3,10,4,4,4,12,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,10,4,4,4,8,8,4,6,5,6,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,3,3,3,3,3,3,3,3,10,4,4,4,4,4,6,5,6,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,5,4,7,4,4,6,5,6,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,3,3,3,3,3,3,3,11,8,4,6,3,5,4,6,5,4,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,4,4,4,4,8,4,4,6,10,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,12
 ]);
 const SpeechBubbleSprite = new NineSlicedSprite("speechBubble.png"  , [16, 16, 16, 24]);
 
@@ -47,10 +42,8 @@ webSocket.onmessage = (event) => {
         let p = otherPlayers.findIndex((element) => {
             return element.username == obj.id;
         })
-        console.log(`Splicing ${p} ${otherPlayers[p].username} ${obj.id} ${otherPlayers.length}`);
         otherPlayers[p].expired = true;
         otherPlayers.splice(p, 1);
-        console.log(`Spliced  ${otherPlayers.length}`);
     } else if ("msg" in obj) {
         receiveMessage(`<${obj.id}> ${obj.msg}`);
         let p = otherPlayers.find((element) => {
@@ -62,7 +55,7 @@ webSocket.onmessage = (event) => {
         }
     } else if ("joinMsg" in obj) {
         receiveMessage(obj.joinMsg);
-    } else if ("posX" in obj && userPlayer.username != obj.id) {
+    } else if ("posX" in obj && connected && userPlayer.username != obj.id) {
         let p = otherPlayers.find((element) => {
             return element.username == obj.id;
         })
@@ -72,6 +65,16 @@ webSocket.onmessage = (event) => {
             p.pos.y = obj.posY; 
         } else {
             otherPlayers.push(new Player(obj.id, new Vector2(obj.posX, obj.posY), obj.id, "#FF0000"));
+        }
+    } else if ("invalidName" in obj) {
+        if (obj.invalidName) {
+            loginState = "username";
+            const textBox = textInputs.find((element) => element.textInput.getAttribute("placeholder") == "Username");
+            textBox.clearTextbox();
+        } else {
+            loginState = "usernameVerified";
+            const textBox = textInputs.find((element) => element.textInput.getAttribute("placeholder") == "Username");
+            setUser(obj.usr, textBox);
         }
     }
 };
@@ -394,13 +397,18 @@ function updateUser(e) {
 
 function setUser(usr, textbox) {
     if (!connected) {
-        if (usr.length > 0) {
-            userPlayer = new Player(usr, World.spawnPos, usr, "#FF0000");
-            webSocket.send(JSON.stringify({
-                id: `${userPlayer.username}`
-            }));
+        if (loginState == "username") {
+            if (usr.length > 0) {
+                userPlayer = new Player(usr, World.spawnPos, usr, "#FF0000");
+                webSocket.send(JSON.stringify({
+                    id: `${userPlayer.username}`
+                }));
+            }
+            loginState = "awaitingVerification";
+        } else if (loginState == "usernameVerified") {
+            loginState = "playing";
             receiveMessage("Username set to "+userPlayer.username);
-            cameraList.push(new Camera("playerCam", Vector2.zero, 0.1, [-512, -512, 512, 512]));
+            cameraList.push(new Camera("playerCam", Vector2.zero, 0.01, [-1024, -1024, 1024, 1024]));
             activeCamera = cameraList[cameraList.length-1];
             textbox.setDisabled(true);
             TextInput.findInputByID("chatInput").setDisabled(false);

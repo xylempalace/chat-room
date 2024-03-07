@@ -14,7 +14,10 @@
             <div><p id="values" class="chatLog"></p></div>
             <div> <label for="tiles">Tile: </label> <select name="tiles" id="selectTile"></select>
             <div> <input id = "confirm" type="button" value = "Export"> </div>
-            <div> <input id = "rows" type="number" placeholder = "Rows"><input id = "cols" type="number" placeholder = "Cols"> </div>
+            <div> 
+                <label for="rows">Rows: </label><input id = "rows" type="number" placeholder = "8">
+                <label for="cols">Cols: </label><input id = "cols" type="number" placeholder = "8"> 
+            </div>
             <div> <input id = "zoom_in" type="button" value = "+"><input id = "zoom_out" type="button" value = "-"> </div>
             <div id="importInput" class="inputDiv" style="position: absolute; bottom: 0;" placeholder="Import" func="sendMessage" hasButton=true reqConnection=false></div>
             </div>

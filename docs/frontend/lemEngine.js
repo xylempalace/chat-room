@@ -125,19 +125,6 @@ class NineSlicedSprite extends Sprite {
     }
 }
 
-class Tile {
-    tileRules = []
-}
-
-class TileRule {
-    image;
-    conditions = [];
-    
-    constructor (image, conds) {
-        this.image = image;
-    }
-}
-
 class TileMap {
     pos;
     tiles = [];
@@ -163,15 +150,13 @@ class TileMap {
         
         for (let i = 0; i < this.cols; i++) {
             for (let k = 0; k < this.rows; k++) {
-                if (i == 1 && k == 1) {
-                    console.log(this.map[(i*this.rows) + k]);
+                if (this.map[(i*this.rows) + k] != null && this.tiles[this.map[(i*this.rows) + k]] != null) { 
+                    this.tiles[this.map[(i*this.rows) + k]].draw(new Vector2(
+                        offsetPos.x + (k * this.tileSize),
+                        offsetPos.y + (i * this.tileSize)).screenPos,
+                        (this.tileSize + 1)* activeCamera.zoom
+                    )
                 }
-                
-                this.tiles[this.map[(i*this.rows) + k]].draw(new Vector2(
-                    offsetPos.x + (k * this.tileSize),
-                    offsetPos.y + (i * this.tileSize)).screenPos,
-                    (this.tileSize + 1)* activeCamera.zoom
-                )
             }
         }
     }

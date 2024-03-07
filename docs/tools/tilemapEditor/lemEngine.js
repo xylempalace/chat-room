@@ -5,7 +5,7 @@ let ctx;
 //FPS tracking and measurement, debug
 let startTime = 0;
 let beginTime = 0;
-const fps = 60;
+const fps = 10;
 const fpms = 1000/fps;
 const scriptStart = Date.now();
 
@@ -31,7 +31,7 @@ class Vector2 {
         this.y = y;
     }
     
-    screenToWorldPos() {
+    get screenToWorldPos() {
         let v = new Vector2(
             ((this.x + (activeCamera.pos.x * activeCamera.zoom)) - activeCamera.halfWidth)  / activeCamera.zoom,
             ((this.y + (activeCamera.pos.y * activeCamera.zoom)) - activeCamera.halfHeight) / activeCamera.zoom
@@ -130,19 +130,6 @@ class NineSlicedSprite extends Sprite {
     }
 }
 
-class Tile {
-    tileRules = []
-}
-
-class TileRule {
-    image;
-    conditions = [];
-    
-    constructor (image, conds) {
-        this.image = image;
-    }
-}
-
 class TileMap {
     pos;
     tiles = [];
@@ -151,7 +138,7 @@ class TileMap {
     rows;
     tileSize;
 
-    constructor (pos, tiles, tileSize, cols, rows, map) {
+    constructor (pos = new Vector2(0,0), tiles = [], tileSize = 16, cols = 8, rows = 8, map = []) {
         this.pos = pos;
         this.tiles = tiles;
         this.tileSize = tileSize;
@@ -168,12 +155,12 @@ class TileMap {
         
         for (let i = 0; i < this.cols; i++) {
             for (let k = 0; k < this.rows; k++) {
-                if (this.map[(i*this.rows) + k] != null && this.tiles[this.map[(i*this.rows) + k]] != null) {                
+                if (this.map[(i*this.rows) + k] != null && this.tiles[this.map[(i*this.rows) + k]] != null) { 
                     this.tiles[this.map[(i*this.rows) + k]].draw(new Vector2(
-                        offsetPos.x + (k * this.tileSize),
-                        offsetPos.y + (i * this.tileSize)).screenPos,
-                        this.tileSize * activeCamera.zoom
-                    )
+                        i*this.tileSize * activeCamera.zoom,
+                        k*this.tileSize * activeCamera.zoom), 
+                        (this.tileSize + 1) * activeCamera.zoom
+                    );
                 }
             }
         }
@@ -364,14 +351,9 @@ function drawScreen() {
     startTime = Date.now();
     var fpsDecimalPlaces = 1;
     var measuredFPS = ((startTime-beginTime))*(fpsDecimalPlaces*10);
-    //drawText(25, 25, "FPS: " + truncateNumber(measuredFPS, fpsDecimalPlaces));
-    //drawText(25, 50, "Target MSPF: "+ truncateNumber(fpms, fpsDecimalPlaces)); //Target miliseconds per frame
-    
+
     frameLength = Math.min(fpms-(Date.now()-beginTime),fpms);
 
-    //Updates FPS graph
-    //DebugGraph.updateFPSGraph(frameLength);
-    //DebugGraph.drawFPSGraph(0, 30, 250, 100, 3); 
 }
 
 function update() {}

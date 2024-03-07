@@ -194,9 +194,11 @@ class Player extends GameObject {
         this.velX = Math.cos(angle)*this.constructor.playerMoveSpeed;
         this.velY = Math.sin(angle)*this.constructor.playerMoveSpeed;
         
+        /*
         receiveMessage("Vel X: " + truncateNumber(this.velX,1) + "   Vel Y: " + truncateNumber(this.velY,1));
         receiveMessage("Angle: " + truncateNumber(angle,1));
         receiveMessage("Cam X: " + truncateNumber(activeCamera.x,1) + "   Cam Y: " + truncateNumber(activeCamera.y,1)+"\n");
+        */
     }
     
     update(deltaTime) {

@@ -21,7 +21,7 @@ body{
 
     margin-bottom:2em;
 
-    overflow-wrap: break-word;
+    overflow-wrap: anywhere;
 
     white-space:pre-line;
 
@@ -31,14 +31,14 @@ body{
 .chatBox { 
     height: -webkit-fill-available;
 
-    width: 215px;
+    width: 230px;
 
     overflow: auto;
 
     /* flex direction puts the text near the bottom */
     display: flex; flex-direction: column-reverse;
 
-    position: relative; align-items: center;
+    position: relative; align-items: baseline;
 
     float: left;
     
@@ -53,13 +53,15 @@ body{
 
 /* username and chatbox thingies */
 .inputText {
-    height:1.5em;
+    position: fixed;
+
+    height:25px; width: 170px; 
 }
 
 .inputButton {
-    width:2em;
+    position: fixed; left: 190px;
 
-    height:2em;
+    width: 33px; height:31px;
 }
 
 .inputDiv {

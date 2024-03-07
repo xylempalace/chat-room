@@ -152,8 +152,8 @@ class TileMap {
             for (let k = 0; k < this.rows; k++) {
                 if (this.map[(i*this.rows) + k] != null && this.tiles[this.map[(i*this.rows) + k]] != null) { 
                     this.tiles[this.map[(i*this.rows) + k]].draw(new Vector2(
-                        offsetPos.x + (k * this.tileSize),
-                        offsetPos.y + (i * this.tileSize)).screenPos,
+                        offsetPos.x + (i * this.tileSize),
+                        offsetPos.y + (k * this.tileSize)).screenPos,
                         (this.tileSize + 1)* activeCamera.zoom
                     )
                 }

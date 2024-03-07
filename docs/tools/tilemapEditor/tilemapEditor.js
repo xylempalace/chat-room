@@ -83,6 +83,9 @@ const tilePalette = [
     new Sprite("tiles/pathCenter.png"),
     new Sprite("tiles/pathNorth.png"),
     new Sprite("tiles/pathSouth.png"),
+    new Sprite("tiles/pathEast.png"),
+    new Sprite("tiles/pathWest.png"),
+    new Sprite("tiles/pathNone.png"),
 ];
 
 const tilesForEditor = [
@@ -95,8 +98,11 @@ const tilesForEditor = [
         new TileRule(tilePalette[1])]),
     new Tile("Path", [
         new TileRule(tilePalette[4]), 
+        new TileRule(tilePalette[9], [0, -1, 0, -1, 0, -1, 0, -1, 0]),
         new TileRule(tilePalette[5], [0, -1, 0, 0, 0, 0, 0, 1, 0]), 
         new TileRule(tilePalette[6], [0, 1, 0, 0, 0, 0, 0, -1, 0]), 
+        new TileRule(tilePalette[7], [0, 0, 0, 1, 0, -1, 0, 0, 0]), 
+        new TileRule(tilePalette[8], [0, 0, 0, -1, 0, 1, 0, 0, 0]), 
         new TileRule(tilePalette[4], [0, 1, 0, 1, 0, 1, 0, 1, 0]),]),
 ]
 

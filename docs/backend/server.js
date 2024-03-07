@@ -112,7 +112,8 @@ sockserver.on('connection', ws => {
         if (obj.id == value) {
           validName = false;
           ws.send(JSON.stringify({
-            invalidName: true
+            invalidName: true,
+            usernameError: "Username Taken"
           }));
           break;
         }
@@ -125,7 +126,8 @@ sockserver.on('connection', ws => {
         console.log("Profane username detected"); 
         validName = false;
         ws.send(JSON.stringify({
-          invalidName: true
+          invalidName: true,
+          usernameError: "Invalid Username"
         }));
       }
         

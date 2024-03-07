@@ -91,6 +91,7 @@ webSocket.onmessage = (event) => {
         }
     } else if ("invalidName" in obj) {
         if (obj.invalidName) {
+            receiveMessage(obj.usernameError);
             loginState = "username";
             const textBox = textInputs.find((element) => element.textInput.getAttribute("placeholder") == "Username");
             textBox.clearTextbox();

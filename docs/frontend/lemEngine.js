@@ -342,7 +342,7 @@ function drawScreen() {
     setTimeout(() => {
         beginTime = Date.now();
         requestAnimationFrame(drawScreen);
-    }, fpms);
+    }, 1);
     
     update();
     

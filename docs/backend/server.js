@@ -105,6 +105,9 @@ sockserver.on('connection', ws => {
       });
     } else if ("id" in obj) {
       var validName = true;
+
+
+
       for (const [key, value] of Object.entries(clients)) {
         if (obj.id == value) {
           validName = false;
@@ -114,6 +117,19 @@ sockserver.on('connection', ws => {
           break;
         }
       }
+      const matcher = new RegExpMatcher({
+        ...englishDataset.build(),
+        ...englishRecommendedTransformers,
+      });
+      if(matcher.hasMatch(obj.id)){
+        console.log("Profane username detected"); 
+        validName = false;
+        ws.send(JSON.stringify({
+          invalidName: true
+        }));
+      }
+        
+
 
       if (validName) {
         var haveId = true

@@ -104,19 +104,36 @@ sockserver.on('connection', ws => {
         }));
       });
     } else if ("id" in obj) {
-      var haveId = true
-      while (haveId) {
-        ws.id = sockserver.getUniqueID();
-        haveId = clients.hasOwnProperty(ws.id)
+      var validName = true;
+      for (const [key, value] of Object.entries(clients)) {
+        if (obj.id == value) {
+          validName = false;
+          ws.send(JSON.stringify({
+            invalidName: true
+          }));
+          break;
+        }
       }
-      console.log(`username: ${obj.id} uid: ${ws.id}`);
-      clients[ws.id] = obj.id;
-      sockserver.clients.forEach(client => {
-        client.send(JSON.stringify({
-          id: obj.id,
-          joinMsg: `${obj.id} has connected!`
+
+      if (validName) {
+        var haveId = true
+        while (haveId) {
+          ws.id = sockserver.getUniqueID();
+          haveId = clients.hasOwnProperty(ws.id)
+        }
+        console.log(`username: ${obj.id} uid: ${ws.id}`);
+        clients[ws.id] = obj.id;
+        ws.send(JSON.stringify({
+          invalidName: false,
+          usr: obj.id
         }));
-      });
+        sockserver.clients.forEach(client => {
+          client.send(JSON.stringify({
+            id: obj.id,
+            joinMsg: `${obj.id} has connected!`
+          }));
+        });
+      }
     }
   })
 

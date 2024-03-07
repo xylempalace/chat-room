@@ -5,6 +5,7 @@ let isDark = false;
 
 //Client information
 let connected = false;
+let loginState = "username";
 let userPlayer;
 let otherPlayers = [];
 
@@ -62,7 +63,7 @@ webSocket.onmessage = (event) => {
         }
     } else if ("joinMsg" in obj) {
         receiveMessage(obj.joinMsg);
-    } else if ("posX" in obj && userPlayer.username != obj.id) {
+    } else if ("posX" in obj && connected && userPlayer.username != obj.id) {
         let p = otherPlayers.find((element) => {
             return element.username == obj.id;
         })
@@ -72,6 +73,16 @@ webSocket.onmessage = (event) => {
             p.pos.y = obj.posY; 
         } else {
             otherPlayers.push(new Player(obj.id, new Vector2(obj.posX, obj.posY), obj.id, "#FF0000"));
+        }
+    } else if ("invalidName" in obj) {
+        if (obj.invalidName) {
+            loginState = "username";
+            const textBox = textInputs.find((element) => element.textInput.getAttribute("placeholder") == "Username");
+            textBox.clearTextbox();
+        } else {
+            loginState = "usernameVerified";
+            const textBox = textInputs.find((element) => element.textInput.getAttribute("placeholder") == "Username");
+            setUser(obj.usr, textBox);
         }
     }
 };
@@ -387,11 +398,16 @@ function updateUser(e) {
 
 function setUser(usr, textbox) {
     if (!connected) {
-        if (usr.length > 0) {
-            userPlayer = new Player(usr, World.spawnPos, usr, "#FF0000");
-            webSocket.send(JSON.stringify({
-                id: `${userPlayer.username}`
-            }));
+        if (loginState == "username") {
+            if (usr.length > 0) {
+                userPlayer = new Player(usr, World.spawnPos, usr, "#FF0000");
+                webSocket.send(JSON.stringify({
+                    id: `${userPlayer.username}`
+                }));
+            }
+            loginState = "awaitingVerification";
+        } else if (loginState == "usernameVerified") {
+            loginState = "playing";
             receiveMessage("Username set to "+userPlayer.username);
             cameraList.push(new Camera("playerCam", Vector2.zero, 0.1, [-512, -512, 512, 512]));
             activeCamera = cameraList[cameraList.length-1];

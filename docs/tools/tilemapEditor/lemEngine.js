@@ -159,7 +159,7 @@ class TileMap {
                     this.tiles[this.map[(i*this.rows) + k]].draw(new Vector2(
                         i*this.tileSize * activeCamera.zoom,
                         k*this.tileSize * activeCamera.zoom), 
-                        (this.tileSize + 1) * activeCamera.zoom
+                        (this.tileSize * activeCamera.zoom) + 1
                     );
                 }
             }

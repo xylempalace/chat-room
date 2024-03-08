@@ -335,7 +335,7 @@ class SpeechBubble {
         ctx.font = this.constructor.font;
     
         for (let i = 0; i < this.message.length; i++) {
-            
+            SpeechBubbleSprite.draw(new Vector2(posX, posY), 50)
             ctx.fillText(this.message[i], posX, posY-(this.constructor.fontHeight*(this.message.length-(1+i))));
         }
 

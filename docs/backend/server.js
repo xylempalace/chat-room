@@ -75,10 +75,10 @@ sockserver.on('connection', ws => {
 
   ws.on('close', () => {
     // When the client disconnects it sends its username to other clients so they know to remove that player from their screen
-    console.log(`${clients[ws.id]}(${ws.id}) has disconnected!`);
+    console.log(`${clients[ws.id][0]}(${ws.id}) has disconnected!`);
     sockserver.clients.forEach(client => {
       client.send(JSON.stringify({
-        id: clients[ws.id],
+        id: clients[ws.id][0],
         expired: true
       })); 
     });
@@ -91,6 +91,8 @@ sockserver.on('connection', ws => {
   
     if ("posX" in obj) {
       // This code handles recieving and distributing positional data from one client to the others
+      clients[ws.id][1] = obj.posX;
+      clients[ws.id][2] = obj.posY;
       sockserver.clients.forEach(client => {
         client.send(JSON.stringify({
           id: obj.id,
@@ -101,14 +103,16 @@ sockserver.on('connection', ws => {
     } else if ("msg" in obj) {
       // When a message is sent this code distributes that message to other clients
       sockserver.clients.forEach(client => {
-        const matches = matcher.getAllMatches(obj.msg);
-        var newmsg = (censor.applyTo(obj.msg, matches));
-        obj.msg = newmsg; 
-        console.log(`distributing message: ${obj.msg}`);
-        client.send(JSON.stringify({
-          id: obj.id,
-          msg: obj.msg
-        }));
+        if (distance(clients[client.id][1], clients[ws.id][1], clients[client.id][2], clients[ws.id][2]) < 800) {
+          const matches = matcher.getAllMatches(obj.msg);
+          var newmsg = (censor.applyTo(obj.msg, matches));
+          obj.msg = newmsg; 
+          console.log(`distributing message: ${obj.msg}`);
+          client.send(JSON.stringify({
+            id: obj.id,
+            msg: obj.msg
+          }));
+        }
       });
     } else if ("id" in obj) {
       // When a client selects a username
@@ -148,7 +152,7 @@ sockserver.on('connection', ws => {
           haveId = clients.hasOwnProperty(ws.id)
         }
         console.log(`username: ${obj.id} uid: ${ws.id}`);
-        clients[ws.id] = obj.id;
+        clients[ws.id] = [obj.id, 0.0, 0.0];
         // The client is then sent a comfimation message
         ws.send(JSON.stringify({
           invalidName: false,
@@ -169,4 +173,8 @@ sockserver.on('connection', ws => {
     // Handles any errors with the websocket
     console.log('websocket error');
   }
-})
+});
+
+function distance(x1, x2, y1, y2) {
+  return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+}

@@ -45,27 +45,33 @@ webSocket.onmessage = (event) => {
     var obj = JSON.parse(event.data);
 
     if ("expired" in obj) {
+        // Handles removing a disconnected player from the screen and printing a leave message
         let p = otherPlayers.findIndex((element) => {
             return element.username == obj.id;
         })
         otherPlayers[p].expired = true;
         otherPlayers.splice(p, 1);
+        receiveMessage(`${obj.id} has disconnected!`);
     } else if ("msg" in obj) {
+        // Handles recieving messages form other players and displaying them in the proper locations
         receiveMessage(`<${obj.id}> ${obj.msg}`);
         let p = otherPlayers.find((element) => {
             return element.username == obj.id;
         })
-
         if (p != null) {
             p.sayMessage(obj.msg);
         }
+        if (userPlayer.username == obj.id) {
+            userPlayer.sayMessage(obj.msg);
+        }
     } else if ("joinMsg" in obj) {
+        // Handles recieving join messages
         receiveMessage(obj.joinMsg);
     } else if ("posX" in obj && connected && userPlayer.username != obj.id) {
+        // Handles displaying other players on the screen
         let p = otherPlayers.find((element) => {
             return element.username == obj.id;
         })
-
         if (p != null) {
             p.pos.x = obj.posX;
             p.pos.y = obj.posY; 
@@ -73,7 +79,9 @@ webSocket.onmessage = (event) => {
             otherPlayers.push(new Player(obj.id, new Vector2(obj.posX, obj.posY), obj.id, "#FF0000"));
         }
     } else if ("invalidName" in obj) {
+        // Handles recieving username selction errors and verification
         if (obj.invalidName) {
+            receiveMessage(obj.usernameError);
             loginState = "username";
             const textBox = textInputs.find((element) => element.textInput.getAttribute("placeholder") == "Username");
             textBox.clearTextbox();
@@ -382,7 +390,6 @@ function sendMessage(msg, textbox) {
     if (msg.length > 0) {
         textbox.clearTextbox();
         if (connected) {
-            userPlayer.sayMessage(msg);
             webSocket.send(JSON.stringify({
                 id: userPlayer.username,
                 msg: `${msg}`
@@ -501,5 +508,11 @@ function ToggleDarkMode() {
 
         /* disables off dark mode */
         isDark = !isDark;
+    }
+}
+
+function onClick(event, canvasPos) {
+    if (connected) {
+        userPlayer.walkTo(canvasPos.screenToWorldPos());
     }
 }

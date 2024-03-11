@@ -42,6 +42,7 @@ const files = {
   '/test.js' : ['text/javascript', '../frontend/test.js'],
   '/favicon.ico' : ['image/vnd.microsoft.icon', '../images/favicon.ico'],
   '/lemEngine.js' : ['text/javascript', '../frontend/lemEngine.js'],
+  '/games.js' : ['text/javascript', '../frontend/games.js'],
   '/sprites/tiles/floor.png' : ['image/png', '../frontend/sprites/tiles/floor.png'],
   '/sprites/tiles/wall.png' : ['image/png', '../frontend/sprites/tiles/wall.png'],
   '/sprites/tiles/grass.png' : ['image/png', '../frontend/sprites/tiles/grass.png'],

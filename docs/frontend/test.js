@@ -516,3 +516,9 @@ function ToggleDarkMode() {
         isDark = !isDark;
     }
 }
+
+function onClick(event, canvasPos) {
+    if (connected) {
+        userPlayer.walkTo(canvasPos.screenToWorldPos());
+    }
+}

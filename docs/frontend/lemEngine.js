@@ -317,14 +317,12 @@ function addCanvas() {
 
 function canvasClick(canvas, e) {
     let canvasRect = canvas.getBoundingClientRect();
-    if (connected) {
-        let worldClick = new Vector2(
+    let worldClick = new Vector2(
             e.clientX - canvasRect.left, 
             e.clientY - canvasRect.top
         );
-        
-        userPlayer.walkTo(worldClick.screenToWorldPos());
-    }
+
+    onClick(e, worldClick);
 }
 
 function drawText(x, y, msg) {
@@ -360,3 +358,5 @@ function drawScreen() {
 }
 
 function update() {}
+
+function onClick(event, canvasPos) {}

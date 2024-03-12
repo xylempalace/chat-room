@@ -14,11 +14,11 @@
 
         <div id = "chatBox" class="chatBox" >
             
-            <div class="inputDiv" style="position: fixed; top: 12px;" placeholder="Username" func="setUser" hasButton=true reqConnection=false> </div>
+            <div class="inputDiv" style="position: fixed; top: 12px;" placeholder="Username" func="setUser" hasButton=true reqConnection=false minlength=3 maxlength=20> </div>
             
             <div><p id="values" class="chatLog"></p> </div>
             
-            <div id="chatInput" class="inputDiv" style="position: fixed; bottom: 44px;" placeholder="Chat..." func="sendMessage" hasButton=true reqConnection=true> </div>
+            <div id="chatInput" class="inputDiv" style="position: fixed; bottom: 44px;" placeholder="Chat..." func="sendMessage" hasButton=true reqConnection=true minlength=1 maxlength=50> </div>
         </div>
         
         <div id = "gameSpace" style= "height: 80%; width:100%;"> </div>
@@ -26,6 +26,7 @@
     </div>
     
     <script src="lemEngine.js"></script>
+    <script src="games.js"></script>
     <script src="test.js"></script>
 </body>
  

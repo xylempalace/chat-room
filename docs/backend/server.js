@@ -1,12 +1,13 @@
 
-//Script used to send index.html in response to HTTP request
+// Script used to send index.html in response to HTTP request
 
-//Import express library and declare it as var app
+// Import express library and declare it as var app
 const express = require('express')
 const app = express()
 const { WebSocketServer } = require('ws')
 const sockserver = new WebSocketServer({ port: 443 })
 
+// Creates a unique uid
 sockserver.getUniqueID = function () {
   function s4() {
       return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
@@ -15,7 +16,7 @@ sockserver.getUniqueID = function () {
 };
 
 const port = 3000
-//Import path library
+// Import path library
 const path = require('path')
 
 const {
@@ -34,12 +35,14 @@ const matcher = new RegExpMatcher({
 const strategy = asteriskCensorStrategy();  
 const censor = new TextCensor().setStrategy(strategy);
 
+// All files that are used and their corresponding urls and mimi types
 const files = {
   '/' : ['text/html', '../frontend/index.html'],
   '/web.css' : ['text/css', '../frontend/web.css'],
   '/test.js' : ['text/javascript', '../frontend/test.js'],
   '/favicon.ico' : ['image/vnd.microsoft.icon', '../images/favicon.ico'],
   '/lemEngine.js' : ['text/javascript', '../frontend/lemEngine.js'],
+  '/games.js' : ['text/javascript', '../frontend/games.js'],
   '/sprites/tiles/floor.png' : ['image/png', '../frontend/sprites/tiles/floor.png'],
   '/sprites/tiles/wall.png' : ['image/png', '../frontend/sprites/tiles/wall.png'],
   '/sprites/tiles/grass.png' : ['image/png', '../frontend/sprites/tiles/grass.png'],
@@ -53,13 +56,19 @@ const files = {
   '/sprites/tiles/pathNorthWest.png' : ['image/png', '../frontend/sprites/tiles/pathNorthWest.png'],
   '/sprites/tiles/pathSouthEast.png' : ['image/png', '../frontend/sprites/tiles/pathSouthEast.png'],
   '/sprites/tiles/pathSouthWest.png' : ['image/png', '../frontend/sprites/tiles/pathSouthWest.png'],
+  '/sprites/tiles/pathNorthEastInner.png' : ['image/png', '../frontend/sprites/tiles/pathNorthEastInner.png'],
+  '/sprites/tiles/pathNorthWestInner.png' : ['image/png', '../frontend/sprites/tiles/pathNorthWestInner.png'],
+  '/sprites/tiles/pathSouthEastInner.png' : ['image/png', '../frontend/sprites/tiles/pathSouthEastInner.png'],
+  '/sprites/tiles/pathSouthWestInner.png' : ['image/png', '../frontend/sprites/tiles/pathSouthWestInner.png'],
+  '/sprites/tiles/pathEastWest.png' : ['image/png', '../frontend/sprites/tiles/pathEastWest.png'],
+  '/sprites/tiles/pathNorthSouth.png' : ['image/png', '../frontend/sprites/tiles/pathNorthSouth.png'],
   '/sprites/speechBubble.png' : ['image/png', '../frontend/sprites/speechBubble.png'],
   '/sprites/speechBubbleOther.png' : ['image/png', '../frontend/sprites/speechBubbleOther.png'],
 };
 
 var clients = {};
 
-//Sends index.html and coressponding css file, TODO: Send JS file as well.
+// Serves corresponding file upon request
 app.get('/*', (req, res) => {
   try {
     var stuff = files[req.url];
@@ -75,14 +84,16 @@ app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
 
+// Socket Server Code
 sockserver.on('connection', ws => {
   console.log('New client connected!'); 
 
   ws.on('close', () => {
-    console.log(`${clients[ws.id]}(${ws.id}) has disconnected!`);
+    // When the client disconnects it sends its username to other clients so they know to remove that player from their screen
+    console.log(`${clients[ws.id][0]}(${ws.id}) has disconnected!`);
     sockserver.clients.forEach(client => {
       client.send(JSON.stringify({
-        id: clients[ws.id],
+        id: clients[ws.id][0],
         expired: true
       })); 
     });
@@ -90,9 +101,13 @@ sockserver.on('connection', ws => {
   });
 
   ws.on('message', (str) => {
+    // Handles recieving data from clients
     var obj = JSON.parse(str);
   
     if ("posX" in obj) {
+      // This code handles recieving and distributing positional data from one client to the others
+      clients[ws.id][1] = obj.posX;
+      clients[ws.id][2] = obj.posY;
       sockserver.clients.forEach(client => {
         client.send(JSON.stringify({
           id: obj.id,
@@ -101,40 +116,64 @@ sockserver.on('connection', ws => {
         }));
       });
     } else if ("msg" in obj) {
+      // When a message is sent this code distributes that message to other clients
       sockserver.clients.forEach(client => {
-        const matches = matcher.getAllMatches(obj.msg);
-        var newmsg = (censor.applyTo(obj.msg, matches));
-        obj.msg = newmsg; 
-        console.log(`distributing message: ${obj.msg}`);
-        client.send(JSON.stringify({
-          id: obj.id,
-          msg: obj.msg
-        }));
+        if (distance(clients[client.id][1], clients[ws.id][1], clients[client.id][2], clients[ws.id][2]) < 800) {
+          const matches = matcher.getAllMatches(obj.msg);
+          var newmsg = (censor.applyTo(obj.msg, matches));
+          obj.msg = newmsg; 
+          console.log(`distributing message: ${obj.msg}`);
+          client.send(JSON.stringify({
+            id: obj.id,
+            msg: obj.msg
+          }));
+        }
       });
     } else if ("id" in obj) {
+      // When a client selects a username
       var validName = true;
+
+      // Checks if the username is taken and if so tells the client to select a different username
       for (const [key, value] of Object.entries(clients)) {
         if (obj.id == value) {
           validName = false;
           ws.send(JSON.stringify({
-            invalidName: true
+            invalidName: true,
+            usernameError: "Username Taken"
           }));
           break;
         }
       }
 
+      // Checks if the username is explicit and if so tells the client to select a different username
+      const matcher = new RegExpMatcher({
+        ...englishDataset.build(),
+        ...englishRecommendedTransformers,
+      });
+      if(matcher.hasMatch(obj.id)){
+        console.log("Profane username detected"); 
+        validName = false;
+        ws.send(JSON.stringify({
+          invalidName: true,
+          usernameError: "Invalid Username"
+        }));
+      }
+
       if (validName) {
+        // If the username is valid, the client is assigned a uid
         var haveId = true
         while (haveId) {
           ws.id = sockserver.getUniqueID();
           haveId = clients.hasOwnProperty(ws.id)
         }
         console.log(`username: ${obj.id} uid: ${ws.id}`);
-        clients[ws.id] = obj.id;
+        clients[ws.id] = [obj.id, 0.0, 0.0];
+        // The client is then sent a comfimation message
         ws.send(JSON.stringify({
           invalidName: false,
           usr: obj.id
         }));
+        // A join message is distributed to the rest of the users
         sockserver.clients.forEach(client => {
           client.send(JSON.stringify({
             id: obj.id,
@@ -146,6 +185,11 @@ sockserver.on('connection', ws => {
   })
 
   ws.onerror = function () {
+    // Handles any errors with the websocket
     console.log('websocket error');
   }
-})
+});
+
+function distance(x1, x2, y1, y2) {
+  return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+}

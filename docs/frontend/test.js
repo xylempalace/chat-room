@@ -25,10 +25,18 @@ const backgroundTiles = [
 	new Sprite("tiles/pathNorthWest.png"),
     new Sprite("tiles/pathSouthEast.png"),
     new Sprite("tiles/pathSouthWest.png"),
+    new Sprite("tiles/pathNorthEastInner.png"),
+	new Sprite("tiles/pathNorthWestInner.png"),
+    new Sprite("tiles/pathSouthEastInner.png"),
+    new Sprite("tiles/pathSouthWestInner.png"),
+    new Sprite("tiles/pathNorthSouth.png"),
+    new Sprite("tiles/pathEastWest.png"),
 ];
 
+// const board = new Board(100, 100);
+
 const backgroundMap = new TileMap(new Vector2(0,0), backgroundTiles, 64, 32, 32, [
-    11,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,13,5,4,7,7,7,7,7,7,7,7,7,7,7,4,4,4,4,4,4,7,7,7,7,7,7,7,7,7,7,7,4,6,5,6,3,3,3,3,3,3,3,3,3,3,3,10,4,4,4,7,12,3,3,3,3,3,1,3,3,3,3,3,5,6,5,6,3,3,3,3,3,3,3,3,3,9,3,3,5,4,12,3,3,3,3,3,3,3,3,3,3,1,3,3,5,6,5,6,3,3,3,3,3,3,3,3,3,3,3,11,4,6,3,3,9,3,3,3,3,3,3,1,3,3,3,3,5,6,5,6,1,3,3,3,3,3,3,3,3,3,3,5,4,6,3,3,3,3,3,3,3,3,3,1,1,1,3,3,5,6,10,12,1,1,3,3,3,3,3,3,3,3,3,5,4,6,3,3,3,3,3,3,3,3,3,1,1,1,1,3,5,6,2,2,2,1,3,3,3,3,3,3,3,3,3,10,4,6,3,3,3,3,3,3,3,3,1,1,1,1,1,3,5,6,2,2,2,1,3,3,3,3,3,3,3,3,3,3,5,4,13,3,3,3,3,3,3,3,1,1,1,3,1,3,5,6,1,1,1,1,3,3,3,3,3,3,3,3,3,3,10,4,6,3,3,3,3,3,3,3,1,1,1,1,1,3,5,6,1,1,1,1,3,3,3,3,3,3,3,3,3,3,3,5,6,3,3,3,3,3,3,3,1,3,1,1,3,3,5,6,1,1,1,3,3,3,3,3,3,3,3,11,8,8,8,4,4,8,8,8,13,3,3,3,3,3,1,3,3,3,5,6,2,2,2,3,3,3,3,3,3,3,3,5,4,7,7,4,4,7,7,4,6,3,3,3,1,3,3,3,1,3,5,6,2,2,2,1,3,3,3,3,3,3,3,5,6,3,3,10,12,3,3,5,6,3,3,3,3,3,1,3,3,3,5,6,2,2,2,1,3,3,3,3,3,3,3,5,6,3,2,1,1,2,3,5,6,3,3,3,3,3,3,3,3,3,5,6,2,2,2,3,3,3,3,3,3,3,3,5,4,13,1,1,1,1,11,4,6,3,3,3,3,3,3,3,3,3,5,6,11,13,1,3,3,3,3,3,3,3,3,5,4,12,1,1,1,1,10,4,6,2,3,2,3,2,3,2,3,2,5,6,5,6,3,3,3,3,3,3,3,3,3,5,6,3,2,1,1,2,3,5,6,3,3,3,3,3,3,3,3,3,5,6,5,6,3,3,3,3,3,3,3,3,3,5,6,3,3,11,13,3,3,5,6,3,3,3,3,3,3,3,3,3,5,6,5,6,3,3,3,3,3,3,3,3,3,5,4,8,8,4,4,8,8,4,4,13,3,3,3,3,3,3,3,3,5,6,5,6,3,3,11,4,4,4,13,3,3,10,7,7,7,7,7,7,7,4,4,6,3,3,3,3,3,3,3,3,5,6,5,6,3,11,12,1,1,1,10,13,3,3,3,3,3,3,2,3,3,10,4,4,13,3,3,3,3,3,3,3,5,6,5,6,3,4,1,11,4,13,1,4,3,3,3,3,3,3,3,3,3,3,10,4,4,8,8,13,3,3,3,3,5,6,5,6,3,4,1,4,2,4,1,4,3,3,3,3,3,3,2,3,3,3,3,10,7,4,4,4,8,13,3,3,5,6,5,6,3,4,1,10,4,12,1,4,3,3,3,3,3,3,3,3,3,3,3,3,3,5,4,4,4,6,3,3,5,6,5,6,3,10,13,1,1,1,11,12,3,3,3,3,3,3,2,3,3,3,3,3,3,10,4,4,4,6,3,3,5,6,5,6,3,3,10,4,4,4,12,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,10,4,4,4,8,8,4,6,5,6,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,3,3,3,3,3,3,3,3,10,4,4,4,4,4,6,5,6,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,5,4,7,4,4,6,5,6,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,3,3,3,3,3,3,3,11,8,4,6,3,5,4,6,5,4,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,4,4,4,4,8,4,4,6,10,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,12
+    11,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,13,5,16,7,7,7,7,7,7,7,7,7,7,7,14,4,4,4,4,16,7,7,7,7,7,7,7,7,7,7,7,14,6,5,6,3,3,3,3,3,3,3,3,3,3,3,10,14,4,16,7,12,3,3,3,3,3,1,3,3,3,3,3,5,6,5,6,3,3,3,3,3,3,3,3,3,9,3,3,5,16,12,3,3,3,3,3,3,3,3,3,3,1,3,3,5,6,5,6,3,3,3,3,3,3,3,3,3,3,3,11,15,6,3,3,9,3,3,3,3,3,3,1,3,3,3,3,5,6,5,6,1,3,3,3,3,3,3,3,3,3,3,5,4,6,3,3,3,3,3,3,3,3,3,1,1,1,3,3,5,6,10,12,1,1,3,3,3,3,3,3,3,3,3,5,4,6,3,3,3,3,3,3,3,3,3,1,1,1,1,3,5,6,2,2,2,1,3,3,3,3,3,3,3,3,3,10,14,6,3,3,3,3,3,3,3,3,1,1,1,1,1,3,5,6,2,2,2,1,3,3,3,3,3,3,3,3,3,3,5,17,13,3,3,3,3,3,3,3,1,1,1,3,1,3,5,6,1,1,1,1,3,3,3,3,3,3,3,3,3,3,10,14,6,3,3,3,3,3,3,3,1,1,1,1,1,3,5,6,1,1,1,1,3,3,3,3,3,3,3,3,3,3,3,5,6,3,3,3,3,3,3,3,1,3,1,1,3,3,5,6,1,1,1,3,3,3,3,3,3,3,3,11,8,8,8,15,17,8,8,8,13,3,3,3,3,3,1,3,3,3,5,6,2,2,2,3,3,3,3,3,3,3,3,5,16,7,7,14,16,7,7,14,6,3,3,3,1,3,3,3,1,3,5,6,2,2,2,1,3,3,3,3,3,3,3,5,6,3,3,10,12,3,3,5,6,3,3,3,3,3,1,3,3,3,5,6,2,2,2,1,3,3,3,3,3,3,3,5,6,3,2,1,1,2,3,5,6,3,3,3,3,3,3,3,3,3,5,6,2,2,2,3,3,3,3,3,3,3,3,5,17,13,1,1,1,1,11,15,6,3,3,3,3,3,3,3,3,3,5,6,11,13,1,3,3,3,3,3,3,3,3,5,16,12,1,1,1,1,10,14,6,2,3,2,3,2,3,2,3,2,5,6,5,6,3,3,3,3,3,3,3,3,3,5,6,3,2,1,1,2,3,5,6,3,3,3,3,3,3,3,3,3,5,6,5,6,3,3,3,3,3,3,3,3,3,5,6,3,3,11,13,3,3,5,6,3,3,3,3,3,3,3,3,3,5,6,5,6,3,3,3,3,3,3,3,3,3,5,17,8,8,15,17,8,8,15,17,13,3,3,3,3,3,3,3,3,5,6,5,6,3,3,11,19,19,19,13,3,3,10,7,7,7,7,7,7,7,14,4,6,3,3,3,3,3,3,3,3,5,6,5,6,3,11,12,1,1,1,10,13,3,3,3,3,3,3,2,3,3,10,14,17,13,3,3,3,3,3,3,3,5,6,5,6,3,18,1,11,19,13,1,18,3,3,3,3,3,3,3,3,3,3,10,14,17,8,8,13,3,3,3,3,5,6,5,6,3,18,1,18,2,18,1,18,3,3,3,3,3,3,2,3,3,3,3,10,7,14,4,17,8,13,3,3,5,6,5,6,3,18,1,10,19,12,1,18,3,3,3,3,3,3,3,3,3,3,3,3,3,5,4,4,4,6,3,3,5,6,5,6,3,10,13,1,1,1,11,12,3,3,3,3,3,3,2,3,3,3,3,3,3,10,14,4,4,6,3,3,5,6,5,6,3,3,10,19,19,19,12,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,10,14,4,17,8,8,15,6,5,6,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,3,3,3,3,3,3,3,3,10,14,4,4,4,4,6,5,6,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,5,16,7,14,4,6,5,6,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,3,3,3,3,3,3,3,11,8,15,6,3,5,4,6,5,17,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,15,4,4,17,8,15,4,6,10,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,12
 ]);
 
 // WebSocket Stuff
@@ -38,27 +46,33 @@ webSocket.onmessage = (event) => {
     var obj = JSON.parse(event.data);
 
     if ("expired" in obj) {
+        // Handles removing a disconnected player from the screen and printing a leave message
         let p = otherPlayers.findIndex((element) => {
             return element.username == obj.id;
         })
         otherPlayers[p].expired = true;
         otherPlayers.splice(p, 1);
+        receiveMessage(`${obj.id} has disconnected!`);
     } else if ("msg" in obj) {
+        // Handles recieving messages form other players and displaying them in the proper locations
         receiveMessage(`<${obj.id}> ${obj.msg}`);
         let p = otherPlayers.find((element) => {
             return element.username == obj.id;
         })
-
         if (p != null) {
             p.sayMessage(obj.msg);
         }
+        if (userPlayer.username == obj.id) {
+            userPlayer.sayMessage(obj.msg);
+        }
     } else if ("joinMsg" in obj) {
+        // Handles recieving join messages
         receiveMessage(obj.joinMsg);
     } else if ("posX" in obj && connected && userPlayer.username != obj.id) {
+        // Handles displaying other players on the screen
         let p = otherPlayers.find((element) => {
             return element.username == obj.id;
         })
-
         if (p != null) {
             p.pos.x = obj.posX;
             p.pos.y = obj.posY; 
@@ -66,7 +80,9 @@ webSocket.onmessage = (event) => {
             otherPlayers.push(new Player(obj.id, new Vector2(obj.posX, obj.posY), obj.id, "#FF0000"));
         }
     } else if ("invalidName" in obj) {
+        // Handles recieving username selction errors and verification
         if (obj.invalidName) {
+            receiveMessage(obj.usernameError);
             loginState = "username";
             const textBox = textInputs.find((element) => element.textInput.getAttribute("placeholder") == "Username");
             textBox.clearTextbox();
@@ -90,7 +106,7 @@ class TextInput {
     sendFunction;
     static textInputs = [];
 
-    constructor(div, placeholder, func, hasButton, reqConnection) {
+    constructor(div, placeholder, func, hasButton=true, reqConnection=true, minLength=1, maxLength=50) {
         this.sendFunction = func;
         
         this.textDiv = div;
@@ -99,6 +115,8 @@ class TextInput {
         this.textInput = document.createElement("input");
         this.textInput.setAttribute("placeholder", placeholder);
         this.textInput.setAttribute("class", "inputText");
+        this.textInput.setAttribute("minlength", minLength);
+        this.textInput.setAttribute("maxLength", maxLength);
         this.textInput.addEventListener("keyup", () => {this.updateText(event)});
 
         this.textDiv.append(this.textInput);
@@ -339,7 +357,7 @@ class SpeechBubble {
         SpeechBubbleSprite2.draw(new Vector2(posX, posY), width, height);
         
         for (let i = 0; i < this.message.length; i++) {
-            
+            //SpeechBubbleSprite.draw(new Vector2(posX, posY), 50)
             ctx.fillText(this.message[i], posX, posY-(this.constructor.fontHeight*(this.message.length-(1+i))));
         }
 
@@ -358,7 +376,9 @@ document.addEventListener("readystatechange", (e) => {
                 foundInputs[i].getAttribute("placeholder"),
                 foundInputs[i].getAttribute("func"),
                 foundInputs[i].getAttribute("hasButton"),
-                foundInputs[i].getAttribute("reqConnection")
+                foundInputs[i].getAttribute("reqConnection"),
+                foundInputs[i].getAttribute("minLength"),
+                foundInputs[i].getAttribute("maxLength")
             );
             textInputs.push(tI);
         }
@@ -376,7 +396,6 @@ function sendMessage(msg, textbox) {
     if (msg.length > 0) {
         textbox.clearTextbox();
         if (connected) {
-            userPlayer.sayMessage(msg);
             webSocket.send(JSON.stringify({
                 id: userPlayer.username,
                 msg: `${msg}`
@@ -495,5 +514,11 @@ function ToggleDarkMode() {
 
         /* disables off dark mode */
         isDark = !isDark;
+    }
+}
+
+function onClick(event, canvasPos) {
+    if (connected) {
+        userPlayer.walkTo(canvasPos.screenToWorldPos());
     }
 }

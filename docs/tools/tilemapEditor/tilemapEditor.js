@@ -24,7 +24,6 @@ class Tile {
 
         let best = 0;
 
-        if (this.tileRules.length - 1 >= 3) {console.log("hello")}
         for (let i = this.tileRules.length - 1; i >= 0; i--) {
             if (this.tileRules[i].matches(area)) {
                 best = i;
@@ -67,9 +66,7 @@ class TileRule {
                 score++;
             }
         }
-        if (score == 8) {
-            console.log(this.rule);
-        }
+
         return score == 8;
     }
 }
@@ -90,16 +87,22 @@ const tilePalette = [
 	new Sprite("tiles/pathNorthWest.png"),
     new Sprite("tiles/pathSouthEast.png"),
     new Sprite("tiles/pathSouthWest.png"),
+    new Sprite("tiles/pathNorthEastInner.png"),
+	new Sprite("tiles/pathNorthWestInner.png"),
+    new Sprite("tiles/pathSouthEastInner.png"),
+    new Sprite("tiles/pathSouthWestInner.png"),
+    new Sprite("tiles/pathNorthSouth.png"),
+    new Sprite("tiles/pathEastWest.png"),
 ];
 
 const tilesForEditor = [
     null,
-    new Tile("Grass", [
-        new TileRule(tilePalette[3])]),
-    new Tile("Wall", [
-        new TileRule(tilePalette[2])]),
     new Tile("Flooring", [
         new TileRule(tilePalette[1])]),
+    new Tile("Wall", [
+        new TileRule(tilePalette[2])]),
+    new Tile("Grass", [
+        new TileRule(tilePalette[3])]),
     new Tile("Path", [
         new TileRule(tilePalette[4]), 
         new TileRule(tilePalette[9], [0, -1, 0, -1, 0, -1, 0, -1, 0]),
@@ -113,8 +116,29 @@ const tilesForEditor = [
         new TileRule(tilePalette[11], [0, -1, 0, -1, 0, 1, 0, 1, 0]), 
         new TileRule(tilePalette[12], [0, 1, 0, 1, 0, -1, 0, -1, 0]), 
         new TileRule(tilePalette[13], [0, 1, 0, -1, 0, 1, 0, -1, 0]), 
+
+        new TileRule(tilePalette[18], [0, -1, 0, 1, 0, 1, 0, -1, 0]), 
+        new TileRule(tilePalette[19], [0, 1, 0, -1, 0, -1, 0, 1, 0]), 
 		
-        new TileRule(tilePalette[4], [0, 1, 0, 1, 0, 1, 0, 1, 0]),]),
+        new TileRule(tilePalette[4], [0, 1, 0, 1, 0, 1, 0, 1, 0]),
+    
+        new TileRule(tilePalette[14], [
+             0, 1,-1,
+             1, 0, 1,
+             0, 1, 0]), 
+        new TileRule(tilePalette[15], [
+            -1, 1, 0, 
+             1, 0, 1, 
+             0, 1, 0]), 
+        new TileRule(tilePalette[16], [
+             0, 1, 0, 
+             1, 0, 1, 
+             0, 1,-1]), 
+        new TileRule(tilePalette[17], [
+             0, 1, 0,
+             1, 0, 1, 
+            -1, 1, 0]), 
+    ]),
 ]
 
 let selectedTileIndex = 0;
@@ -277,6 +301,38 @@ document.addEventListener("mousemove", (e) => {
     mousePos.x = e.clientX;
     mousePos.y = e.clientY;
 });
+
+function sendMessage(msg) {
+    drawnMap = {
+        storage: {},
+        get: function (a, b){
+            try {
+                return this.storage[a][b];
+            } catch (err) {
+                return null;
+            }
+        },
+        set: function (a, b, value){
+            if (typeof this.storage[a] !== "object")
+                this.storage[a] = {};
+            this.storage[a][b] = value;
+        }
+    }
+
+    let strMap = JSON.parse("["+msg+"]"); 
+    console.log(strMap);
+    for (let x = 0; x < cols; x++) {
+        for (let y = 0; y < rows; y++) { 
+            let cTile = strMap[(y*rows)+x];
+            console.log(cTile);
+            if (cTile <= 3) {
+                drawnMap.set(y, x, cTile);
+            } else {
+                drawnMap.set(y, x, 4);
+            }
+        }
+    }
+}
 
 function printMessage(msg) {
     log.textContent += msg+"\n";

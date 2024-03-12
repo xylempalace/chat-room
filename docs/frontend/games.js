@@ -8,13 +8,18 @@ class Board {
         this.rows = r;
         this.columns = c;
 
-        var emptyRow = [];
-        for (var i = 0; i < c; i++) {
-            emptyRow.push(null);
-        }
-
-        for (i = 0; i < r; i++) {
+        for (var i = 0; i < r; i++) {
+            var emptyRow = [];
+            for (var j = 0; j < c; j++) {
+                emptyRow.push(null);
+            }
             this.board.push(emptyRow);
+        }
+    }
+
+    set(pos, obj, condition) {
+        if (condition()) {
+            this.board[pos.x][pos.y] = obj;
         }
         console.log(this.board);
     }

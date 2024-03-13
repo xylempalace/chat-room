@@ -94,3 +94,16 @@ class Board {
         }
     }
 }
+
+class Game {
+
+    maxPlayers;
+    minPlayers;
+    board;
+    turn = true;
+
+    constructor() {
+
+    }
+
+}

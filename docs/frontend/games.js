@@ -94,6 +94,10 @@ class Board {
     }
 }
 
+class Piece {
+    value;
+}
+
 class Deck {
     cards = [];
     cardTypes= [];
@@ -131,6 +135,7 @@ class Card {
 
 class Game {
     maxPlayers;
+    players;
     minPlayers;
     board;
     deck;
@@ -140,5 +145,18 @@ class Game {
         this.maxPlayers = maxPlayers;
         this.minPlayers = minPlayers;
         this.board = board;
+    }
+
+    startGame(players) {
+        this.players = players;
+    }
+
+    switchTurn() {
+        turn++;
+        turn %= this.players;
+    }
+
+    testWin(rules) {
+        return rules(this.board, this.players, this.turn);
     }
 }

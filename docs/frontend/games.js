@@ -1,10 +1,9 @@
 class Board {
-
     board = [];
     rows;
     columns;
 
-    constructor (r, c) {
+    constructor(r, c) {
         this.rows = r;
         this.columns = c;
 
@@ -95,15 +94,51 @@ class Board {
     }
 }
 
-class Game {
+class Deck {
+    cards = [];
+    cardTypes= [];
 
+    constructor(cards) {
+        this.cardTypes = cards;
+        for (var i = 0; i < this.cardTypes.length; i++) {
+            for (var j = 0; j < this.cardTypes[i].amountInDeck; i++) {
+                this.cards.push(this.cardTypes[i]);
+            }
+        }
+        this.shuffle();
+    }
+
+    shuffle() {
+        newDeck = [];
+        while (this.cards.length > 0) {
+            var i = Math.floor(Math.random()) * this.cards.length;
+            newDeck.push(this.cards[i]);
+            delete this.cardsp[i];
+        }
+        this.cards = newDeck;
+    }
+}
+
+class Card {
+    value;
+    amountInDeck;
+
+    constructor(value, amountInDeck) {
+        this.value = value;
+        this.amountInDeck = amountInDeck;
+    }
+}
+
+class Game {
     maxPlayers;
     minPlayers;
     board;
-    turn = true;
+    deck;
+    turn = 0;
 
-    constructor() {
-
+    constructor(maxPlayers, minPlayers, board) {
+        this.maxPlayers = maxPlayers;
+        this.minPlayers = minPlayers;
+        this.board = board;
     }
-
 }

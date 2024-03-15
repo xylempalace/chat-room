@@ -96,6 +96,10 @@ class Board {
 
 class Piece {
     value;
+
+    constructor(value) {
+        this.value = value;
+    }
 }
 
 class Deck {

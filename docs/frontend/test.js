@@ -33,6 +33,9 @@ const backgroundTiles = [
     new Sprite("tiles/pathEastWest.png"),
 ];
 
+// GAMES
+
+// Tic-Tac-Toe
 var board = new Board(3, 3);
 for (var i = 0; i < 3; i++) {
     board.setRow(i, [new Piece("")], () => true);
@@ -42,33 +45,38 @@ tictactoe.startGame(2);
 function moveCondition(inSpot) {
     return inSpot.value == "";
 };
-function winCondition(board, players, turn) {
+const winCondition = (board, players, turn) => {
     const getWinner = arr => {
-        var winner;
-        const allEqual = arr => arr.every(val => val === arr[0]);
-        console.log(allEqual(arr) + " " + arr[0].value + " " + arr[1].value + " " + arr[2].value);
-        if (allEqual(arr)) {
+        if (arr.every(val => val.value === arr[0].value)) {
             if (arr[0].value == "X") {
-                winner = 0;
+                return 0;
             } else if (arr[0].value == "O") {
-                winner = 1;
+                return 1;
             }
         }
-        return winner;
+        return null;
     };
-    var win;
+    var win = null;
 
     for (var i = 0; i < 3; i++) {
-        win = getWinner(board.getRow(new Vector2(0, i), true));
-        win = getWinner(board.getColumn(new Vector2(i, 0), true));
+        if (win === null) {
+            win = getWinner(board.getRow(new Vector2(0, i), true));
+        }
+        if (win === null) {
+            win = getWinner(board.getColumn(new Vector2(i, 0), true));
+        }
     }
 
     var diags = [board.getDiagonal(new Vector2(0, 0), 1, 1), board.getDiagonal(new Vector2(2, 0), -1, 1)];
-    win = getWinner(diags[0]);
-    win = getWinner(diags[1]);
+    if (win === null) {
+        win = getWinner(diags[0]);
+    }
+    if (win === null) {
+        win = getWinner(diags[1]);
+    }
 
-    if (win == null) {
-        win = 3;
+    if (win === null) {
+        win = 2;
         for (var i = 0; i < 3; i++) {
             for (var j = 0; j < 3; j++) {
                 if (board.get(new Vector2(i, j)).value == "") {
@@ -79,17 +87,6 @@ function winCondition(board, players, turn) {
     }
     return win;
 };
-tictactoe.board.setPos(new Vector2(0, 0), new Piece("X"), moveCondition);
-console.log(tictactoe.testWin(winCondition));
-tictactoe.board.setPos(new Vector2(1, 0), new Piece("O"), moveCondition);
-console.log(tictactoe.testWin(winCondition));
-tictactoe.board.setPos(new Vector2(1, 1), new Piece("X"), moveCondition);
-console.log(tictactoe.testWin(winCondition));
-tictactoe.board.setPos(new Vector2(2, 0), new Piece("O"), moveCondition);
-console.log(tictactoe.testWin(winCondition));
-tictactoe.board.setPos(new Vector2(2, 2), new Piece("X"), moveCondition);
-console.log(tictactoe.board.getDiagonal(new Vector2(0, 0), 1, 1));
-console.log(tictactoe.testWin(winCondition));
 
 const backgroundMap = new TileMap(new Vector2(0,0), backgroundTiles, 64, 32, 32, [
     11,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,13,5,16,7,7,7,7,7,7,7,7,7,7,7,14,4,4,4,4,16,7,7,7,7,7,7,7,7,7,7,7,14,6,5,6,3,3,3,3,3,3,3,3,3,3,3,10,14,4,16,7,12,3,3,3,3,3,1,3,3,3,3,3,5,6,5,6,3,3,3,3,3,3,3,3,3,9,3,3,5,16,12,3,3,3,3,3,3,3,3,3,3,1,3,3,5,6,5,6,3,3,3,3,3,3,3,3,3,3,3,11,15,6,3,3,9,3,3,3,3,3,3,1,3,3,3,3,5,6,5,6,1,3,3,3,3,3,3,3,3,3,3,5,4,6,3,3,3,3,3,3,3,3,3,1,1,1,3,3,5,6,10,12,1,1,3,3,3,3,3,3,3,3,3,5,4,6,3,3,3,3,3,3,3,3,3,1,1,1,1,3,5,6,2,2,2,1,3,3,3,3,3,3,3,3,3,10,14,6,3,3,3,3,3,3,3,3,1,1,1,1,1,3,5,6,2,2,2,1,3,3,3,3,3,3,3,3,3,3,5,17,13,3,3,3,3,3,3,3,1,1,1,3,1,3,5,6,1,1,1,1,3,3,3,3,3,3,3,3,3,3,10,14,6,3,3,3,3,3,3,3,1,1,1,1,1,3,5,6,1,1,1,1,3,3,3,3,3,3,3,3,3,3,3,5,6,3,3,3,3,3,3,3,1,3,1,1,3,3,5,6,1,1,1,3,3,3,3,3,3,3,3,11,8,8,8,15,17,8,8,8,13,3,3,3,3,3,1,3,3,3,5,6,2,2,2,3,3,3,3,3,3,3,3,5,16,7,7,14,16,7,7,14,6,3,3,3,1,3,3,3,1,3,5,6,2,2,2,1,3,3,3,3,3,3,3,5,6,3,3,10,12,3,3,5,6,3,3,3,3,3,1,3,3,3,5,6,2,2,2,1,3,3,3,3,3,3,3,5,6,3,2,1,1,2,3,5,6,3,3,3,3,3,3,3,3,3,5,6,2,2,2,3,3,3,3,3,3,3,3,5,17,13,1,1,1,1,11,15,6,3,3,3,3,3,3,3,3,3,5,6,11,13,1,3,3,3,3,3,3,3,3,5,16,12,1,1,1,1,10,14,6,2,3,2,3,2,3,2,3,2,5,6,5,6,3,3,3,3,3,3,3,3,3,5,6,3,2,1,1,2,3,5,6,3,3,3,3,3,3,3,3,3,5,6,5,6,3,3,3,3,3,3,3,3,3,5,6,3,3,11,13,3,3,5,6,3,3,3,3,3,3,3,3,3,5,6,5,6,3,3,3,3,3,3,3,3,3,5,17,8,8,15,17,8,8,15,17,13,3,3,3,3,3,3,3,3,5,6,5,6,3,3,11,19,19,19,13,3,3,10,7,7,7,7,7,7,7,14,4,6,3,3,3,3,3,3,3,3,5,6,5,6,3,11,12,1,1,1,10,13,3,3,3,3,3,3,2,3,3,10,14,17,13,3,3,3,3,3,3,3,5,6,5,6,3,18,1,11,19,13,1,18,3,3,3,3,3,3,3,3,3,3,10,14,17,8,8,13,3,3,3,3,5,6,5,6,3,18,1,18,2,18,1,18,3,3,3,3,3,3,2,3,3,3,3,10,7,14,4,17,8,13,3,3,5,6,5,6,3,18,1,10,19,12,1,18,3,3,3,3,3,3,3,3,3,3,3,3,3,5,4,4,4,6,3,3,5,6,5,6,3,10,13,1,1,1,11,12,3,3,3,3,3,3,2,3,3,3,3,3,3,10,14,4,4,6,3,3,5,6,5,6,3,3,10,19,19,19,12,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,10,14,4,17,8,8,15,6,5,6,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,3,3,3,3,3,3,3,3,10,14,4,4,4,4,6,5,6,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,5,16,7,14,4,6,5,6,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,3,3,3,3,3,3,3,11,8,15,6,3,5,4,6,5,17,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,15,4,4,17,8,15,4,6,10,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,12

@@ -104,16 +104,20 @@ class Piece {
 
 class Deck {
     cards = [];
-    cardTypes= [];
+    cardTypes = [];
 
-    constructor(cards) {
-        this.cardTypes = cards;
-        for (var i = 0; i < this.cardTypes.length; i++) {
-            for (var j = 0; j < this.cardTypes[i].amountInDeck; i++) {
-                this.cards.push(this.cardTypes[i]);
+    constructor(cards, hand = false) {
+        if (hand) {
+            this.cards = cards;
+        } else {
+            this.cardTypes = cards;
+            for (var i = 0; i < this.cardTypes.length; i++) {
+                for (var j = 0; j < this.cardTypes[i].amountInDeck; i++) {
+                    this.cards.push(this.cardTypes[i]);
+                }
             }
+            this.shuffle();
         }
-        this.shuffle();
     }
 
     shuffle() {
@@ -121,9 +125,15 @@ class Deck {
         while (this.cards.length > 0) {
             var i = Math.floor(Math.random()) * this.cards.length;
             newDeck.push(this.cards[i]);
-            delete this.cardsp[i];
+            delete this.cards[i];
         }
         this.cards = newDeck;
+    }
+
+    draw() {
+        returnCard = this.cards[0];
+        delete this.cards[0];
+        return returnCard;
     }
 }
 

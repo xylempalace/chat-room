@@ -305,7 +305,12 @@ function addCanvas() {
     canvas.style.border = "0.5rem solid rgb(105, 100, 100)";
     
     canvas.addEventListener("mouseup", (e) => {
-        canvasClick(canvas, e)
+        canvasClick(canvas, e);
+    });
+    
+    canvas.addEventListener("keydown", (e) => {
+        console.log("FSAF");
+        onKey(e);
     });
     
     cameraList.push(new Camera("default", Vector2.zero, 0.01, []));
@@ -361,3 +366,5 @@ function drawScreen() {
 function update() {}
 
 function onClick(event, canvasPos) {}
+
+function onKey(event) {}

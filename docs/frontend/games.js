@@ -151,14 +151,14 @@ class Game {
     maxPlayers;
     players;
     minPlayers;
-    board;
+    gameBoard;
     deck;
     turn = 0;
 
     constructor(maxPlayers, minPlayers, board) {
         this.maxPlayers = maxPlayers;
         this.minPlayers = minPlayers;
-        this.board = board;
+        this.gameBoard = board;
     }
 
     startGame(players) {
@@ -172,5 +172,15 @@ class Game {
 
     testWin(rules) {
         return rules(this.board, this.players, this.turn);
+    }
+}
+
+class GameInteractable {
+    sprite;
+    game;
+
+    constructor(sprite, game) {
+        this.sprite = sprite;
+        this.game = game;
     }
 }

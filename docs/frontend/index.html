@@ -10,7 +10,7 @@
 <body>
     <button type="button" class="darkModeButton" onclick="ToggleDarkMode()"> Toggle Dark Mode </button>
 
-    <div style="width:100%; height: 100%;">
+    <div style="width:100%; height: 90%;">
 
         <div id = "chatBox" class="chatBox" >
             
@@ -18,13 +18,21 @@
             
             <div><p id="values" class="chatLog"></p> </div>
             
-            <div id="chatInput" class="inputDiv" style="position: fixed; bottom: 44px;" placeholder="Chat..." func="sendMessage" hasButton=true reqConnection=true minlength=1 maxlength=50> </div>
+            <div id="chatInput" class="inputDiv" style="position: relative; bottom: 1vh;" placeholder="Chat..." func="sendMessage" hasButton=true reqConnection=true minlength=1 maxlength=50> </div>
         </div>
         
         <div id = "gameSpace" style= "height: 80%; width:100%;"> </div>
 
     </div>
+
+    <footer class="infoBar">
+        <div class="infoRow">
+            <a href="https://github.com/xylempalace/chat-room">Github</a>
+        </div>
+        
+    </footer>
     
+    <div id="clip"></div>
     <script src="lemEngine.js"></script>
     <script src="test.js"></script>
 </body>

@@ -83,6 +83,9 @@ class Sprite {
     image;
     centeredOffset;
 
+    static cropCanvas  = document.createElement('canvas');
+    static cropContext = Sprite.cropCanvas.getContext("2d");
+    
     constructor (image) {
         this.id = image;
         this.image = new Image();
@@ -95,7 +98,87 @@ class Sprite {
     }
 
     draw (pos, size) {
-        ctx.drawImage(this.image, pos.x, pos.y, size, size);
+        try {
+            ctx.drawImage(this.image, pos.x, pos.y, size, size);
+        } catch (e) {
+            console.log(`Image ${this.image} is mangled, removing`);
+            this.image = null;
+        }
+    }
+
+    resize (x = 0, y = 0, width = 16, height = 16) {
+        console.log(this.image);
+        let self = this;
+        let cropPromise = new Promise(function(resolve, reject) {
+            let cropCanvas  = document.createElement('canvas');
+            let cropContext = cropCanvas.getContext("2d");
+            cropCanvas.width  = width;
+            cropCanvas.height = height;
+            document.getElementById("gameSpace").appendChild(cropCanvas);
+            cropContext.drawImage(self.image, x, y, width, height, 0, 0, width, height);
+            cropContext.fillStyle = rgb((x*width)/(512-width),(y*height)/(512-height),0);
+            cropContext.beginPath();
+            cropContext.rect(32,32,64,64);
+            cropContext.fill();
+            console.log(`W: ${cropCanvas.width} H: ${cropCanvas.height}`);
+            
+            resolve(cropCanvas);
+        });
+        
+        cropPromise.then(
+            function(value) {self.image.src = value.toDataURL("image/png");},
+            function(error) {console.log(error);}
+        );
+        console.log(this.image);
+    }
+
+    clipTo (x,y,w,h) {
+        // create an in-memory canvas
+        let clipCanvas = document.createElement('canvas');
+        let clipCTX = clipCanvas.getContext('2d');
+
+        // size the canvas to the desired sub-sprite size
+        clipCanvas.width=w;
+        clipCanvas.height=h;
+
+        // clip the sub-sprite from x,y,w,h on the spritesheet image
+        // and draw the clipped sub-sprite on the canvas at 0,0
+        clipCTX.drawImage(this.image,  x,y,w,h,  0,0,w,y);
+
+        // convert the canvas to an image
+        let subsprite=new Image();
+        //subsprite.onload=function(){ doCallback(subsprite); };
+        setTimeout(() => {
+            subsprite.src=clipCanvas.toDataURL(); 
+            this.image = subsprite;
+        }, 10)
+    }
+
+    setImage(image) {
+        console.log(typeof image)
+        if (typeof image == "object") {
+            console.log(image.constructor.name)
+            if (image.constructor.name === "HTMLImageElement") {
+                console.log("a")
+                this.image = image;
+                this.centeredOffset = new Vector2(
+                    -(this.image.width  / 2),
+                    -(this.image.height / 2)
+                )
+            }
+        } else if (typeof image === "string") {
+            this.id = image;
+            this.image = new Image();
+            this.setSRC('./sprites/'+image); // Is this dangerous, given a custom input, eg "../[FILE NAME]", could a user potentially access files not intended?
+        } 
+    }
+
+    setSRC(uri) {
+        this.image.src = uri;
+        this.centeredOffset = new Vector2(
+            -(this.image.width  / 2),
+            -(this.image.height / 2)
+        )
     }
 }
 
@@ -122,6 +205,43 @@ class NineSlicedSprite extends Sprite {
         foreach ((element) => {
             ctx.drawImage(this.image, element[0], element[1], element[2], element[3], pos.x + element[0], pos.y + element[1], s * element[2], s * element[3]);
         })
+    }
+}
+
+class Atlas {
+    sprites = [];
+    image;
+    imagesWide = 4;
+    imagesHigh = 4;
+    tileWidth  = 16;
+    tileHeight = 16;
+
+    constructor (image, wide, high) {
+        this.image = new Sprite(image);
+
+        this.imagesWide = wide;
+        this.imagesHigh = high;
+
+        this.tileWidth  = Math.floor(this.image.image.width  / this.imagesWide); //Calculate how wide a single tile is
+        this.tileHeight = Math.floor(this.image.image.height / this.imagesHigh); //Calculate how tall a single tile is
+
+        console.log(`AW: ${this.image.image.width} AH: ${this.image.image.height}`);
+
+        setTimeout(() => {
+            for (let j = 0; j < high; j++) {     //Go through each column
+                for (let k = 0; k < wide; k++) { //Then each row
+                    let tSprite = new Sprite(image); // -----------------------------------------------------   Create a new sprite
+                    tSprite.clipTo(k * this.tileWidth, j * this.tileHeight, this.tileWidth, this.tileHeight); //Crop the image to the single tile
+                    this.sprites.push(tSprite); // ----------------------------------------------------------   Add the sprite to the sprite list
+                }
+            }
+        }, 10);
+
+        //Should output like this
+        // [1, 2, 3, 4,
+        //  5, 6, 7, 8,
+        //  9,10,11,12,
+        // 13,14,15,16]
     }
 }
 

@@ -83,6 +83,9 @@ class Sprite {
     image;
     centeredOffset;
 
+    static cropCanvas  = document.createElement('canvas');
+    static cropContext = Sprite.cropCanvas.getContext("2d");
+    
     constructor (image) {
         this.id = image;
         this.image = new Image();
@@ -95,12 +98,15 @@ class Sprite {
     }
 
     draw (pos, size) {
-        //printMessage(x + ", " + y);
         ctx.drawImage(this.image, pos.x, pos.y, size, size);
     }
-    
-    get toString () {
-        return this.id;
+
+    resize (x = 0, y = 0, width = 16, height = 16) {
+        Sprite.cropCanvas.width  = width;
+        Sprite.cropCanvas.height = height;
+        Sprite.cropContext.drawImage(this.image, x, y, width, height, 0, 0, width, height);
+
+        this.image = Sprite.cropCanvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
     }
 }
 
@@ -127,6 +133,39 @@ class NineSlicedSprite extends Sprite {
         foreach ((element) => {
             ctx.drawImage(this.image, element[0], element[1], element[2], element[3], pos.x + element[0], pos.y + element[1], s * element[2], s * element[3]);
         })
+    }
+}
+
+class Atlas {
+    sprites = [];
+    image;
+    imagesWide = 4;
+    imagesHigh = 4;
+    tileWidth  = 16;
+    tileHeight = 16;
+
+    constructor (image, wide, high) {
+        this.image = new Sprite(image);
+
+        this.imagesWide = wide;
+        this.imagesHigh = high;
+
+        this.tileWidth  = Math.floor(this.image.width  / this.imagesWide); //Calculate how wide a single tile is
+        this.tileHeight = Math.floor(this.image.height / this.imagesHigh); //Calculate how tall a single tile is
+
+        for (let j = 0; j < high; j++) { //Go through each column
+            for (let k = 0; k < wide; k++) { //Then each row
+                let tSprite = new Sprite(image); //Create a new sprite
+                tSprite.resize(k * this.tileWidth, j * this.tileHeight, this.tileWidth, this.tileHeight) //Crop the image to the single tile
+                this.sprites.push() //Add the sprite to the sprite list
+            }
+        }
+
+        //Should output like this
+        // [1, 2, 3, 4,
+        //  5, 6, 7, 8,
+        //  9,10,11,12,
+        // 13,14,15,16]
     }
 }
 

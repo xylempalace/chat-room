@@ -59,6 +59,7 @@ const files = {
   '/sprites/tiles/pathSouthWestInner.png' : ['image/png', '../frontend/sprites/tiles/pathSouthWestInner.png'],
   '/sprites/tiles/pathEastWest.png' : ['image/png', '../frontend/sprites/tiles/pathEastWest.png'],
   '/sprites/tiles/pathNorthSouth.png' : ['image/png', '../frontend/sprites/tiles/pathNorthSouth.png'],
+  '/sprites/tiles/pathAtlas.png' : ['image/png', '../frontend/sprites/tiles/pathAtlas.png'],
   '/sprites/speechBubble.png' : ['image/png', '../frontend/sprites/speechBubble.png'],
 };
 
@@ -67,6 +68,7 @@ var clients = {};
 //Sends index.html and coressponding css file, TODO: Send JS file as well.
 app.get('/*', (req, res) => {
   try {
+    if(req.url == '/sprites/tiles/pathAtlas.png') {console.log("Atlas request");}
     var stuff = files[req.url];
     res.set('Content-Type', stuff[0]);
     res.sendFile(path.join(__dirname, stuff[1]));

@@ -75,3 +75,8 @@ body{
     
     bottom: 0; right: 0;
 }
+
+.infoBar {
+    display: inline-block;
+    background-color: rgb(105, 100, 100);
+}

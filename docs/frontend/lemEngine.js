@@ -25,6 +25,12 @@ class Vector2 {
     
     x;
     y;
+
+    static zero = new Vector2( 0, 0);
+	static up   = new Vector2( 0,-1);
+	static down = new Vector2( 0, 1);
+	static right= new Vector2( 1, 0);
+	static left = new Vector2(-1, 0);
     
     constructor(x, y) {
         this.x = x;
@@ -54,10 +60,6 @@ class Vector2 {
 
     get toString() {
         return "X: " + truncateNumber(this.x, 1) + "   Y: " + truncateNumber(this.y, 1);
-    }
-
-    static get zero() {
-        return new Vector2(0,0);
     }
 
 }

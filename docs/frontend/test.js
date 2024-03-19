@@ -252,7 +252,7 @@ class Player extends GameObject {
     drawSpeechBubbles() {
         if (!this.expired) {
             var curBubble;
-            let vertOffset = (this.constructor.playerSizeY * 1.1 * activeCamera.zoom);
+            let vertOffset = (this.constructor.playerSizeY * 1.3 * activeCamera.zoom);
             
             for (let i = 0; i < this.speechBubbles.length; i++) {
                 
@@ -268,7 +268,6 @@ class Player extends GameObject {
                     vertOffset += (curBubble.height);           
                     
                     curBubble.drawBubble(bubbleCenterX, bubbleCenterY);
-
                 }
             }
         }
@@ -310,7 +309,7 @@ class SpeechBubble {
 
     constructor (message) {
         this.spawnTime = Date.now();
-        this.deathTime = this.spawnTime+this.constructor.lifeTime;
+        this.deathTime = this.spawnTime + this.constructor.lifeTime;
 
         // Checks if textbox is too long for one line, and, if so, breaks up into multiple lines
         if (ctx.measureText(message) < this.constructor.maxWidth) {
@@ -322,6 +321,7 @@ class SpeechBubble {
 
             for (var i = 1; i < words.length; i++) {
                 var word = words[i];
+                console.log("what the width should be: " + ctx.measureText(currentLine + " " + word).width);
                 var width = ctx.measureText(currentLine + " " + word).width;
                 if (width < this.constructor.maxWidth) {
                     currentLine += " " + word;
@@ -337,6 +337,7 @@ class SpeechBubble {
         }
         
         this.height = this.message.length * this.constructor.fontHeight;
+        console.log("height: " + this.height);
     }
 
     //Returns true if the bubble is past its expiry time
@@ -345,8 +346,9 @@ class SpeechBubble {
     }
 
     // Draws the current bubble object at the given coordinates
-    drawBubble(posX, posY, width, height) {
+    drawBubble(posX, posY) {
         
+
         const SpeechBubbleSprite2 = new Sprite("speechBubbleOther.png");
 
         var prevAlign = ctx.textAlign;
@@ -354,13 +356,17 @@ class SpeechBubble {
         ctx.textAlign = 'center';
         ctx.font = this.constructor.font;
     
-        SpeechBubbleSprite2.draw(new Vector2(posX, posY), width, height);
         
         for (let i = 0; i < this.message.length; i++) {
-            //SpeechBubbleSprite.draw(new Vector2(posX, posY), 50)
             ctx.fillText(this.message[i], posX, posY-(this.constructor.fontHeight*(this.message.length-(1+i))));
         }
 
+        let test = ctx.measureText("bug fan");
+        console.log(test.fontBoundingBoxAscent);
+
+        //SpeechBubbleSprite2.drawCentered(new Vector2(posX, posY), this.constructor.maxWidth, (this.message.length * this.constructor.fontHeight) );
+        SpeechBubbleSprite2.drawCentered(new Vector2(posX, posY), this.constructor.maxWidth, 50);
+    
         ctx.textAlign = prevAlign;
         ctx.font = prevFont;
     }

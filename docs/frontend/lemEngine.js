@@ -89,14 +89,19 @@ class Sprite {
         this.image.src = './sprites/'+image; // Is this dangerous, given a custom input, eg "../[FILE NAME]", could a user potentially access files not intended?
 
         this.centeredOffset = new Vector2(
-            -(this.image.width  / 2),
-            -(this.image.height / 2)
+            -(this.image.width),
+            -(this.image.height * 2)
         )
     }
 
-    draw (pos, width, height) {
+    draw(pos, width, height) {
         ctx.drawImage(this.image, pos.x, pos.y, width, height);
     }
+
+    drawCentered(pos, width, height) {
+        ctx.drawImage(this.image, pos.x - (width/2), (pos.y - height/2), width, height);
+    }
+    
 }
 
 class NineSlicedSprite extends Sprite {
@@ -117,7 +122,7 @@ class NineSlicedSprite extends Sprite {
         ];
     }
     
-    draw (pos, size) {
+    draw(pos, size) {
         let s = size / 3;
         foreach ((element) => {
             ctx.drawImage(this.image, element[0], element[1], element[2], element[3], pos.x + element[0], pos.y + element[1], s * element[2], s * element[3]);
@@ -142,7 +147,7 @@ class TileMap {
         this.map = map;
     }
 
-    draw () {
+    draw() {
         let offsetPos = new Vector2(
             this.pos.x - this.rows * this.tileSize / 2,
             this.pos.y - this.cols * this.tileSize / 2

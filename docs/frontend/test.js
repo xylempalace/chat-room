@@ -364,8 +364,7 @@ class SpeechBubble {
         let test = ctx.measureText("bug fan");
         console.log(test.fontBoundingBoxAscent);
 
-        //SpeechBubbleSprite2.drawCentered(new Vector2(posX, posY), this.constructor.maxWidth, (this.message.length * this.constructor.fontHeight) );
-        SpeechBubbleSprite2.drawCentered(new Vector2(posX, posY), this.constructor.maxWidth, 50);
+        SpeechBubbleSprite2.drawCentered(new Vector2(posX, posY), this.constructor.maxWidth, (this.message.length * this.constructor.fontHeight) );
     
         ctx.textAlign = prevAlign;
         ctx.font = prevFont;

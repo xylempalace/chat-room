@@ -99,7 +99,7 @@ class Sprite {
     }
 
     drawCentered(pos, width, height) {
-        ctx.drawImage(this.image, pos.x - (width/2), (pos.y - height/2), width, height);
+        ctx.drawImage(this.image, (pos.x - width/2), (pos.y - height/2), width, height);
     }
     
 }

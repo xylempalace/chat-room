@@ -13,7 +13,7 @@ const scriptStart = Date.now();
 let activeCamera;
 let cameraList = [];
 
-addEventListener("resize", (event) => {
+document.addEventListener("resize", (event) => {
     cameraList.forEach((element) => {
         gameCanvas.width  = document.getElementById('gameSpace').clientWidth*0.8;
         gameCanvas.height = document.getElementById('gameSpace').clientHeight;
@@ -66,11 +66,25 @@ class Vector2 {
 
 class GameObject {
     pos;
+    drawPos;
     id;
+    static objs = [];
 
     constructor (id, pos) {
         this.id = id;
         this.pos = pos;
+        this.drawOffset = new Vector2(0,0);
+        GameObject.objs.push(this);
+    }
+
+    static sortVertically(a, b) {
+        if (a.y + a.drawOffset.y > b.y + b.drawOffset.y ) {
+            return 1; //The first game object is lower than the first
+        } else if (a.y + a.drawOffset.y  < b.y + b.drawOffset.y ) {
+            return -1; //The second game object is lower than the first
+        }
+
+        return 0; // The two game objects are at the same height
     }
 
     get x () {return this.pos.x;}
@@ -78,6 +92,8 @@ class GameObject {
 
     set x (v) {this.pos.x = v;}
     set y (v) {this.pos.y = v;}
+
+    draw () {}
 }
 
 class Sprite {

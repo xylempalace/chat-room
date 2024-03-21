@@ -250,6 +250,10 @@ class Player extends GameObject {
         this.speechBubbles.unshift(newBubble);
     }
 
+    draw() {
+        this.drawPlayer();
+    }
+
     drawSpeechBubbles() {
         if (!this.expired) {
             var curBubble;
@@ -362,6 +366,25 @@ class SpeechBubble {
     }
 }
 
+class Prop extends GameObject {
+    sprite;
+    size;
+    offset;
+
+    constructor (sprite, pos, offset, size) {
+        super("PROP-"+sprite.image.src, pos);
+
+        this.sprite = sprite;
+        this.size = size;
+        this.drawOffset = offset;
+    }
+
+    draw() {
+        console.log("Test");
+        this.sprite.draw(this.pos.screenPos, this.size);
+    }
+}
+
 //Called when the page is finished loading
 document.addEventListener("readystatechange", (e) => {
     if (e.target.readyState === "complete") {
@@ -452,6 +475,15 @@ function connect() {
 }
 
 function startAnimating() {
+    let treeA = new Sprite("tree.png");
+    let treeB = new Sprite("tree2.png");
+    new Prop(treeB, new Vector2(-950, -600), new Vector2(0, 240), 300*activeCamera.zoom);
+    new Prop(treeA, new Vector2(-500, -450), new Vector2(0, 250), 300*activeCamera.zoom);
+    new Prop(treeB, new Vector2(-150, -1150), new Vector2(0, 340), 400*activeCamera.zoom);
+    new Prop(treeA, new Vector2(-800, -1100), new Vector2(0, 300), 350*activeCamera.zoom);
+    new Prop(treeA, new Vector2(100, -850), new Vector2(0, 250), 300*activeCamera.zoom);
+    new Prop(treeA, new Vector2(775, 575), new Vector2(0, 200), 250*activeCamera.zoom);
+    
     startTime = Date.now(); 
     drawScreen();
 }
@@ -463,15 +495,23 @@ function update() {
 
     backgroundMap.draw();
 
-    userPlayer.drawPlayer(gameCanvas);
+    GameObject.objs.sort(GameObject.sortVertically);
+    GameObject.objs.forEach((element) => {
+        element.draw();
+    })
+    
+    //userPlayer.drawPlayer(gameCanvas);
     userPlayer.drawSpeechBubbles(gameCanvas);
     userPlayer.update((Date.now()-startTime) / fpms);
     
     otherPlayers.forEach((element) => {
-        element.drawPlayer(gameCanvas);
+        //element.drawPlayer(gameCanvas);
         element.drawSpeechBubbles(gameCanvas);
         element.update((Date.now()-startTime)/fpms);
     });
+
+    //let treeSprite = new Sprite("tree.png");
+    //treeSprite.draw(new Vector2(-256, -256).screenPos, 400);
 }
 
 function serverUpdate() {

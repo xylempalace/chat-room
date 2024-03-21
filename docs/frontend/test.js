@@ -341,7 +341,6 @@ class SpeechBubble {
         }
         
         this.height = this.message.length * this.constructor.fontHeight;
-        console.log("height: " + this.height);
     }
 
     //Returns true if the bubble is past its expiry time
@@ -360,15 +359,13 @@ class SpeechBubble {
         ctx.textAlign = 'center';
         ctx.font = this.constructor.font;
     
+        let initOffset = (this.constructor.fontHeight * (this.message.length + 1) * 0.5)
         
         for (let i = 0; i < this.message.length; i++) {
-            ctx.fillText(this.message[i], posX, posY-(this.constructor.fontHeight*(this.message.length-(1+i))));
+            ctx.fillText(this.message[i], posX, (posY - (this.constructor.fontHeight * (this.message.length - i))) + initOffset);
         }
 
-        let test = ctx.measureText("bug fan");
-        console.log(test.fontBoundingBoxAscent);
-
-        SpeechBubbleSprite2.drawCentered(new Vector2(posX, posY), this.constructor.maxWidth, (this.message.length * this.constructor.fontHeight) );
+        SpeechBubbleSprite2.drawCentered(new Vector2(posX, posY), this.constructor.maxWidth, (this.message.length * this.constructor.fontHeight) * 1.5 + 10);
     
         ctx.textAlign = prevAlign;
         ctx.font = prevFont;

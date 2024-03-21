@@ -64,6 +64,8 @@ const files = {
   '/sprites/tiles/pathNorthSouth.png' : ['image/png', '../frontend/sprites/tiles/pathNorthSouth.png'],
   '/sprites/speechBubble.png' : ['image/png', '../frontend/sprites/speechBubble.png'],
   '/sprites/speechBubbleOther.png' : ['image/png', '../frontend/sprites/speechBubbleOther.png'],
+  '/sprites/tree.png' : ['image/png', '../frontend/sprites/tree.png'],
+  '/sprites/tree2.png' : ['image/png', '../frontend/sprites/tree2.png'],
 };
 
 var clients = {};
@@ -85,19 +87,23 @@ app.listen(port, () => {
 });
 
 // Socket Server Code
-sockserver.on('connection', ws => {
-  console.log('New client connected!'); 
+sockserver.on('connection', (ws, req) => {
+  console.log(`New client connected with IP ${req.socket.remoteAddress}`); 
 
   ws.on('close', () => {
     // When the client disconnects it sends its username to other clients so they know to remove that player from their screen
-    console.log(`${clients[ws.id][0]}(${ws.id}) has disconnected!`);
-    sockserver.clients.forEach(client => {
-      client.send(JSON.stringify({
-        id: clients[ws.id][0],
-        expired: true
-      })); 
-    });
-    delete clients[ws.id];
+    try {
+      console.log(`${clients[ws.id][0]}(${ws.id}) has disconnected!`);
+      sockserver.clients.forEach(client => {
+        client.send(JSON.stringify({
+          id: clients[ws.id][0],
+          expired: true
+        })); 
+      });
+      delete clients[ws.id];
+    } catch (e) {
+      console.log(e);
+    }
   });
 
   ws.on('message', (str) => {

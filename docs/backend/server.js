@@ -65,6 +65,7 @@ const files = {
   '/sprites/speechBubble.png' : ['image/png', '../frontend/sprites/speechBubble.png'],
   '/sprites/tree.png' : ['image/png', '../frontend/sprites/tree.png'],
   '/sprites/tree2.png' : ['image/png', '../frontend/sprites/tree2.png'],
+  '/sprites/minigame/tictactoe/tictactoeBoardInteract.png' : ['image/png', '../frontend/sprites/minigame/tictactoe/tictactoeBoardInteract.png']
 };
 
 var clients = {};
@@ -76,7 +77,7 @@ app.get('/*', (req, res) => {
     res.set('Content-Type', stuff[0]);
     res.sendFile(path.join(__dirname, stuff[1]));
   } catch (err) {
-    console.log(err);
+    console.log(err + "\n" + req.url);
   }
 });
 
@@ -193,7 +194,3 @@ sockserver.on('connection', (ws, req) => {
     console.log('websocket error');
   }
 });
-
-function distance(x1, x2, y1, y2) {
-  return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
-}

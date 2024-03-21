@@ -175,12 +175,28 @@ class Game {
     }
 }
 
-class GameInteractable {
-    sprite;
+class GameProp extends Prop {
+    interactionRange;
     game;
 
-    constructor(sprite, game) {
-        this.sprite = sprite;
+    constructor(sprite, pos, offset, size, interactionRange, game) {
+        super(sprite, pos, offset, size);
+
+        this.interactionRange = interactionRange;
         this.game = game;
+    }
+
+    interactPrompt(pos) {
+        var display = distance(pos.x, this.pos.x + this.drawOffset.x, pos.y, this.pos.y + this.drawOffset.y) <= this.interactionRange;
+        if (display) {
+            ctx.save();
+            ctx.textAlign = 'center';
+            ctx.fillStyle = "white";
+            ctx.fillRect(this.pos.screenPos.x + this.drawOffset.x + (-175 * activeCamera.zoom), this.pos.screenPos.y + this.drawOffset.y + (30 * activeCamera.zoom), 350 , 40)
+            ctx.fillStyle = "black";
+            ctx.fillText("PRESS SPACE TO PLAY", this.pos.screenPos.x + this.drawOffset.x, this.pos.screenPos.y + this.drawOffset.y + (60 * activeCamera.zoom));
+            ctx.restore();
+        }
+        return display;
     }
 }

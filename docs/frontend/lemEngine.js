@@ -312,6 +312,24 @@ class Camera extends GameObject {
     }   
 }
 
+class Prop extends GameObject {
+    sprite;
+    size;
+    offset;
+
+    constructor (sprite, pos, offset, size) {
+        super("PROP-"+sprite.image.src, pos);
+
+        this.sprite = sprite;
+        this.size = size;
+        this.drawOffset = offset;
+    }
+
+    draw() {    
+        this.sprite.draw(this.pos.screenPos, this.size);
+    }
+}
+
 function addCanvas() {
     var canvas = document.createElement('canvas');
     canvas.id = "gameCanvas";
@@ -326,8 +344,7 @@ function addCanvas() {
         canvasClick(canvas, e);
     });
     
-    canvas.addEventListener("keydown", (e) => {
-        console.log("FSAF");
+    window.addEventListener("keypress", (e) => {
         onKey(e);
     });
     
@@ -379,6 +396,10 @@ function drawScreen() {
     //Updates FPS graph
     DebugGraph.updateFPSGraph(frameLength);
     DebugGraph.drawFPSGraph(0, 30, 250, 100, 3); 
+}
+
+function distance(x1, x2, y1, y2) {
+    return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
 }
 
 function update() {}

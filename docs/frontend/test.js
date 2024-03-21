@@ -34,6 +34,7 @@ const backgroundTiles = [
 ];
 
 // GAMES
+gameProps = [];
 
 // Tic-Tac-Toe
 var gameBoard = new Board(3, 3);
@@ -418,25 +419,6 @@ class SpeechBubble {
     }
 }
 
-class Prop extends GameObject {
-    sprite;
-    size;
-    offset;
-
-    constructor (sprite, pos, offset, size) {
-        super("PROP-"+sprite.image.src, pos);
-
-        this.sprite = sprite;
-        this.size = size;
-        this.drawOffset = offset;
-    }
-
-    draw() {
-        console.log("Test");
-        this.sprite.draw(this.pos.screenPos, this.size);
-    }
-}
-
 //Called when the page is finished loading
 document.addEventListener("readystatechange", (e) => {
     if (e.target.readyState === "complete") {
@@ -529,6 +511,8 @@ function connect() {
 function startAnimating() {
     let treeA = new Sprite("tree.png");
     let treeB = new Sprite("tree2.png");
+    let tictactoeBoard = new Sprite("minigame/tictactoe/tictactoeBoardInteract.png");
+    gameProps.push(new GameProp(tictactoeBoard, new Vector2(0, 0), new Vector2(50, 50), 100*activeCamera.zoom, 50, tictactoe));
     new Prop(treeB, new Vector2(-950, -600), new Vector2(0, 240), 300*activeCamera.zoom);
     new Prop(treeA, new Vector2(-500, -450), new Vector2(0, 250), 300*activeCamera.zoom);
     new Prop(treeB, new Vector2(-150, -1150), new Vector2(0, 340), 400*activeCamera.zoom);
@@ -561,6 +545,10 @@ function update() {
         element.drawSpeechBubbles(gameCanvas);
         element.update((Date.now()-startTime)/fpms);
     });
+
+    for (var i = 0; i < gameProps.length; i++) {
+        gameProps[i].interactPrompt(userPlayer.pos);
+    }
 
     //let treeSprite = new Sprite("tree.png");
     //treeSprite.draw(new Vector2(-256, -256).screenPos, 400);
@@ -612,8 +600,10 @@ function onClick(event, canvasPos) {
 }
 
 function onKey(event) {
-    console.log("space");
-    if (connected && event.key === 32) {
+    if (connected && event.key === " ") {
         console.log("space");
+        for (var i = 0; i < gameProps.length; i++) {
+            gameProps[i].interactPrompt(userPlayer.pos);
+        }
     }
 }

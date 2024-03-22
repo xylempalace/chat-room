@@ -148,6 +148,7 @@ class Card {
 }
 
 class Game {
+    title;
     maxPlayers;
     players;
     minPlayers;
@@ -155,7 +156,8 @@ class Game {
     deck;
     turn = 0;
 
-    constructor(maxPlayers, minPlayers, board) {
+    constructor(title, maxPlayers, minPlayers, board) {
+        this.title = title;
         this.maxPlayers = maxPlayers;
         this.minPlayers = minPlayers;
         this.gameBoard = board;
@@ -188,15 +190,58 @@ class GameProp extends Prop {
 
     interactPrompt(pos) {
         var display = distance(pos.x, this.pos.x + this.drawOffset.x, pos.y, this.pos.y + this.drawOffset.y) <= this.interactionRange;
+        const canvas = document.getElementById("gameCanvas");
         if (display) {
             ctx.save();
             ctx.textAlign = 'center';
             ctx.fillStyle = "white";
-            ctx.fillRect(this.pos.screenPos.x + this.drawOffset.x + (-175 * activeCamera.zoom), this.pos.screenPos.y + this.drawOffset.y + (30 * activeCamera.zoom), 350 , 40)
+            ctx.fillRect(canvas.width / 2 - 175, canvas.height - 45, 350, 40)
             ctx.fillStyle = "black";
-            ctx.fillText("PRESS SPACE TO PLAY", this.pos.screenPos.x + this.drawOffset.x, this.pos.screenPos.y + this.drawOffset.y + (60 * activeCamera.zoom));
+            ctx.fillText("PRESS SPACE TO PLAY", canvas.width / 2, canvas.height - 15);//750, 725);
             ctx.restore();
         }
         return display;
     }
+
+    openWindow() {
+        new GameMenu(this.game.title, this.game.maxPlayers, this.game.minPlayers);
+    }
+}
+
+class GameMenu {
+    title;
+    maxPlayers;
+    minPlayers;
+    prepareClose = false;
+
+    constructor(title, maxPlayers, minPlayers) {
+        this.title = title;
+        this.maxPlayers = maxPlayers;
+        this.minPlayers = minPlayers;
+        gameWindowDraw(this);
+    }
+
+    draw() {
+        const canvas = document.getElementById("gameCanvas");
+        ctx.fillStyle = "gray";
+        ctx.save();
+        ctx.fillRect(canvas.width / 2 - 300, canvas.height / 2 - 300, 600, 600);
+        ctx.restore();
+    }
+
+    destroy() {
+        delete this;
+    }
+}
+
+function gameWindowDraw(window) {
+    if (!window.prepareClose) {
+        setTimeout(() => {
+            gameWindowDraw(window);
+        }, 1);
+    } else {
+        window.destroy();
+    }
+    console.log("HELLO");
+    window.draw();
 }

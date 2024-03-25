@@ -8,6 +8,7 @@ let connected = false;
 let loginState = "username";
 let userPlayer;
 let otherPlayers = [];
+let freezePlayer = false;
 
 //Tilemap
 const backgroundTiles = [
@@ -548,6 +549,9 @@ function update() {
 
     for (var i = 0; i < gameProps.length; i++) {
         gameProps[i].interactPrompt(userPlayer.pos);
+        if (gameProps[i].drawMenu) {
+            //gameProps[i].window.draw();
+        }
     }
 
     //let treeSprite = new Sprite("tree.png");
@@ -594,17 +598,28 @@ function ToggleDarkMode() {
 }
 
 function onClick(event, canvasPos) {
-    if (connected) {
+    if (connected && !freezePlayer) {
         userPlayer.walkTo(canvasPos.screenToWorldPos());
     }
 }
 
 function onKey(event) {
-    if (connected && event.key === " ") {
-        for (var i = 0; i < gameProps.length; i++) {
-            if (gameProps[i].interactPrompt(userPlayer.pos)) {
-                console.log("space");
-            }
+    if (connected) {
+        console.log(event.code);
+        switch (event.code) {
+            case "Space":
+                for (var i = 0; i < gameProps.length; i++) {
+                    if (gameProps[i].interactPrompt(userPlayer.pos)) {
+                        gameProps[i].drawMenu = true;
+                        freezePlayer = true;
+                        this.velX = 0;
+                        this.velY = 0;
+                    }
+                }
+                break;
+            case "Escape":
+                console.log("HELLPO");
+                break;
         }
     }
 }

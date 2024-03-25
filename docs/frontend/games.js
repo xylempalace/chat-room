@@ -180,18 +180,21 @@ class Game {
 class GameProp extends Prop {
     interactionRange;
     game;
+    window;
+    drawMenu = false;
 
     constructor(sprite, pos, offset, size, interactionRange, game) {
         super(sprite, pos, offset, size);
 
         this.interactionRange = interactionRange;
         this.game = game;
+        this.window = new GameMenu(this.game.title, this.game.maxPlayers, this.game.minPlayers);
     }
 
     interactPrompt(pos) {
         var display = distance(pos.x, this.pos.x + this.drawOffset.x, pos.y, this.pos.y + this.drawOffset.y) <= this.interactionRange;
         const canvas = document.getElementById("gameCanvas");
-        if (display) {
+        if (!this.drawMenu && display) {
             ctx.save();
             ctx.textAlign = 'center';
             ctx.fillStyle = "white";
@@ -201,10 +204,6 @@ class GameProp extends Prop {
             ctx.restore();
         }
         return display;
-    }
-
-    openWindow() {
-        new GameMenu(this.game.title, this.game.maxPlayers, this.game.minPlayers);
     }
 }
 
@@ -218,7 +217,6 @@ class GameMenu {
         this.title = title;
         this.maxPlayers = maxPlayers;
         this.minPlayers = minPlayers;
-        gameWindowDraw(this);
     }
 
     draw() {
@@ -228,20 +226,4 @@ class GameMenu {
         ctx.fillRect(canvas.width / 2 - 300, canvas.height / 2 - 300, 600, 600);
         ctx.restore();
     }
-
-    destroy() {
-        delete this;
-    }
-}
-
-function gameWindowDraw(window) {
-    if (!window.prepareClose) {
-        setTimeout(() => {
-            gameWindowDraw(window);
-        }, 1);
-    } else {
-        window.destroy();
-    }
-    console.log("HELLO");
-    window.draw();
 }

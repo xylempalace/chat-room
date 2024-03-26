@@ -13,7 +13,7 @@ const scriptStart = Date.now();
 let activeCamera;
 let cameraList = [];
 
-document.addEventListener("resize", (event) => {
+addEventListener("resize", (event) => {
     cameraList.forEach((element) => {
         gameCanvas.width  = document.getElementById('gameSpace').clientWidth*0.8;
         gameCanvas.height = document.getElementById('gameSpace').clientHeight;
@@ -25,12 +25,6 @@ class Vector2 {
     
     x;
     y;
-
-    static zero = new Vector2( 0, 0);
-	static up   = new Vector2( 0,-1);
-	static down = new Vector2( 0, 1);
-	static right= new Vector2( 1, 0);
-	static left = new Vector2(-1, 0);
     
     constructor(x, y) {
         this.x = x;
@@ -62,29 +56,19 @@ class Vector2 {
         return "X: " + truncateNumber(this.x, 1) + "   Y: " + truncateNumber(this.y, 1);
     }
 
+    static get zero() {
+        return new Vector2(0,0);
+    }
+
 }
 
 class GameObject {
     pos;
-    drawPos;
     id;
-    static objs = [];
 
     constructor (id, pos) {
         this.id = id;
         this.pos = pos;
-        this.drawOffset = new Vector2(0,0);
-        GameObject.objs.push(this);
-    }
-
-    static sortVertically(a, b) {
-        if (a.y + a.drawOffset.y > b.y + b.drawOffset.y ) {
-            return 1; //The first game object is lower than the first
-        } else if (a.y + a.drawOffset.y  < b.y + b.drawOffset.y ) {
-            return -1; //The second game object is lower than the first
-        }
-
-        return 0; // The two game objects are at the same height
     }
 
     get x () {return this.pos.x;}
@@ -92,24 +76,16 @@ class GameObject {
 
     set x (v) {this.pos.x = v;}
     set y (v) {this.pos.y = v;}
-
-    draw () {}
 }
 
 class Sprite {
     id;
     image;
-    centeredOffset;
 
     constructor (image) {
         this.id = image;
         this.image = new Image();
         this.image.src = './sprites/'+image; // Is this dangerous, given a custom input, eg "../[FILE NAME]", could a user potentially access files not intended?
-
-        this.centeredOffset = new Vector2(
-            -(this.image.width),
-            -(this.image.height * 2)
-        )
     }
 
     draw(pos, width, height) {
@@ -129,14 +105,29 @@ class NineSlicedSprite extends Sprite {
     constructor (image, sc) {
         super(image);
         this.sliceCoords = sc
-        let w = this.image.width;
-        let h = this.image.height;
-        let r = this.image.width - sc[2];
-        let b = this.image.height - sc[3];
+
+        const realWidth = this.image.width;
+        const realHeight = this.image.height;
+
+        const sliceWidth = realWidth / 3;
+        const sliceHeight = realHeight / 3;
+
         this.segments = [
-            [0    , 0    , sc[0], sc[1]], [sc[0], 0    , r   , sc[1]], [r    , 0    , w    , sc[1]], 
-            [0    , sc[1], sc[0], b    ], [sc[0], sc[1], r   , b    ], [r    , sc[1], w    , b    ],
-            [0    , b    , sc[0], h    ], [sc[0], b    , r   , h    ], [r    , b    , w    , h    ],
+            // slice: [posX, posY, width height]
+
+            // [1] [2] [3]
+            // [4] [5] [6]
+            // [7] [8] [9]
+
+            // Drawing the slices in the "top row" from left to right (slices 1, 2 and 3) 
+            [0, 0, sliceWidth, sliceHeight],           [sliceWidth, 0, sliceWidth, sliceHeight],           [realWidth - sliceWidth, 0, sliceWidth, sliceHeight],
+
+            // Drawing the slices in the "middle row" from left to right (slices 4, 5 and 6)
+            [0, sliceHeight, sliceWidth, sliceHeight], [sliceWidth, sliceHeight, sliceWidth, sliceHeight], [realWidth - sliceWidth, realHeight - sliceHeight, sliceWidth, sliceHeight], 
+
+            // Drawing the slices in the "bottom row" from left to right (slices 7, 8 and 9)
+            [0, realHeight - sliceHeight, sliceWidth, sliceHeight], [sliceWidth, realHeight - sliceHeight, sliceWidth, sliceHeight], [realWidth - realHeight, realHeight - sliceHeight, sliceWidth, sliceHeight]
+            
         ];
     }
     

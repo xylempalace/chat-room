@@ -224,18 +224,19 @@ class GameMenu {
         this.title = game.title;
         this.maxPlayers = game.maxPlayers;
         this.minPlayers = game.minPlayers;
-        this.width = game.dimensions.x;
-        this.height = game.dimensions.y;
+        this.width = game.dimensions.x * activeCamera.zoom;
+        this.height = game.dimensions.y * activeCamera.zoom;
         const canvas = document.getElementById("gameCanvas");
         this.origin = new Vector2(canvas.width / 2 - this.width / 2, canvas.height / 2 - this.height / 2);
     }
 
     draw() {
-        var width = this.width * activeCamera.zoom;
-        var height = this.height * activeCamera.zoom;
         ctx.fillStyle = "#cacaca";
         ctx.save();
-        ctx.fillRect(this.origin.x, this.origin.y, width, height);
+        ctx.fillRect(this.origin.x, this.origin.y, this.width, this.height);
+        ctx.textAlign = 'center';
+        ctx.fillStyle = "black";
+        ctx.fillText(this.title, this.origin.x + this.width / 2, this.origin.y + 50);
         ctx.restore();
     }
 

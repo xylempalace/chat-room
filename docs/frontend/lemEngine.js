@@ -386,6 +386,7 @@ function drawScreen() {
     update();
     
     ctx.fillStyle = "#000000";
+    ctx.textAlign = "left";
     startTime = Date.now();
     var fpsDecimalPlaces = 1;
     var measuredFPS = ((startTime-beginTime))*(fpsDecimalPlaces*10);

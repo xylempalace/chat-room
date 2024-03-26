@@ -77,7 +77,8 @@ app.get('/*', (req, res) => {
     res.set('Content-Type', stuff[0]);
     res.sendFile(path.join(__dirname, stuff[1]));
   } catch (err) {
-    console.log(err + "\n" + req.url);
+    console.log(req.url);
+    console.log(err);
   }
 });
 
@@ -91,7 +92,7 @@ sockserver.on('connection', (ws, req) => {
 
   ws.on('close', () => {
     // When the client disconnects it sends its username to other clients so they know to remove that player from their screen
-    try {  
+    try {
       console.log(`${clients[ws.id][0]}(${ws.id}) has disconnected!`);
       sockserver.clients.forEach(client => {
         client.send(JSON.stringify({
@@ -100,8 +101,8 @@ sockserver.on('connection', (ws, req) => {
         })); 
       });
       delete clients[ws.id];
-    } catch (err) {
-      console.log(err);
+    } catch (e) {
+      console.log(e);
     }
   });
 

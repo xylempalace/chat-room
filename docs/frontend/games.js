@@ -155,12 +155,14 @@ class Game {
     gameBoard;
     deck;
     turn = 0;
+    dimensions;
 
-    constructor(title, maxPlayers, minPlayers, board) {
+    constructor(title, maxPlayers, minPlayers, board, dimensions) {
         this.title = title;
         this.maxPlayers = maxPlayers;
         this.minPlayers = minPlayers;
         this.gameBoard = board;
+        this.dimensions = dimensions;
     }
 
     startGame(players) {
@@ -188,7 +190,7 @@ class GameProp extends Prop {
 
         this.interactionRange = interactionRange;
         this.game = game;
-        this.window = new GameMenu(this.game.title, this.game.maxPlayers, this.game.minPlayers);
+        this.window = new GameMenu(this.game);
     }
 
     interactPrompt(pos) {
@@ -200,7 +202,7 @@ class GameProp extends Prop {
             ctx.fillStyle = "white";
             ctx.fillRect(canvas.width / 2 - 175, canvas.height - 45, 350, 40)
             ctx.fillStyle = "black";
-            ctx.fillText("PRESS SPACE TO PLAY", canvas.width / 2, canvas.height - 15);//750, 725);
+            ctx.fillText("PRESS SPACE TO PLAY", canvas.width / 2, canvas.height - 15);
             ctx.restore();
         }
         return display;
@@ -208,22 +210,40 @@ class GameProp extends Prop {
 }
 
 class GameMenu {
+    game;
     title;
     maxPlayers;
     minPlayers;
     prepareClose = false;
+    width;
+    height;
+    origin;
 
-    constructor(title, maxPlayers, minPlayers) {
-        this.title = title;
-        this.maxPlayers = maxPlayers;
-        this.minPlayers = minPlayers;
+    constructor(game) {
+        this.game = game;
+        this.title = game.title;
+        this.maxPlayers = game.maxPlayers;
+        this.minPlayers = game.minPlayers;
+        this.width = game.dimensions.x;
+        this.height = game.dimensions.y;
+        const canvas = document.getElementById("gameCanvas");
+        this.origin = new Vector2(canvas.width / 2 - this.width / 2, canvas.height / 2 - this.height / 2);
     }
 
     draw() {
-        const canvas = document.getElementById("gameCanvas");
-        ctx.fillStyle = "gray";
+        var width = this.width * activeCamera.zoom;
+        var height = this.height * activeCamera.zoom;
+        ctx.fillStyle = "#cacaca";
         ctx.save();
-        ctx.fillRect(canvas.width / 2 - 300, canvas.height / 2 - 300, 600, 600);
+        ctx.fillRect(this.origin.x, this.origin.y, width, height);
         ctx.restore();
+    }
+
+    processClick(position) {
+        if (position.x >= this.origin.x && position.y >= this.origin.y && position.x <= this.origin.x + this.width * activeCamera.zoom && position.y <= this.origin.y + this.height * activeCamera.zoom) {
+            return false;
+        } else {
+            return true;
+        }
     }
 }

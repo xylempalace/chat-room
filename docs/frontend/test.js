@@ -87,7 +87,7 @@ const winCondition = (gameBoard, players, turn) => {
     }
     return win;
 };
-const tictactoe = new Game("Tic Tac Toe", 2, 2, gameBoard);
+const tictactoe = new Game("Tic Tac Toe", 2, 2, gameBoard, new Vector2(800, 400));
 
 const backgroundMap = new TileMap(new Vector2(0,0), backgroundTiles, 64, 32, 32, [
     11,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,13,5,16,7,7,7,7,7,7,7,7,7,7,7,14,4,4,4,4,16,7,7,7,7,7,7,7,7,7,7,7,14,6,5,6,3,3,3,3,3,3,3,3,3,3,3,10,14,4,16,7,12,3,3,3,3,3,1,3,3,3,3,3,5,6,5,6,3,3,3,3,3,3,3,3,3,9,3,3,5,16,12,3,3,3,3,3,3,3,3,3,3,1,3,3,5,6,5,6,3,3,3,3,3,3,3,3,3,3,3,11,15,6,3,3,9,3,3,3,3,3,3,1,3,3,3,3,5,6,5,6,1,3,3,3,3,3,3,3,3,3,3,5,4,6,3,3,3,3,3,3,3,3,3,1,1,1,3,3,5,6,10,12,1,1,3,3,3,3,3,3,3,3,3,5,4,6,3,3,3,3,3,3,3,3,3,1,1,1,1,3,5,6,2,2,2,1,3,3,3,3,3,3,3,3,3,10,14,6,3,3,3,3,3,3,3,3,1,1,1,1,1,3,5,6,2,2,2,1,3,3,3,3,3,3,3,3,3,3,5,17,13,3,3,3,3,3,3,3,1,1,1,3,1,3,5,6,1,1,1,1,3,3,3,3,3,3,3,3,3,3,10,14,6,3,3,3,3,3,3,3,1,1,1,1,1,3,5,6,1,1,1,1,3,3,3,3,3,3,3,3,3,3,3,5,6,3,3,3,3,3,3,3,1,3,1,1,3,3,5,6,1,1,1,3,3,3,3,3,3,3,3,11,8,8,8,15,17,8,8,8,13,3,3,3,3,3,1,3,3,3,5,6,2,2,2,3,3,3,3,3,3,3,3,5,16,7,7,14,16,7,7,14,6,3,3,3,1,3,3,3,1,3,5,6,2,2,2,1,3,3,3,3,3,3,3,5,6,3,3,10,12,3,3,5,6,3,3,3,3,3,1,3,3,3,5,6,2,2,2,1,3,3,3,3,3,3,3,5,6,3,2,1,1,2,3,5,6,3,3,3,3,3,3,3,3,3,5,6,2,2,2,3,3,3,3,3,3,3,3,5,17,13,1,1,1,1,11,15,6,3,3,3,3,3,3,3,3,3,5,6,11,13,1,3,3,3,3,3,3,3,3,5,16,12,1,1,1,1,10,14,6,2,3,2,3,2,3,2,3,2,5,6,5,6,3,3,3,3,3,3,3,3,3,5,6,3,2,1,1,2,3,5,6,3,3,3,3,3,3,3,3,3,5,6,5,6,3,3,3,3,3,3,3,3,3,5,6,3,3,11,13,3,3,5,6,3,3,3,3,3,3,3,3,3,5,6,5,6,3,3,3,3,3,3,3,3,3,5,17,8,8,15,17,8,8,15,17,13,3,3,3,3,3,3,3,3,5,6,5,6,3,3,11,19,19,19,13,3,3,10,7,7,7,7,7,7,7,14,4,6,3,3,3,3,3,3,3,3,5,6,5,6,3,11,12,1,1,1,10,13,3,3,3,3,3,3,2,3,3,10,14,17,13,3,3,3,3,3,3,3,5,6,5,6,3,18,1,11,19,13,1,18,3,3,3,3,3,3,3,3,3,3,10,14,17,8,8,13,3,3,3,3,5,6,5,6,3,18,1,18,2,18,1,18,3,3,3,3,3,3,2,3,3,3,3,10,7,14,4,17,8,13,3,3,5,6,5,6,3,18,1,10,19,12,1,18,3,3,3,3,3,3,3,3,3,3,3,3,3,5,4,4,4,6,3,3,5,6,5,6,3,10,13,1,1,1,11,12,3,3,3,3,3,3,2,3,3,3,3,3,3,10,14,4,4,6,3,3,5,6,5,6,3,3,10,19,19,19,12,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,10,14,4,17,8,8,15,6,5,6,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,3,3,3,3,3,3,3,3,10,14,4,4,4,4,6,5,6,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,5,16,7,14,4,6,5,6,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,3,3,3,3,3,3,3,11,8,15,6,3,5,4,6,5,17,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,15,4,4,17,8,15,4,6,10,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,12
@@ -284,19 +284,34 @@ class Player extends GameObject {
             // Checks if current X position is further than your "destination"
             // Stops you if it is, keeps moving forward otherwise
             if (Math.abs(nextX-this.destination.x) > Math.abs(this.pos.x-this.destination.x)) {
-                this.velX = 0;
                 this.pos.x = this.destination.x;
+                this.stopX();
             } else {
                 this.pos.x = nextX;
             }
             
             if (Math.abs(nextY-this.destination.y) > Math.abs(this.pos.y-this.destination.y)) {
-                this.velY = 0;
                 this.pos.y = this.destination.y;
+                this.stopY();
             } else {
                 this.pos.y = nextY;
             }
         }
+    }
+
+    stopX() {
+        this.velX = 0;
+        this.destination.x = this.pos.x;
+    }
+
+    stopY() {
+        this.velY = 0;
+        this.destination.y = this.pos.y;
+    }
+
+    stop() {
+        this.stopX();
+        this.stopY();
     }
 
     sayMessage(message) {
@@ -550,7 +565,7 @@ function update() {
     for (var i = 0; i < gameProps.length; i++) {
         gameProps[i].interactPrompt(userPlayer.pos);
         if (gameProps[i].drawMenu) {
-            //gameProps[i].window.draw();
+            gameProps[i].window.draw();
         }
     }
 
@@ -598,8 +613,17 @@ function ToggleDarkMode() {
 }
 
 function onClick(event, canvasPos) {
-    if (connected && !freezePlayer) {
-        userPlayer.walkTo(canvasPos.screenToWorldPos());
+    if (connected) {
+        if (freezePlayer) {
+            for (var i = 0; i < gameProps.length; i++) {
+                    if (gameProps[i].window.processClick(canvasPos)) {
+                        gameProps[i].drawMenu = false;
+                        freezePlayer = false;
+                    }
+                }
+        } else {
+            userPlayer.walkTo(canvasPos.screenToWorldPos());
+        }
     }
 }
 
@@ -612,13 +636,9 @@ function onKey(event) {
                     if (gameProps[i].interactPrompt(userPlayer.pos)) {
                         gameProps[i].drawMenu = true;
                         freezePlayer = true;
-                        this.velX = 0;
-                        this.velY = 0;
+                        userPlayer.stop();
                     }
                 }
-                break;
-            case "Escape":
-                console.log("HELLPO");
                 break;
         }
     }

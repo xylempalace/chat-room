@@ -194,11 +194,14 @@ class Player extends GameObject {
     speechBubbles = [];
     color;
     cosmetics = [];
+    static baseCosmetics = [new Sprite("player/base.png")]
+    flipped = false;
 
-    constructor(id, pos, username, color) {
+    constructor(id, pos, username, color, cosmetics = Player.baseCosmetics) {
         super ("PLAYER-"+username, pos);
         this.username = username;
         this.color = color;
+        this.cosmetics = cosmetics;
     }
 
     setCosmetics(cosmeticArr) {
@@ -215,11 +218,7 @@ class Player extends GameObject {
         this.velX = Math.cos(angle)*this.constructor.playerMoveSpeed;
         this.velY = Math.sin(angle)*this.constructor.playerMoveSpeed;
         
-        /*
-        receiveMessage("Vel X: " + truncateNumber(this.velX,1) + "   Vel Y: " + truncateNumber(this.velY,1));
-        receiveMessage("Angle: " + truncateNumber(angle,1));
-        receiveMessage("Cam X: " + truncateNumber(activeCamera.x,1) + "   Cam Y: " + truncateNumber(activeCamera.y,1)+"\n");
-        */
+        this.flipped = this.velX < 0;
     }
     
     update(deltaTime) {
@@ -290,6 +289,10 @@ class Player extends GameObject {
                 this.constructor.playerSizeX * activeCamera.zoom, 
                 this.constructor.playerSizeY * activeCamera.zoom
             );
+
+            this.cosmetics.forEach((i) => {
+                i.draw(this.pos.screenPos, Player.playerSizeX * activeCamera.zoom, this.flipped);
+            })
 
             ctx.fillStyle = "#000000";
             ctx.textAlign = 'center';
@@ -380,7 +383,6 @@ class Prop extends GameObject {
     }
 
     draw() {
-        console.log("Test");
         this.sprite.draw(this.pos.screenPos, this.size);
     }
 }

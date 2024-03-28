@@ -2,11 +2,22 @@
 // Script used to send index.html in response to HTTP request
 
 // Import express library and declare it as var app
+var https = require('https')
+var fs = require('fs')
+var https_options = {
+  key: fs.readFileSync('./server.key'),
+  cert: fs.readFileSync('./server.crt'),
+}
+ 
+server = https.createServer({https_options})
+const port = 443
+ 
+ 
+
 const express = require('express')
 const app = express()
 const { WebSocketServer } = require('ws')
-const sockserver = new WebSocketServer({ port: 443 })
-
+const sockserver = new WebSocketServer({ server: server })
 // Creates a unique uid
 sockserver.getUniqueID = function () {
   function s4() {
@@ -15,7 +26,6 @@ sockserver.getUniqueID = function () {
   return s4() + s4() + '-' + s4();
 };
 
-const port = 3000
 // Import path library
 const path = require('path')
 
@@ -81,7 +91,7 @@ app.get('/*', (req, res) => {
   }
 });
 
-app.listen(port, () => {
+https.createServer(https_options, app).listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
 

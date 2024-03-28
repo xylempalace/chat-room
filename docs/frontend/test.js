@@ -41,7 +41,7 @@ const backgroundMap = new TileMap(new Vector2(0,0), backgroundTiles, 64, 32, 32,
 const SpeechBubbleSprite = new NineSlicedSprite("speechBubble.png"  , [16, 16, 16, 24]);
 
 // WebSocket Stuff
-const webSocket = new WebSocket('ws://localhost:443/');
+const webSocket = new WebSocket('wss://localhost:443/');
 
 webSocket.onmessage = (event) => {
     var obj = JSON.parse(event.data);

@@ -214,10 +214,11 @@ class GameMenu {
     title;
     maxPlayers;
     minPlayers;
-    prepareClose = false;
+    buttons = [];
     width;
     height;
     origin;
+    windowState = 0;
 
     constructor(game) {
         this.game = game;
@@ -228,12 +229,14 @@ class GameMenu {
         this.height = game.dimensions.y * activeCamera.zoom;
         const canvas = document.getElementById("gameCanvas");
         this.origin = new Vector2(canvas.width / 2 - this.width / 2, canvas.height / 2 - this.height / 2);
+        this.buttons.push(new Button(this.width, this.height, "#cacaca"), null);
     }
 
     draw() {
-        ctx.fillStyle = "#cacaca";
         ctx.save();
-        ctx.fillRect(this.origin.x, this.origin.y, this.width, this.height);
+        for (var i = 0 ; i < this.buttons.length; i++) {
+            this.buttons[i].draw();
+        }
         ctx.textAlign = 'center';
         ctx.fillStyle = "black";
         ctx.fillText(this.title, this.origin.x + this.width / 2, this.origin.y + 50);
@@ -241,10 +244,38 @@ class GameMenu {
     }
 
     processClick(position) {
-        if (position.x >= this.origin.x && position.y >= this.origin.y && position.x <= this.origin.x + this.width * activeCamera.zoom && position.y <= this.origin.y + this.height * activeCamera.zoom) {
-            return false;
-        } else {
+        if (this.buttons[0].processClick(position, (clicked) => {return !clicked;})) {
             return true;
+        } else {
+            return false;
         }
+    }
+}
+
+class Button {
+    width;
+    height;
+    origin;
+    color;
+    windowState;
+
+    constructor(width, height, color, state) {
+        this.width = width;
+        this.height = height;
+        const canvas = document.getElementById("gameCanvas");
+        this.origin = new Vector2(canvas.width / 2 - this.width / 2, canvas.height / 2 - this.height / 2);
+        this.color = color;
+        this.windowState = state;
+    }
+
+    draw(state) {
+        if (state === this.windowState) {
+            ctx.fillStyle = this.color;
+            ctx.fillRect(this.origin.x, this.origin.y, this.width, this.height);
+        }
+    }
+
+    processClick(position, execute) {
+        return execute(position.x >= this.origin.x && position.y >= this.origin.y && position.x <= this.origin.x + this.width && position.y <= this.origin.y + this.height, this.windowState);
     }
 }

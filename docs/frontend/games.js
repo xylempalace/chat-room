@@ -229,13 +229,13 @@ class GameMenu {
         this.height = game.dimensions.y * activeCamera.zoom;
         const canvas = document.getElementById("gameCanvas");
         this.origin = new Vector2(canvas.width / 2 - this.width / 2, canvas.height / 2 - this.height / 2);
-        this.buttons.push(new Button(this.width, this.height, "#cacaca"), null);
+        this.buttons.push(new Button(this.width, this.height, "#cacaca"), 0);
     }
 
     draw() {
         ctx.save();
         for (var i = 0 ; i < this.buttons.length; i++) {
-            this.buttons[i].draw();
+            this.buttons[i].draw(this.windowState);
         }
         ctx.textAlign = 'center';
         ctx.fillStyle = "black";

@@ -183,8 +183,8 @@ class Cosmetic extends GameObject {
 }
 
 class Player extends GameObject {
-    static playerSizeX = 50;
-    static playerSizeY = 50;
+    static playerSizeX = 75;
+    static playerSizeY = 75;
     static playerMoveSpeed = 5;
     expired = false;
     destination = Vector2.zero;
@@ -282,16 +282,16 @@ class Player extends GameObject {
         if (!this.expired) {
             ctx.save();
 
-            ctx.fillStyle = this.color;
+            /*ctx.fillStyle = this.color;
             ctx.fillRect(
                 this.pos.screenPos.x - (this.constructor.playerSizeX * activeCamera.zoom) / 2, 
                 this.pos.screenPos.y - (this.constructor.playerSizeY * activeCamera.zoom) / 2, 
                 this.constructor.playerSizeX * activeCamera.zoom, 
                 this.constructor.playerSizeY * activeCamera.zoom
-            );
+            );*/
 
             this.cosmetics.forEach((i) => {
-                i.draw(this.pos.screenPos, Player.playerSizeX * activeCamera.zoom, this.flipped);
+                i.draw(new Vector2(this.left, this.top).screenPos, Player.playerSizeX * activeCamera.zoom, this.flipped);
             })
 
             ctx.fillStyle = "#000000";
@@ -299,10 +299,18 @@ class Player extends GameObject {
             ctx.scale(activeCamera.zoom, activeCamera.zoom);
             ctx.font = this.constructor.font;
         
-            ctx.fillText("<" + this.username + ">", this.pos.screenPos.x / activeCamera.zoom, (this.pos.screenPos.y + (this.constructor.playerSizeY * 1.1 * activeCamera.zoom)) / activeCamera.zoom);
+            ctx.fillText("<" + this.username + ">", this.pos.screenPos.x / activeCamera.zoom, (this.pos.screenPos.y + (this.constructor.playerSizeY * 0.8 * activeCamera.zoom)) / activeCamera.zoom);
 
             ctx.restore();
         }
+    }
+
+    get top () {
+        return this.pos.y - (this.constructor.playerSizeY / 2);
+    }
+
+    get left () {
+        return this.pos.x - (this.constructor.playerSizeX / 2);
     }
 }
 

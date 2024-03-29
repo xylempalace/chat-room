@@ -366,7 +366,10 @@ class SpeechBubble {
         }
 
         SpeechBubbleSprite2.drawCentered(new Vector2(posX, posY), this.constructor.maxWidth, (this.message.length * this.constructor.fontHeight) * 1.5 + 10);
-    
+        
+        let testNineSlice = new NineSlicedSprite("tree.png")
+        testNineSlice.draw(new Vector2(2, 2), 200);
+
         ctx.textAlign = prevAlign;
         ctx.font = prevFont;
     }
@@ -386,7 +389,6 @@ class Prop extends GameObject {
     }
 
     draw() {
-        console.log("Test");
         this.sprite.draw(this.pos.screenPos, this.size);
     }
 }
@@ -494,6 +496,8 @@ function startAnimating() {
     drawScreen();
 }
 
+
+
 function update() {
     activeCamera.follow(userPlayer.pos);
 
@@ -506,18 +510,14 @@ function update() {
         element.draw();
     })
     
-    //userPlayer.drawPlayer(gameCanvas);
     userPlayer.drawSpeechBubbles(gameCanvas);
     userPlayer.update((Date.now()-startTime) / fpms);
     
     otherPlayers.forEach((element) => {
-        //element.drawPlayer(gameCanvas);
         element.drawSpeechBubbles(gameCanvas);
         element.update((Date.now()-startTime) / fpms);
     });
 
-    //let treeSprite = new Sprite("tree.png");
-    //treeSprite.draw(new Vector2(-256, -256).screenPos, 400);
 }
 
 function serverUpdate() {

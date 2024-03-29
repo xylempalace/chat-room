@@ -13,7 +13,7 @@ const scriptStart = Date.now();
 let activeCamera;
 let cameraList = [];
 
-addEventListener("resize", (event) => {
+document.addEventListener("resize", (event) => {
     cameraList.forEach((element) => {
         gameCanvas.width  = document.getElementById('gameSpace').clientWidth*0.8;
         gameCanvas.height = document.getElementById('gameSpace').clientHeight;
@@ -25,6 +25,12 @@ class Vector2 {
     
     x;
     y;
+
+    static zero = new Vector2( 0, 0);
+	static up   = new Vector2( 0,-1);
+	static down = new Vector2( 0, 1);
+	static right= new Vector2( 1, 0);
+	static left = new Vector2(-1, 0);
     
     constructor(x, y) {
         this.x = x;
@@ -56,19 +62,30 @@ class Vector2 {
         return "X: " + truncateNumber(this.x, 1) + "   Y: " + truncateNumber(this.y, 1);
     }
 
-    static get zero() {
-        return new Vector2(0,0);
-    }
-
 }
 
 class GameObject {
     pos;
+    drawPos;
+
     id;
+    static objs = [];
 
     constructor (id, pos) {
         this.id = id;
         this.pos = pos;
+        this.drawOffset = new Vector2(0,0);
+        GameObject.objs.push(this);
+    }
+
+    static sortVertically(a, b) {
+        if (a.y + a.drawOffset.y > b.y + b.drawOffset.y ) {
+            return 1; //The first game object is lower than the first
+        } else if (a.y + a.drawOffset.y  < b.y + b.drawOffset.y ) {
+            return -1; //The second game object is lower than the first
+        }
+
+        return 0; // The two game objects are at the same height
     }
 
     get x () {return this.pos.x;}
@@ -76,6 +93,8 @@ class GameObject {
 
     set x (v) {this.pos.x = v;}
     set y (v) {this.pos.y = v;}
+
+    draw () {}
 }
 
 class Sprite {
@@ -101,41 +120,65 @@ class Sprite {
 class NineSlicedSprite extends Sprite {
     sliceCoords = [];
     segments = [];
-    
-    constructor (image, sc) {
+
+    constructor (image) {
         super(image);
-        this.sliceCoords = sc
 
         const realWidth = this.image.width;
         const realHeight = this.image.height;
 
-        const sliceWidth = realWidth / 3;
-        const sliceHeight = realHeight / 3;
-
+        // setting the height and witdh of each slice (each slice should be 1/9th of the image)
+        this.sliceWidth = realWidth / 3;
+        this.sliceHeight = realHeight / 3;
+        
         this.segments = [
-            // slice: [posX, posY, width height]
+            // slice: [posX, posY, width, height]
 
             // [1] [2] [3]
             // [4] [5] [6]
             // [7] [8] [9]
 
             // Drawing the slices in the "top row" from left to right (slices 1, 2 and 3) 
-            [0, 0, sliceWidth, sliceHeight],           [sliceWidth, 0, sliceWidth, sliceHeight],           [realWidth - sliceWidth, 0, sliceWidth, sliceHeight],
+            [0, 0, this.sliceWidth, this.sliceHeight],           [this.sliceWidth, 0, this.sliceWidth, this.sliceHeight],           [realWidth - this.sliceWidth, 0, this.sliceWidth, this.sliceHeight],
 
             // Drawing the slices in the "middle row" from left to right (slices 4, 5 and 6)
-            [0, sliceHeight, sliceWidth, sliceHeight], [sliceWidth, sliceHeight, sliceWidth, sliceHeight], [realWidth - sliceWidth, realHeight - sliceHeight, sliceWidth, sliceHeight], 
+            [0, this.sliceHeight, this.sliceWidth, this.sliceHeight], [this.sliceWidth, this.sliceHeight, this.sliceWidth, this.sliceHeight], [realWidth - this.sliceWidth, realHeight - this.sliceHeight, this.sliceWidth, this.sliceHeight], 
 
             // Drawing the slices in the "bottom row" from left to right (slices 7, 8 and 9)
-            [0, realHeight - sliceHeight, sliceWidth, sliceHeight], [sliceWidth, realHeight - sliceHeight, sliceWidth, sliceHeight], [realWidth - realHeight, realHeight - sliceHeight, sliceWidth, sliceHeight]
+            [0, realHeight - this.sliceHeight, this.sliceWidth, this.sliceHeight], [this.sliceWidth, realHeight - this.sliceHeight, this.sliceWidth, this.sliceHeight], [realWidth - realHeight, realHeight - this.sliceHeight, this.sliceWidth, this.sliceHeight]
             
         ];
+    }
+
+    // slice: [posX, posY, width, height]
+    getSlicePosX(i) {
+        return this.segments[i][1];
+    }
+
+    getSlicePosY(i) {
+        return this.segments[i][2];
+    }
+
+    getSliceWidth(i) {
+        return this.segments[i][3];
+    }
+
+    getSliceHeight(i) {
+        return this.segments[i][4];
     }
     
     draw(pos, size) {
         let s = size / 3;
-        foreach ((element) => {
-            ctx.drawImage(this.image, element[0], element[1], element[2], element[3], pos.x + element[0], pos.y + element[1], s * element[2], s * element[3]);
-        })
+        for (let i = 0; i < this.segments.length; i++) {
+            //ctx.drawImage(this.segments[i]);
+            console.log(
+            "Pos X: " + this.getSlicePosX(i) + " " +
+            "Pos Y: " + this.getSlicePosY(i) + " " +
+            "Width: " + this.getSliceWidth(i) + " " +
+            "Height: " + this.getSliceHeight(i)
+            );
+            
+        }
     }
 }
 

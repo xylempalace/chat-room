@@ -169,16 +169,27 @@ class World {
     static spawnPos = new Vector2(0, 0);
 }
 
-class Cosmetic extends GameObject {
-    order;
-    halfHeight;
-    halfWidth;
-    img;
-    player;
+class PlayerCosmetic {
+    color;
+    sprite;
+    flippedSprite;
 
-    constructor(id, image, player) {
-        super("COSMET-" + id, player.pos);
-        this.img = image;
+    /**
+     * 
+     * @param {String} spritePath 
+     * @param {String} flippedSpritePath 
+     */
+    constructor (spritePath, flippedSpritePath) {
+        this.sprite = new Sprite(spritePath);
+        this.flippedSprite = new Sprite(flippedSpritePath)
+    }
+
+    draw(pos, size, flipped = false) {
+        if (!flipped) {
+            this.sprite.draw(pos, size);
+        } else {
+            this.flippedSprite.draw(pos, size);
+        }
     }
 }
 
@@ -194,7 +205,7 @@ class Player extends GameObject {
     speechBubbles = [];
     color;
     cosmetics = [];
-    static baseCosmetics = [new Sprite("player/base.png")]
+    static baseCosmetics = [new PlayerCosmetic("player/base.png", "player/base_flipped.png"), new PlayerCosmetic("player/flower.png", "player/flower_flipped.png")];
     flipped = false;
 
     constructor(id, pos, username, color, cosmetics = Player.baseCosmetics) {
@@ -282,16 +293,9 @@ class Player extends GameObject {
         if (!this.expired) {
             ctx.save();
 
-            /*ctx.fillStyle = this.color;
-            ctx.fillRect(
-                this.pos.screenPos.x - (this.constructor.playerSizeX * activeCamera.zoom) / 2, 
-                this.pos.screenPos.y - (this.constructor.playerSizeY * activeCamera.zoom) / 2, 
-                this.constructor.playerSizeX * activeCamera.zoom, 
-                this.constructor.playerSizeY * activeCamera.zoom
-            );*/
-
+            let playerDrawPos = new Vector2(this.left, this.top).screenPos;
             this.cosmetics.forEach((i) => {
-                i.draw(new Vector2(this.left, this.top).screenPos, Player.playerSizeX * activeCamera.zoom, this.flipped);
+                i.draw(playerDrawPos, Player.playerSizeX * activeCamera.zoom, this.flipped);
             })
 
             ctx.fillStyle = "#000000";

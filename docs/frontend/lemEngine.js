@@ -101,6 +101,10 @@ class Sprite {
     image;
     centeredOffset;
 
+    /**
+     * Create a new sprite object
+     * @param {String} image String file path to the image, starting in the sprites folder, including file type 
+     */
     constructor (image) {
         this.id = image;
         this.image = new Image();
@@ -112,7 +116,14 @@ class Sprite {
         )
     }
 
-    draw (pos, size) {
+    /**
+     * 
+     * @param {Vector2} pos 
+     * @param {Number} size 
+     * @param {Boolean} flipX 
+     * @param {Boolean} flipY 
+     */
+    draw (pos, size, flipX = false, flipY = false) {
         ctx.drawImage(this.image, pos.x, pos.y, size, size);
     }
 }

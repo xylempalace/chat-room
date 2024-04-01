@@ -261,8 +261,8 @@ class GameProp extends Prop {
     }
 }
 
-class GameMenu {
-    game;
+class Menu {
+    source;
     title;
     maxPlayers;
     minPlayers;
@@ -272,13 +272,13 @@ class GameMenu {
     origin;
     windowState = 0;
 
-    constructor(game) {
-        this.game = game;
-        this.title = game.title;
-        this.maxPlayers = game.maxPlayers;
-        this.minPlayers = game.minPlayers;
-        this.width = game.dimensions.x * activeCamera.zoom;
-        this.height = game.dimensions.y * activeCamera.zoom;
+    constructor(source) {
+        this.source = source;
+        this.title = source.title;
+        this.maxPlayers = source.maxPlayers;
+        this.minPlayers = source.minPlayers;
+        this.width = source.dimensions.x * activeCamera.zoom;
+        this.height = source.dimensions.y * activeCamera.zoom;
         const canvas = document.getElementById("gameCanvas");
         this.origin = new Vector2(canvas.width / 2 - this.width / 2, canvas.height / 2 - this.height / 2);
         this.buttons.push(new Button(this.origin, this.width, this.height, "#cacaca", null, ""));

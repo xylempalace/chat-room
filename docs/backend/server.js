@@ -66,6 +66,10 @@ const files = {
   '/sprites/speechBubbleOther.png' : ['image/png', '../frontend/sprites/speechBubbleOther.png'],
   '/sprites/tree.png' : ['image/png', '../frontend/sprites/tree.png'],
   '/sprites/tree2.png' : ['image/png', '../frontend/sprites/tree2.png'],
+  '/sprites/player/base.png' : ['image/png', '../frontend/sprites/player/base.png'],
+  '/sprites/player/base_flipped.png' : ['image/png', '../frontend/sprites/player/base_flipped.png'],
+  '/sprites/player/flower.png' : ['image/png', '../frontend/sprites/player/flower.png'],
+  '/sprites/player/flower_flipped.png' : ['image/png', '../frontend/sprites/player/flower_flipped.png'],
 };
 
 var clients = {};
@@ -102,7 +106,7 @@ sockserver.on('connection', (ws, req) => {
       });
       delete clients[ws.id];
     } catch (e) {
-      console.log(e);
+      console.log(`Disconnect failed! Error: \n${e}`);
     }
   });
 

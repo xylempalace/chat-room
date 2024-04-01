@@ -101,14 +101,30 @@ class Sprite {
     id;
     image;
 
+    /**
+     * Create a new sprite object
+     * @param {String} image String file path to the image, starting in the sprites folder, including file type 
+     */
     constructor (image) {
         this.id = image;
         this.image = new Image();
         this.image.src = './sprites/'+image; // Is this dangerous, given a custom input, eg "../[FILE NAME]", could a user potentially access files not intended?
     }
 
+<<<<<<< HEAD
     draw(pos, width, height) {
         ctx.drawImage(this.image, pos.x, pos.y, width, height);
+=======
+    /**
+     * 
+     * @param {Vector2} pos 
+     * @param {Number} size 
+     * @param {Boolean} flipX 
+     * @param {Boolean} flipY 
+     */
+    draw (pos, size, flipX = false, flipY = false) {
+        ctx.drawImage(this.image, pos.x, pos.y, size, size);
+>>>>>>> 8d8c0285e925abc6a5ab9c3d1a32b0ecfa99a794
     }
 
     drawCentered(pos, width, height) {

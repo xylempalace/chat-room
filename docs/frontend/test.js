@@ -168,22 +168,33 @@ class World {
     static spawnPos = new Vector2(0, 0);
 }
 
-class Cosmetic extends GameObject {
-    order;
-    halfHeight;
-    halfWidth;
-    img;
-    player;
+class PlayerCosmetic {
+    color;
+    sprite;
+    flippedSprite;
 
-    constructor(id, image, player) {
-        super("COSMET-" + id, player.pos);
-        this.img = image;
+    /**
+     * 
+     * @param {String} spritePath 
+     * @param {String} flippedSpritePath 
+     */
+    constructor (spritePath, flippedSpritePath) {
+        this.sprite = new Sprite(spritePath);
+        this.flippedSprite = new Sprite(flippedSpritePath)
+    }
+
+    draw(pos, size, flipped = false) {
+        if (!flipped) {
+            this.sprite.draw(pos, size);
+        } else {
+            this.flippedSprite.draw(pos, size);
+        }
     }
 }
 
 class Player extends GameObject {
-    static playerSizeX = 50;
-    static playerSizeY = 50;
+    static playerSizeX = 75;
+    static playerSizeY = 75;
     static playerMoveSpeed = 5;
     expired = false;
     destination = Vector2.zero;
@@ -193,11 +204,14 @@ class Player extends GameObject {
     speechBubbles = [];
     color;
     cosmetics = [];
+    static baseCosmetics = [new PlayerCosmetic("player/base.png", "player/base_flipped.png"), new PlayerCosmetic("player/flower.png", "player/flower_flipped.png")];
+    flipped = false;
 
-    constructor(id, pos, username, color) {
+    constructor(id, pos, username, color, cosmetics = Player.baseCosmetics) {
         super ("PLAYER-"+username, pos);
         this.username = username;
         this.color = color;
+        this.cosmetics = cosmetics;
     }
 
     setCosmetics(cosmeticArr) {
@@ -214,11 +228,7 @@ class Player extends GameObject {
         this.velX = Math.cos(angle)*this.constructor.playerMoveSpeed;
         this.velY = Math.sin(angle)*this.constructor.playerMoveSpeed;
         
-        /*
-        receiveMessage("Vel X: " + truncateNumber(this.velX,1) + "   Vel Y: " + truncateNumber(this.velY,1));
-        receiveMessage("Angle: " + truncateNumber(angle,1));
-        receiveMessage("Cam X: " + truncateNumber(activeCamera.x,1) + "   Cam Y: " + truncateNumber(activeCamera.y,1)+"\n");
-        */
+        this.flipped = this.velX < 0;
     }
     
     update(deltaTime) {
@@ -281,23 +291,28 @@ class Player extends GameObject {
         if (!this.expired) {
             ctx.save();
 
-            ctx.fillStyle = this.color;
-            ctx.fillRect(
-                this.pos.screenPos.x - (this.constructor.playerSizeX * activeCamera.zoom) / 2, 
-                this.pos.screenPos.y - (this.constructor.playerSizeY * activeCamera.zoom) / 2, 
-                this.constructor.playerSizeX * activeCamera.zoom, 
-                this.constructor.playerSizeY * activeCamera.zoom
-            );
+            let playerDrawPos = new Vector2(this.left, this.top).screenPos;
+            this.cosmetics.forEach((i) => {
+                i.draw(playerDrawPos, Player.playerSizeX * activeCamera.zoom, this.flipped);
+            })
 
             ctx.fillStyle = "#000000";
             ctx.textAlign = 'center';
             ctx.scale(activeCamera.zoom, activeCamera.zoom);
             ctx.font = this.constructor.font;
         
-            ctx.fillText("<" + this.username + ">", this.pos.screenPos.x / activeCamera.zoom, (this.pos.screenPos.y + (this.constructor.playerSizeY * 1.1 * activeCamera.zoom)) / activeCamera.zoom);
+            ctx.fillText("<" + this.username + ">", this.pos.screenPos.x / activeCamera.zoom, (this.pos.screenPos.y + (this.constructor.playerSizeY * 0.8 * activeCamera.zoom)) / activeCamera.zoom);
 
             ctx.restore();
         }
+    }
+
+    get top () {
+        return this.pos.y - (this.constructor.playerSizeY / 2);
+    }
+
+    get left () {
+        return this.pos.x - (this.constructor.playerSizeX / 2);
     }
 }
 

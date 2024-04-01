@@ -622,24 +622,15 @@ function onClick(event, canvasPos) {
                     }
                 }
         } else {
-            userPlayer.walkTo(canvasPos.screenToWorldPos());
-        }
-    }
-}
-
-function onKey(event) {
-    if (connected) {
-        console.log(event.code);
-        switch (event.code) {
-            case "Space":
-                for (var i = 0; i < gameProps.length; i++) {
-                    if (gameProps[i].interactPrompt(userPlayer.pos)) {
-                        gameProps[i].drawMenu = true;
-                        freezePlayer = true;
-                        userPlayer.stop();
-                    }
+            for (var i = 0; i < gameProps.length; i++) {
+                if (gameProps[i].interactPrompt(userPlayer.pos) && gameProps[i].button.processClick(canvasPos, (condition) => {return condition;})) {
+                    gameProps[i].drawMenu = true;
+                    freezePlayer = true;
+                    userPlayer.stop();
+                    return;
                 }
-                break;
+            }
+            userPlayer.walkTo(canvasPos.screenToWorldPos());
         }
     }
 }

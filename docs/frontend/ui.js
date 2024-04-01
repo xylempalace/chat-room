@@ -236,6 +236,7 @@ class GameProp extends Prop {
     game;
     window;
     drawMenu = false;
+    button;
 
     constructor(sprite, pos, offset, size, interactionRange, game) {
         super(sprite, pos, offset, size);
@@ -243,18 +244,16 @@ class GameProp extends Prop {
         this.interactionRange = interactionRange;
         this.game = game;
         this.window = new UiMenu(this.game);
+
+        const canvas = document.getElementById("gameCanvas");
+        this.button = new Button(new Vector2(canvas.width / 2 - 175, canvas.height - 45), 350, 40, "#ffffff", null, "CLICK HERE TO PLAY");
     }
 
     interactPrompt(pos) {
         var display = distance(pos.x, this.pos.x + this.drawOffset.x, pos.y, this.pos.y + this.drawOffset.y) <= this.interactionRange;
-        const canvas = document.getElementById("gameCanvas");
         if (!this.drawMenu && display) {
             ctx.save();
-            ctx.textAlign = 'center';
-            ctx.fillStyle = "white";
-            ctx.fillRect(canvas.width / 2 - 175, canvas.height - 45, 350, 40)
-            ctx.fillStyle = "black";
-            ctx.fillText("PRESS SPACE TO PLAY", canvas.width / 2, canvas.height - 15);
+            this.button.draw(0);
             ctx.restore();
         }
         return display;

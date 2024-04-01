@@ -344,10 +344,6 @@ function addCanvas() {
         canvasClick(canvas, e);
     });
     
-    window.addEventListener("keypress", (e) => {
-        onKey(e);
-    });
-    
     cameraList.push(new Camera("default", Vector2.zero, 0.01, []));
     activeCamera = cameraList[0];
     
@@ -407,5 +403,3 @@ function distance(x1, x2, y1, y2) {
 function update() {}
 
 function onClick(event, canvasPos) {}
-
-function onKey(event) {}

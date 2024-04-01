@@ -242,7 +242,7 @@ class GameProp extends Prop {
 
         this.interactionRange = interactionRange;
         this.game = game;
-        this.window = new UiGame(this.game);
+        this.window = new UiMenu(this.game);
     }
 
     interactPrompt(pos) {
@@ -261,7 +261,7 @@ class GameProp extends Prop {
     }
 }
 
-class UiGame {
+class UiMenu {
     source;
     title;
     maxPlayers;
@@ -286,7 +286,7 @@ class UiGame {
     }
 
     /**
-     * Draws the source window to the screen
+     * Draws the game window to the screen
      */
     draw() {
         ctx.save();

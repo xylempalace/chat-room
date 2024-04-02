@@ -246,7 +246,7 @@ class GameProp extends Prop {
         this.window = new UiMenu(this.game);
 
         const canvas = document.getElementById("gameCanvas");
-        this.button = new Button(new Vector2(canvas.width / 2 - 175, canvas.height - 45), 350, 40, "#ffffff", null, "CLICK HERE TO PLAY");
+        this.button = new Button(new Vector2(canvas.width / 2 - 175 * activeCamera.zoom, canvas.height - 45 * activeCamera.zoom), 350, 40, "#ffffff", "CLICK HERE TO PLAY", 30, null, 0);
     }
 
     interactPrompt(pos) {
@@ -280,21 +280,27 @@ class UiMenu {
         this.height = source.dimensions.y * activeCamera.zoom;
         const canvas = document.getElementById("gameCanvas");
         this.origin = new Vector2(canvas.width / 2 - this.width / 2, canvas.height / 2 - this.height / 2);
-        this.buttons.push(new Button(this.origin, this.width, this.height, "#cacaca", null, ""));
-        this.buttons.push(new Button(new Vector2(this.origin.x + this.width / 2 - 50, this.origin.y + this.height / 2 - 20), 100, 40, "#20ff00", 0, "PLAY", 1));
+        this.buttons.push(new Button(this.origin, source.dimensions.x, source.dimensions.y, "#cacaca", "", 30, null, 0));
+
+        this.buttons.push(new Button(new Vector2(this.origin.x + this.width / 2 - 240 * activeCamera.zoom, this.origin.y + this.height / 2 - 20 * activeCamera.zoom), 220, 40, "#20ff00", "PUBLIC GAME", 30, 0, 100));
+        this.buttons.push(new Button(new Vector2(this.origin.x + this.width / 2 - 240 * activeCamera.zoom, this.origin.y + this.height / 2 - 20 * activeCamera.zoom), 220, 40, "#20ff00", "JOIN ROOM", 30, 100, 110));
+        this.buttons.push(new Button(new Vector2(this.origin.x + this.width / 2 + 30 * activeCamera.zoom, this.origin.y + this.height / 2 - 20 * activeCamera.zoom), 240, 40, "#20ff00", "CREATE ROOM", 30, 100, 120));
+
+        this.buttons.push(new Button(new Vector2(this.origin.x + this.width / 2 + 30 * activeCamera.zoom, this.origin.y + this.height / 2 - 20 * activeCamera.zoom), 240, 40, "#20ff00", "PRIVATE GAME", 30, 0, 20));
     }
 
     /**
      * Draws the game window to the screen
      */
     draw() {
-        ctx.save();
+        ctx.save()
         for (var i = 0 ; i < this.buttons.length; i++) {
             this.buttons[i].draw(this.windowState); 
         }
         ctx.textAlign = 'center';
         ctx.fillStyle = "black";
-        ctx.fillText(this.title, this.origin.x + this.width / 2, this.origin.y + 50);
+        ctx.font = `${30 * activeCamera.zoom}px Arial`;
+        ctx.fillText(this.title, this.origin.x + this.width / 2, this.origin.y + 50 * activeCamera.zoom);
         ctx.restore();
     }
 
@@ -309,13 +315,16 @@ class UiMenu {
         } else {
             for (var i = 1; i < this.buttons.length; i++) {
                 if (this.buttons[i].windowState === this.windowState) {
-                    this.windowState = this.buttons[i].processClick(position, (condition, nextState, windowState) => {
+                    var nextState = this.buttons[i].processClick(position, (condition, nextState, windowState) => {
                     if (condition) {
                         return nextState;
                     } else {
                         return windowState;
+                    }});
+                    if (nextState !== this.windowState) {
+                        this.windowState = nextState;
+                        return false;
                     }
-                });
                 }
             }
             return false;
@@ -331,6 +340,8 @@ class Button {
     windowState;
     text;
     nextState;
+    fontSize;
+    process;
 
     /**
      * Game Window buttons that run a specified function on click
@@ -340,16 +351,18 @@ class Button {
      * @param {string} color color of button
      * @param state the state number of the game window when this button should draw
      * @param {string} text text on button
-     * @param nextState the state the game window should switch upon click
+     * @param nextState the state the game window should switch upon click 
      */
-    constructor(origin, width, height, color, state, text, nextState) {
-        this.width = width;
-        this.height = height;
+    constructor(origin, width, height, color, text, fontSize, state, nextState, processButton = false) {
+        this.width = width * activeCamera.zoom;
+        this.height = height * activeCamera.zoom;
         this.origin = origin;
         this.color = color;
         this.windowState = state;
         this.text = text;
         this.nextState = nextState;
+        this.fontSize = fontSize;
+        this.process = processButton;
     }
 
     /**
@@ -362,7 +375,8 @@ class Button {
             ctx.fillRect(this.origin.x, this.origin.y, this.width, this.height);
             ctx.textAlign = 'center';
             ctx.fillStyle = "black";
-            ctx.fillText(this.text, this.origin.x + this.width / 2, this.origin.y + this.height / 2 + 10);
+            ctx.font = `${this.fontSize * activeCamera.zoom}px Arial`;
+            ctx.fillText(this.text, this.origin.x + this.width / 2, this.origin.y + this.height / 2 + 10 * activeCamera.zoom);
         }
     }
 

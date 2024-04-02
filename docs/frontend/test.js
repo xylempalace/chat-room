@@ -625,6 +625,7 @@ function onClick(event, canvasPos) {
             for (var i = 0; i < gameProps.length; i++) {
                 if (gameProps[i].interactPrompt(userPlayer.pos) && gameProps[i].button.processClick(canvasPos, (condition) => {return condition;})) {
                     gameProps[i].drawMenu = true;
+                    gameProps[i].window.windowState = 0;
                     freezePlayer = true;
                     userPlayer.stop();
                     return;

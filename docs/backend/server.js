@@ -141,7 +141,7 @@ sockserver.on('connection', (ws, req) => {
 
       // Checks if the username is taken and if so tells the client to select a different username
       for (const [key, value] of Object.entries(clients)) {
-        if (obj.id == value) {
+        if (obj.id == value[0]) {
           validName = false;
           ws.send(JSON.stringify({
             invalidName: true,
@@ -195,3 +195,7 @@ sockserver.on('connection', (ws, req) => {
     console.log('websocket error');
   }
 });
+
+function distance(x1, x2, y1, y2) {
+  return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+}

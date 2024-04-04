@@ -22,21 +22,21 @@ document.addEventListener("resize", (event) => {
 });
 
 class Vector2 {
-    
+   
     x;
     y;
-
+   
     static zero = new Vector2( 0, 0);
-	static up   = new Vector2( 0,-1);
-	static down = new Vector2( 0, 1);
-	static right= new Vector2( 1, 0);
-	static left = new Vector2(-1, 0);
-    
+    static up   = new Vector2( 0,-1);
+    static down = new Vector2( 0, 1);
+    static right= new Vector2( 1, 0);
+    static left = new Vector2(-1, 0);
+   
     constructor(x, y) {
         this.x = x;
         this.y = y;
     }
-    
+   
     screenToWorldPos() {
         let v = new Vector2(
             ((this.x + (activeCamera.pos.x * activeCamera.zoom)) - activeCamera.halfWidth)  / activeCamera.zoom,
@@ -44,7 +44,48 @@ class Vector2 {
         );
         return v;
     }
+ 
+    /**
+     * Adds this vector to vector v, does not effect the original vector
+     * @param {Vector2} v component
+     * @returns {Vector2} The sum x and y values between the two vectors
+     */
+    add (v) {
+        let o = new Vector2(this.x + v.x, this.y + v.y);
+        return o;
+    }
+ 
+    /**
+     * Subtracts this vector by vector v, does not effect the original vector
+     * @param {Vector2} v Subtrahend
+     * @returns {Vector2} The difference of x and y values between the two vectors
+     */
+    sub (v) {
+        let o = new Vector2(this.x - v.x, this.y - v.y);
+        return o;
+    }
     
+    /**
+     * Scales the vector by number n, does not effect original vector
+     * @param {Number} n 
+     * @returns {Vector2} The scaled vector
+     */
+    mul (n) {
+        let o = new Vector2(this.x * n, this.y * n);
+        return o;
+    }
+
+    /**
+     * Divides the vector by number n, does not effect original vector
+     * o = (x/n, y/n)
+     * @param {Number} n 
+     * @returns {Vector2} The divided vector
+     */
+    div (n) {
+        let o = new Vector2(this.x / n, this.y / n);
+        return o;
+    }
+ 
     get screenPos() {
         let v = new Vector2(
             (activeCamera.zoom * this.x + activeCamera.halfWidth)  - (activeCamera.pos.x * activeCamera.zoom),
@@ -52,16 +93,19 @@ class Vector2 {
         );
         return v;
     }
-    
+   
     get normalized() {
         let a = Math.atan2(this.y, this.x);
         return new Vector2(Math.cos(a), Math.sin(a));
     }
-
+ 
+    get magnitude() {
+        return Math.sqrt((this.x * this.x) + (this.y * this.y));
+    }
+ 
     get toString() {
         return "X: " + truncateNumber(this.x, 1) + "   Y: " + truncateNumber(this.y, 1);
     }
-
 }
 
 class GameObject {
@@ -119,12 +163,28 @@ class Sprite {
     /**
      * 
      * @param {Vector2} pos 
-     * @param {Number} size 
-     * @param {Boolean} flipX 
-     * @param {Boolean} flipY 
+     * @param {Number} width 
+     * @param {Number} height 
      */
-    draw (pos, size, flipX = false, flipY = false) {
+    draw (pos, width, height) {
+        ctx.drawImage(this.image, pos.x, pos.y, width, height);
+    }
+
+    /**
+     * 
+     * @param {Vector2} pos 
+     * @param {Number} size 
+     */
+    draw (pos, size) {
         ctx.drawImage(this.image, pos.x, pos.y, size, size);
+    }
+
+    get width () {
+        return this.image.width;
+    }
+
+    get height () {
+        return this.image.height;
     }
 }
 

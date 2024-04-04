@@ -116,7 +116,7 @@ class Sprite {
      * @param {Vector2} pos 
      * @param {Number} size 
      */
-    
+
     draw(pos, width, height) {
         ctx.drawImage(this.image, pos.x, pos.y, width, height);
     }
@@ -140,7 +140,6 @@ class NineSlicedSprite extends Sprite {
         // setting the height and witdh of each slice (each slice should be 1/9th of the image)
         this.sliceWidth = realWidth / 3;
         this.sliceHeight = realHeight / 3;
-        
         this.segments = [
             // slice: [posX, posY, width, height]
 
@@ -152,43 +151,45 @@ class NineSlicedSprite extends Sprite {
             [0, 0, this.sliceWidth, this.sliceHeight],           [this.sliceWidth, 0, this.sliceWidth, this.sliceHeight],           [realWidth - this.sliceWidth, 0, this.sliceWidth, this.sliceHeight],
 
             // Drawing the slices in the "middle row" from left to right (slices 4, 5 and 6)
-            [0, this.sliceHeight, this.sliceWidth, this.sliceHeight], [this.sliceWidth, this.sliceHeight, this.sliceWidth, this.sliceHeight], [realWidth - this.sliceWidth, realHeight - this.sliceHeight, this.sliceWidth, this.sliceHeight], 
+            [0, this.sliceHeight, this.sliceWidth, this.sliceHeight], [this.sliceWidth, this.sliceHeight, this.sliceWidth, this.sliceHeight], [realWidth - this.sliceWidth, this.sliceHeight, this.sliceWidth, this.sliceHeight], 
 
             // Drawing the slices in the "bottom row" from left to right (slices 7, 8 and 9)
-            [0, realHeight - this.sliceHeight, this.sliceWidth, this.sliceHeight], [this.sliceWidth, realHeight - this.sliceHeight, this.sliceWidth, this.sliceHeight], [realWidth - realHeight, realHeight - this.sliceHeight, this.sliceWidth, this.sliceHeight]
+            [0, realHeight - this.sliceHeight, this.sliceWidth, this.sliceHeight], [this.sliceWidth, realHeight - this.sliceHeight, this.sliceWidth, this.sliceHeight], [realWidth - this.sliceWidth, realHeight - this.sliceHeight, this.sliceWidth, this.sliceHeight]
             
         ];
     }
 
+    // slices: [slice1, slice2, slice3, sliceN...]
     // slice: [posX, posY, width, height]
-    getSlicePosX(i) {
-        return this.segments[i][1];
+    getSlicePosX(index) {
+        return this.segments[index][0];
     }
 
-    getSlicePosY(i) {
-        return this.segments[i][2];
+    getSlicePosY(index) {
+        return this.segments[index][1];
     }
 
-    getSliceWidth(i) {
-        return this.segments[i][3];
+    getSliceWidth(index) {
+        return this.segments[index][2];
     }
 
-    getSliceHeight(i) {
-        return this.segments[i][4];
+    getSliceHeight(index) {
+        return this.segments[index][3];
     }
     
     draw(pos, size) {
-        let s = size / 3;
         for (let i = 0; i < this.segments.length; i++) {
-            //ctx.drawImage(this.segments[i]);
-            console.log(
+            ctx.drawImage(this.image, ...this.segments[i], pos.x, pos.y, this.getSliceWidth(i), this.getSliceHeight(i));
+            console.log(pos.x);
+           /* console.log(
+            "index: " + i + " " +
             "Pos X: " + this.getSlicePosX(i) + " " +
             "Pos Y: " + this.getSlicePosY(i) + " " +
             "Width: " + this.getSliceWidth(i) + " " +
             "Height: " + this.getSliceHeight(i)
-            );
-            
+            ); */
         }
+    
     }
 }
 

@@ -185,9 +185,9 @@ class PlayerCosmetic {
 
     draw(pos, size, flipped = false) {
         if (!flipped) {
-            this.sprite.draw(pos, size);
+            this.sprite.draw(pos, size, size);
         } else {
-            this.flippedSprite.draw(pos, size);
+            this.flippedSprite.draw(pos, size, size);
         }
     }
 }
@@ -382,8 +382,8 @@ class SpeechBubble {
 
         SpeechBubbleSprite2.drawCentered(new Vector2(posX, posY), this.constructor.maxWidth, (this.message.length * this.constructor.fontHeight) * 1.5 + 10);
         
-        let testNineSlice = new NineSlicedSprite("tree.png")
-        testNineSlice.draw(new Vector2(2, 2), 200);
+        let testNineSlice = new NineSlicedSprite("SpeechBubble.png")
+        testNineSlice.draw(new Vector2(posX, posY), 200);
 
         ctx.textAlign = prevAlign;
         ctx.font = prevFont;
@@ -404,7 +404,7 @@ class Prop extends GameObject {
     }
 
     draw() {
-        this.sprite.draw(this.pos.screenPos, this.size);
+        this.sprite.draw(this.pos.screenPos, this.size, this.size);
     }
 }
 

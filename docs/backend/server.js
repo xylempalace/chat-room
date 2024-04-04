@@ -43,6 +43,8 @@ const files = {
   '/favicon.ico' : ['image/vnd.microsoft.icon', '../images/favicon.ico'],
   '/lemEngine.js' : ['text/javascript', '../frontend/lemEngine.js'],
   '/games.js' : ['text/javascript', '../frontend/games.js'],
+
+  // Tiles
   '/sprites/tiles/floor.png' : ['image/png', '../frontend/sprites/tiles/floor.png'],
   '/sprites/tiles/wall.png' : ['image/png', '../frontend/sprites/tiles/wall.png'],
   '/sprites/tiles/grass.png' : ['image/png', '../frontend/sprites/tiles/grass.png'],
@@ -63,8 +65,16 @@ const files = {
   '/sprites/tiles/pathEastWest.png' : ['image/png', '../frontend/sprites/tiles/pathEastWest.png'],
   '/sprites/tiles/pathNorthSouth.png' : ['image/png', '../frontend/sprites/tiles/pathNorthSouth.png'],
   '/sprites/speechBubble.png' : ['image/png', '../frontend/sprites/speechBubble.png'],
+
+  // Props
   '/sprites/tree.png' : ['image/png', '../frontend/sprites/tree.png'],
   '/sprites/tree2.png' : ['image/png', '../frontend/sprites/tree2.png'],
+  '/sprites/pillar_1.png' : ['image/png', '../frontend/sprites/pillar_1.png'],
+  '/sprites/pillar_2.png' : ['image/png', '../frontend/sprites/pillar_2.png'],
+  '/sprites/pillar_3.png' : ['image/png', '../frontend/sprites/pillar_3.png'],
+  '/sprites/pillar_4.png' : ['image/png', '../frontend/sprites/pillar_4.png'],
+
+  //Player
   '/sprites/player/base.png' : ['image/png', '../frontend/sprites/player/base.png'],
   '/sprites/player/base_flipped.png' : ['image/png', '../frontend/sprites/player/base_flipped.png'],
   '/sprites/player/flower.png' : ['image/png', '../frontend/sprites/player/flower.png'],

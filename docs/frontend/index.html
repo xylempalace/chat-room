@@ -11,13 +11,13 @@
 
     <div class = "container">
         <h1>Welcome to Lexicomm!</h1>
-        <a href="#" class="button">ENTER USERNAME</a>
+        <div input="text" placeholder="Username" func = 'setUser' hasButton=true reqConnection=false minlength=3 maxlength=20 id="usernameInput">
+        <br /><br />
+            <a href = "#" class = "button" id="loginButton">Enter</a> 
     </div>
 
     <div class="popup">
         <div class= "popup-content">
-            <input type = "text" placeholder="Username">
-            <a href = "#" class = "button">Enter</a>  
         </div>
 
     </div>
@@ -28,8 +28,8 @@
 
         <div id = "chatBox" class="chatBox" >
             
-            <div class="inputDiv" style="position: fixed; top: 12px;" placeholder="Username" func="setUser" hasButton=true reqConnection=false minlength=3 maxlength=20> </div>
-            
+           <div class="inputDiv" style="position: fixed; top: 12px;" placeholder="Username" func="setUser" hasButton=true reqConnection=false minlength=3 maxlength=20> </div>
+          
             <div><p id="values" class="chatLog"></p> </div>
             
             <div id="chatInput" class="inputDiv" style="position: fixed; bottom: 44px;" placeholder="Chat..." func="sendMessage" hasButton=true reqConnection=true minlength=1 maxlength=50> </div>

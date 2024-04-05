@@ -5,7 +5,7 @@ let isDark = false;
 
 //Client information
 let connected = false;
-let loginState = "username";
+let loginState = "name";
 let userPlayer;
 let otherPlayers = [];
 

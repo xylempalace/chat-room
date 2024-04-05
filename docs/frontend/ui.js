@@ -1,3 +1,9 @@
+class Resources {
+    static ws;
+    static player;
+    static currentRoomID;
+}
+
 class Board {
     board = [];
     rows;
@@ -284,7 +290,12 @@ class UiMenu {
 
         this.buttons.push(new Button(new Vector2(this.origin.x + this.width / 2 - 240 * activeCamera.zoom, this.origin.y + this.height / 2 - 20 * activeCamera.zoom), 220, 40, "#20ff00", "PUBLIC GAME", 30, 0, 100));
         this.buttons.push(new Button(new Vector2(this.origin.x + this.width / 2 - 240 * activeCamera.zoom, this.origin.y + this.height / 2 - 20 * activeCamera.zoom), 220, 40, "#20ff00", "JOIN ROOM", 30, 100, 110));
-        this.buttons.push(new Button(new Vector2(this.origin.x + this.width / 2 + 30 * activeCamera.zoom, this.origin.y + this.height / 2 - 20 * activeCamera.zoom), 240, 40, "#20ff00", "CREATE ROOM", 30, 100, 120));
+        this.buttons.push(new Button(new Vector2(this.origin.x + this.width / 2 + 30 * activeCamera.zoom, this.origin.y + this.height / 2 - 20 * activeCamera.zoom), 240, 40, "#20ff00", "CREATE ROOM", 30, 100, 120, (players) => {
+            Resources.ws.send(JSON.stringify({
+                newRoom: "public",
+                players: players
+            }));
+        }));
 
         this.buttons.push(new Button(new Vector2(this.origin.x + this.width / 2 + 30 * activeCamera.zoom, this.origin.y + this.height / 2 - 20 * activeCamera.zoom), 240, 40, "#20ff00", "PRIVATE GAME", 30, 0, 20));
     }
@@ -321,6 +332,9 @@ class UiMenu {
                     } else {
                         return windowState;
                     }});
+                    if (this.buttons[i].process !== null) {
+                        this.buttons[i].process(this.source.maxPlayers);
+                    }
                     if (nextState !== this.windowState) {
                         this.windowState = nextState;
                         return false;
@@ -353,7 +367,7 @@ class Button {
      * @param {string} text text on button
      * @param nextState the state the game window should switch upon click 
      */
-    constructor(origin, width, height, color, text, fontSize, state, nextState, processButton = false) {
+    constructor(origin, width, height, color, text, fontSize, state, nextState, processButton = null) {
         this.width = width * activeCamera.zoom;
         this.height = height * activeCamera.zoom;
         this.origin = origin;

@@ -7,6 +7,7 @@ let isDark = false;
 let connected = false;
 let loginState = "username";
 let userPlayer;
+Resources.player = userPlayer;
 let otherPlayers = [];
 let freezePlayer = false;
 
@@ -96,6 +97,7 @@ const SpeechBubbleSprite = new NineSlicedSprite("speechBubble.png"  , [16, 16, 1
 
 // WebSocket Stuff
 const webSocket = new WebSocket('ws://localhost:443/');
+Resources.ws = webSocket;
 
 webSocket.onmessage = (event) => {
     var obj = JSON.parse(event.data);
@@ -146,6 +148,8 @@ webSocket.onmessage = (event) => {
             const textBox = textInputs.find((element) => element.textInput.getAttribute("placeholder") == "Username");
             setUser(obj.usr, textBox);
         }
+    } else if ("newRoomID" in obj) {
+        Resources.currentRoomID = obj.newRoomID;
     }
 };
 
@@ -491,13 +495,13 @@ function setUser(usr, textbox) {
     if (!connected) {
         if (loginState == "username") {
             if (usr.length > 0) {
-                userPlayer = new Player(usr, World.spawnPos, usr, "#FF0000");
                 webSocket.send(JSON.stringify({
-                    id: `${userPlayer.username}`
+                    id: `${usr}`
                 }));
             }
             loginState = "awaitingVerification";
         } else if (loginState == "usernameVerified") {
+            userPlayer = new Player(usr, World.spawnPos, usr, "#FF0000");
             loginState = "playing";
             receiveMessage("Username set to "+userPlayer.username);
             cameraList.push(new Camera("playerCam", Vector2.zero, 0.01, [-1024, -1024, 1024, 1024]));
@@ -619,6 +623,11 @@ function onClick(event, canvasPos) {
                     if (gameProps[i].window.processClick(canvasPos)) {
                         gameProps[i].drawMenu = false;
                         freezePlayer = false;
+                        if (Resources.currentRoomID !== null) {    
+                            webSocket.send(JSON.stringify({
+                                leaveRoom: Resources.currentRoomID
+                            }));
+                        }
                     }
                 }
         } else {

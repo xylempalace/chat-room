@@ -26,7 +26,6 @@ const {
 	englishRecommendedTransformers,
   asteriskCensorStrategy, 
 } = require('obscenity');
-
 const matcher = new RegExpMatcher({
 	...englishDataset.build(),
 	...englishRecommendedTransformers,
@@ -69,6 +68,7 @@ const files = {
 };
 
 var clients = {};
+var gameRooms = {};
 
 // Serves corresponding file upon request
 app.get('/*', (req, res) => {
@@ -101,6 +101,18 @@ sockserver.on('connection', (ws, req) => {
         })); 
       });
       delete clients[ws.id];
+      var del;
+      for (const [key, value] of Object.entries(gameRooms)) {
+        for (var i = 0; i < value[1].length; i++) {
+          if (value[1][i] === ws.id) {
+            del = key;
+          }
+        }
+      }
+      if (del !== null) {
+        delete gameRooms[del];
+        console.log(gameRooms);
+      }
     } catch (e) {
       console.log(e);
     }
@@ -135,6 +147,36 @@ sockserver.on('connection', (ws, req) => {
           }));
         }
       });
+    } else if ("newRoom" in obj) {
+      // When a new game room is created
+      var gameID;
+      var cond;
+      while (cond !== true) {
+        cond = true;
+        gameID = `${obj.newRoom == "public" ? "pub-" : "priv-"}${sockserver.getUniqueID()}`;
+        for (const [key, value] of Object.entries(gameRooms)) {
+          if (gameID === key) {
+            cond = false;
+          }
+        }
+      }
+
+      gameRooms[gameID] = [obj.players, [ws.id]];
+      console.log(`New room created with game ID: ${gameID}`);
+      ws.send(JSON.stringify({
+        newRoomID: gameID
+      }));
+    } else if ("leaveRoom" in obj) {  
+      for (var i = 0; i < gameRooms[obj.leaveRoom][1].length; i++) {
+        if (ws.id === gameRooms[obj.leaveRoom][1][i]) {
+          delete gameRooms[obj.leaveRoom][1].splice(i, 1);
+          break;
+        }
+      }
+      if (gameRooms[obj.leaveRoom][1].length <= 0) {
+        delete gameRooms[obj.leaveRoom];
+      }
+      console.log(gameRooms);
     } else if ("id" in obj) {
       // When a client selects a username
       var validName = true;

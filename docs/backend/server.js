@@ -188,7 +188,7 @@ sockserver.on('connection', (ws, req) => {
       if (obj.joinRoom === null) {
         for (const [key, value] of Object.entries(gameRooms)) {
           if (key.includes("pub-")) {
-            cond = false;
+            
           }
         }
       }

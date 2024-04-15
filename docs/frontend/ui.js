@@ -252,7 +252,7 @@ class GameProp extends Prop {
         this.window = new UiMenu(this.game);
 
         const canvas = document.getElementById("gameCanvas");
-        this.button = new Button(new Vector2(canvas.width / 2 - 175 * activeCamera.zoom, canvas.height - 45 * activeCamera.zoom), 350, 40, "#ffffff", "CLICK HERE TO PLAY", 30, null, 0);
+        this.button = new Button(new Vector2(canvas.width / 2, canvas.height - 45 * activeCamera.zoom), 350, 40, "#ffffff", "CLICK HERE TO PLAY", 30, null, 0);
     }
 
     interactPrompt(pos) {

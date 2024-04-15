@@ -627,6 +627,7 @@ function onClick(event, canvasPos) {
                             webSocket.send(JSON.stringify({
                                 leaveRoom: Resources.currentRoomID
                             }));
+                            Resources.currentRoomID = null;
                         }
                     }
                 }

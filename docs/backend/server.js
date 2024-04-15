@@ -14,6 +14,9 @@ sockserver.getUniqueID = function () {
   }
   return s4() + s4() + '-' + s4();
 };
+sockserver.getUniqueRoomID = function () {
+  return Math.floor((1 + Math.random()) * 0x100000).toString(16).substring(1);
+};
 
 const port = 3000
 // Import path library
@@ -153,7 +156,7 @@ sockserver.on('connection', (ws, req) => {
       var cond;
       while (cond !== true) {
         cond = true;
-        gameID = `${obj.newRoom == "public" ? "pub-" : "priv-"}${sockserver.getUniqueID()}`;
+        gameID = `${obj.newRoom == "public" ? "pub-" : "priv-"}${sockserver.getUniqueRoomID()}`;
         for (const [key, value] of Object.entries(gameRooms)) {
           if (gameID === key) {
             cond = false;
@@ -167,16 +170,28 @@ sockserver.on('connection', (ws, req) => {
         newRoomID: gameID
       }));
     } else if ("leaveRoom" in obj) {  
-      for (var i = 0; i < gameRooms[obj.leaveRoom][1].length; i++) {
-        if (ws.id === gameRooms[obj.leaveRoom][1][i]) {
-          delete gameRooms[obj.leaveRoom][1].splice(i, 1);
-          break;
+      try {
+        for (var i = 0; i < gameRooms[obj.leaveRoom][1].length; i++) {
+          if (ws.id === gameRooms[obj.leaveRoom][1][i]) {
+            delete gameRooms[obj.leaveRoom][1].splice(i, 1);
+            break;
+          }
+        }
+        if (gameRooms[obj.leaveRoom][1].length <= 0) {
+          delete gameRooms[obj.leaveRoom];
+        }
+        console.log(gameRooms);
+      } catch(err) {
+        console.log(err);
+      }
+    } else if ("joinRoom" in obj) {
+      if (obj.joinRoom === null) {
+        for (const [key, value] of Object.entries(gameRooms)) {
+          if (key.includes("pub-")) {
+            cond = false;
+          }
         }
       }
-      if (gameRooms[obj.leaveRoom][1].length <= 0) {
-        delete gameRooms[obj.leaveRoom];
-      }
-      console.log(gameRooms);
     } else if ("id" in obj) {
       // When a client selects a username
       var validName = true;

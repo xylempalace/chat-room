@@ -286,18 +286,37 @@ class UiMenu {
         this.height = source.dimensions.y * activeCamera.zoom;
         const canvas = document.getElementById("gameCanvas");
         this.origin = new Vector2(canvas.width / 2 - this.width / 2, canvas.height / 2 - this.height / 2);
-        this.buttons.push(new Button(this.origin, source.dimensions.x, source.dimensions.y, "#cacaca", "", 30, null, 0));
+        this.center = new Vector2(this.origin.x + this.width / 2, this.origin.y + this.height / 2);
+        this.buttons.push(new Button(this.center, source.dimensions.x, source.dimensions.y, "#cacaca", "", 30, null, 0));
 
-        this.buttons.push(new Button(new Vector2(this.origin.x + this.width / 2 - 240 * activeCamera.zoom, this.origin.y + this.height / 2 - 20 * activeCamera.zoom), 220, 40, "#20ff00", "PUBLIC GAME", 30, 0, 100));
-        this.buttons.push(new Button(new Vector2(this.origin.x + this.width / 2 - 240 * activeCamera.zoom, this.origin.y + this.height / 2 - 20 * activeCamera.zoom), 220, 40, "#20ff00", "JOIN ROOM", 30, 100, 110));
-        this.buttons.push(new Button(new Vector2(this.origin.x + this.width / 2 + 30 * activeCamera.zoom, this.origin.y + this.height / 2 - 20 * activeCamera.zoom), 240, 40, "#20ff00", "CREATE ROOM", 30, 100, 120, (players) => {
+        // Room Joining UI
+        this.buttons.push(new Button(new Vector2(this.center.x - 130 * activeCamera.zoom, this.center.y), 220, 40, "#20ff00", "JOIN ROOM", 30, 0, 10));
+
+        this.buttons.push(new Button(new Vector2(this.center.x - 130 * activeCamera.zoom, this.center.y), 220, 40, "#20ff00", "JOIN ANY", 30, 10, 1, () => {
+            Resources.ws.send(JSON.stringify({
+                joinRoom: null
+            }));
+        }));
+        this.buttons.push(new Button(new Vector2(this.center.x + 130 * activeCamera.zoom, this.center.y), 240, 40, "#20ff00", "JOIN CODE", 30, 10, 11));
+
+        // Room Creation UI
+        this.buttons.push(new Button(new Vector2(this.center.x + 130 * activeCamera.zoom, this.center.y), 240, 40, "#20ff00", "CREATE ROOM", 30, 0, 20));
+
+        this.buttons.push(new Button(new Vector2(this.center.x, this.center.y - 50 * activeCamera.zoom), 180, 40, "#ffb300", "PUBLIC", 30, 20, 21));
+        this.buttons.push(new Button(new Vector2(this.center.x, this.center.y + 50 * activeCamera.zoom), 180, 40, "#20ff00", "CREATE", 30, 20, 1, (players) => {
             Resources.ws.send(JSON.stringify({
                 newRoom: "public",
                 players: players
             }));
         }));
 
-        this.buttons.push(new Button(new Vector2(this.origin.x + this.width / 2 + 30 * activeCamera.zoom, this.origin.y + this.height / 2 - 20 * activeCamera.zoom), 240, 40, "#20ff00", "PRIVATE GAME", 30, 0, 20));
+        this.buttons.push(new Button(new Vector2(this.center.x, this.center.y - 50 * activeCamera.zoom), 180, 40, "#00a2ff", "PRIVATE", 30, 21, 20));
+        this.buttons.push(new Button(new Vector2(this.center.x, this.center.y + 50 * activeCamera.zoom), 180, 40, "#20ff00", "CREATE", 30, 21, 1, (players) => {
+            Resources.ws.send(JSON.stringify({
+                newRoom: "private",
+                players: players
+            }));
+        }));
     }
 
     /**
@@ -370,7 +389,7 @@ class Button {
     constructor(origin, width, height, color, text, fontSize, state, nextState, processButton = null) {
         this.width = width * activeCamera.zoom;
         this.height = height * activeCamera.zoom;
-        this.origin = origin;
+        this.origin = new Vector2(origin.x - this.width / 2, origin.y - this.height / 2);
         this.color = color;
         this.windowState = state;
         this.text = text;

@@ -21,6 +21,19 @@ document.addEventListener("resize", (event) => {
     })
 });
 
+class LMath {
+    static mod(n, d) {
+        return ((n % d) + d) % d;
+    }
+
+    static clamp(val, min, max) {
+        if (val > max) {
+            return max;
+        }
+        return Math.max(min, val);
+    }
+}
+
 class Vector2 {
    
     x;
@@ -112,6 +125,7 @@ class GameObject {
     pos;
     drawPos;
     id;
+    collider;
     static objs = [];
 
     constructor (id, pos) {
@@ -167,7 +181,9 @@ class Sprite {
      * @param {Number} height 
      */
     draw (pos, width, height) {
-        ctx.drawImage(this.image, pos.x, pos.y, width, height);
+        if (this.image.width !== 0) {
+            ctx.drawImage(this.image, pos.x, pos.y, width, height);
+        }
     }
 
     /**
@@ -176,7 +192,9 @@ class Sprite {
      * @param {Number} size 
      */
     draw (pos, size) {
-        ctx.drawImage(this.image, pos.x, pos.y, size, size);
+        if (this.image.width !== 0) {
+            ctx.drawImage(this.image, pos.x, pos.y, size, size);
+        }
     }
 
     get width () {
@@ -248,6 +266,217 @@ class TileMap {
                 }
             }
         }
+    }
+}
+
+class ColliderEdge {
+
+    start;
+    end;
+ 
+    angle;
+
+    normalQuad;
+    normalAngle;
+   
+    static renderNormals = true;
+    static renderPlane = true;
+ 
+    debugFlag = false;
+   
+    /**
+     * Creates a new edge between two points, with the inside edge being determined as the clockwise perpendicular angle to this angle
+     * @param {Vector2} start Sets the start of the edge
+     * @param {Vector2} end End of the edge
+     */
+    constructor (start, end) {
+        
+        this.start = start;
+        this.end = end;
+
+        this.pos = start;
+
+        let d = this.start.sub(this.end); // Find the difference between our start and end
+        this.angle = Math.atan2(d.y, d.x); // Use that difference to calculate the angle of this line
+
+        this.normalAngle = this.angle - (Math.PI / 2);
+        this.normalQuad = LMath.mod(Math.floor(this.normalAngle * 0.6366197724), 4) + 1; // Calculate the quadrant the plane's normal will be facing towards
+
+        printMessage(this.normalQuad);
+    }
+   
+    /**
+     * Calculates Y position of this slope based on X
+     * @param {Number} x
+     * @returns The Y position on the slope of this plane at position X
+     */
+    calc(x) {
+        let val = x - this.pos.x;
+        val *= Math.tan(this.angle);
+        val += this.pos.y;
+        return val;
+    }
+   
+    /**
+     * Calculates X position of this slope based on Y
+     * @param {Number} y
+     * @returns The X position on the slope of this plane at position Y
+     */
+    invCalc(y) {
+        let val = y - this.pos.y;
+        val /= Math.tan(this.angle);
+        val += this.pos.x;
+        return val;
+    }
+   
+    /**
+     *
+     * @param {Vector2} point Point to evaluate based on its position
+     * @returns {boolean} Returns true if the point is colliding with the plane
+     */
+    isColliding(point) {
+ 
+        //Assume that the point will not be within the plane
+        let x_collide = false;
+        let y_collide = false;
+ 
+        // If plane faces up,
+        if (this.normalQuad == 3 || this.normalQuad == 4) {
+            // Check if point is beneath plane
+            y_collide = this.calc(point.x) < point.y;
+ 
+        // Otherwise the plane faces down
+        } else {
+            // Check if point is above plave
+            y_collide = this.calc(point.x) > point.y;
+        }
+ 
+        // If plane is in 1 or 4
+        if(this.normalQuad == 1 || this.normalQuad == 4) {
+            // Check if point is to the left of the plane
+            x_collide = this.invCalc(point.y) > point.x;
+ 
+        // Otherwise plane is in quadrant 2 or 3
+        } else {
+            // Check if point is to the right of the plane
+            x_collide = this.invCalc(point.y) < point.x;
+        }
+ 
+        // If the point is colliding on both the x and y planes, return true
+        return (x_collide && y_collide);
+    }
+   
+    draw() {
+        if(this.renderPlane) {
+            if (this.debugFlag) {
+                ctx.fillStyle = "red";
+            }
+ 
+            ctx.beginPath(); // Start a new line
+ 
+            // Calculate where to start the line
+                // These two calculations could better account for slopes that have very small y components
+            if (Math.abs(Math.sin(this.angle)) > 0.00005) {
+                ctx.moveTo(
+                    this.invCalc(0),
+                    0 // 0 because we are drawing from the top side of the screen
+                    )
+ 
+                // Calculate where to end the line
+                ctx.lineTo(
+                    this.invCalc(1080),
+                    1080 // 1080 because we are assuming that the viewport ends after 1080 pixels
+                    );
+            } else {
+                ctx.moveTo(
+                    0,
+                    this.calc(0) // 0 because we are drawing from the top side of the screen
+                    )
+ 
+                // Calculate where to end the line
+                ctx.lineTo(
+                    1920,
+                    this.calc(1920) // 1920 because we are assuming that the viewport ends after 1080 pixels
+                    );
+            }
+ 
+            ctx.stroke(); // Render the line
+ 
+            if (PlaneComponent.renderNormals) {
+                ctx.beginPath();
+                ctx.arc(this.pos.x, this.pos.y, 20, 0, 2 * Math.PI);
+                ctx.stroke();
+               
+                ctx.beginPath();
+                ctx.moveTo(this.pos.x, this.pos.y);
+                ctx.lineTo(this.pos.x + (Math.cos(this.normalAngle) * 50), this.pos.y + (Math.sin(this.normalAngle) * 50));
+                ctx.stroke();
+            }
+ 
+            if (this.debugFlag) {
+                ctx.fillStyle = "black";
+                this.debugFlag = false;
+            }
+        }
+    }
+}
+
+class StaticConvexCollider  {
+
+    static colliders = []
+
+    points = []
+    edges = []
+
+    pos;
+
+    /**
+     * A static convex collider
+     * @param {Vector2} position Center position of this collider
+     * @param {Array<Vector2>} relativePoints Array of vectors representing the postions of the points that make up this collider, ordered in counter clockwise order
+     */
+    constructor (position, relativePoints) {
+        this.pos = position;
+
+        let start = relativePoints[0].add(this.pos);
+        let end;
+
+        this.points = [start];
+
+        let len = relativePoints.length;
+        console.log(`Point length: ${len}`);
+        for (let i = 1; i < len; i++) {
+            end = relativePoints[i].add(this.pos); // Convert relative point position to world position
+
+            this.points.push(end); // Add this point to our list of points
+            this.edges.push(new ColliderEdge(start, end)); // Connect an edge from start to end
+
+            start = end; // Start from the previous point
+        }
+        this.edges.push(new ColliderEdge(start, this.points[0]));
+
+        StaticConvexCollider.colliders.push(this);
+    }
+
+    /**
+     * 
+     * @param {Vector2} point 
+     * @returns {Boolean} Returns true if the point is colliding with
+     */
+    isColliding(point) {
+        let score = 0;
+
+        this.edges.forEach((i) => {
+            if (i.isColliding(point)) {
+                score++;
+            }
+        })
+
+        return score == this.edges.length;
+    }
+
+    set pos (v) {
+        throw("Static collider cannot be moved");
     }
 }
 

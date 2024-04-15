@@ -62,7 +62,7 @@ class ImageManipulator {
 						output.src = ImageManipulator.canvas.toDataURL("image/png");
 
 						// Clean up transformations
-						ImageManipulator.context.save();
+						ImageManipulator.context.restore();
 
 						// Resolve the promise
 						resolve(output);

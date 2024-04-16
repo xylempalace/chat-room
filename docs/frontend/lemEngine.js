@@ -302,7 +302,6 @@ class ColliderEdge {
         this.normalAngle = this.angle - (Math.PI / 2);
         this.normalQuad = LMath.mod(Math.floor(this.normalAngle * 0.6366197724), 4) + 1; // Calculate the quadrant the plane's normal will be facing towards
 
-        printMessage(this.normalQuad);
     }
    
     /**

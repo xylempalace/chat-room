@@ -428,6 +428,12 @@ class StaticConvexCollider  {
     points = []
     edges = []
 
+    // Rough bounds for cheap collision detection
+    rt //rough top
+    rb //rough bottom
+    rl //rough left
+    rr //rough right
+
     pos;
 
     /**
@@ -436,6 +442,12 @@ class StaticConvexCollider  {
      * @param {Array<Vector2>} relativePoints Array of vectors representing the postions of the points that make up this collider, ordered in counter clockwise order
      */
     constructor (position, relativePoints) {
+
+        // Check if collider has enough points to be a shape
+        if (relativePoints.length < 3) {
+            throw (`Static convex collider attempted to be created with less than 3 points, please add more points to this collider`);
+        }
+
         this.pos = position;
 
         let start = relativePoints[0].add(this.pos);
@@ -444,7 +456,13 @@ class StaticConvexCollider  {
         this.points = [start];
 
         let len = relativePoints.length;
-        console.log(`Point length: ${len}`);
+
+        // Create variables to store the rough bounds
+        this.rt = start.y; //rough top
+        this.rb = start.y; //rough bottom
+        this.rl = start.x; //rough left
+        this.rr = start.x; //rough right
+
         for (let i = 1; i < len; i++) {
             end = relativePoints[i].add(this.pos); // Convert relative point position to world position
 
@@ -452,6 +470,20 @@ class StaticConvexCollider  {
             this.edges.push(new ColliderEdge(start, end)); // Connect an edge from start to end
 
             start = end; // Start from the previous point
+
+            // Check if new point is the farthest of each side to set rough edges
+            if (end.x < this.rl) {
+                this.rl = end.x;
+            }
+            if (end.x > this.rr) {
+                this.rr = end.x;
+            }
+            if (end.y < this.rt) {
+                this.rt = end.y;
+            }
+            if (end.y > this.rb) {
+                this.rb = end.y;
+            }
         }
         this.edges.push(new ColliderEdge(start, this.points[0]));
 
@@ -464,15 +496,25 @@ class StaticConvexCollider  {
      * @returns {Boolean} Returns true if the point is colliding with
      */
     isColliding(point) {
-        let score = 0;
 
-        this.edges.forEach((i) => {
-            if (i.isColliding(point)) {
-                score++;
-            }
-        })
+        // Check if point is within the rough bounds
+        if (point.x < this.rr && point.x > this.rl && point.y < this.rb && point.y > this.rt) {
 
-        return score == this.edges.length;
+            // Remember how many of the edges we are colliding with
+            let score = 0;
+
+            // Count how many edges we are colliding with
+            this.edges.forEach((i) => {
+                if (i.isColliding(point)) {
+                    score++;
+                }
+            })
+
+            // If we are colliding with all edges, and the shape is convex, then the point is inside the collider
+            return score == this.edges.length;
+        }
+
+        return false;
     }
 
     set pos (v) {

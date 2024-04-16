@@ -394,6 +394,7 @@ class Prop extends GameObject {
     center;
     centerProportion;
     ready = false;
+    collider;
 
     /**
      * 
@@ -430,7 +431,7 @@ class Prop extends GameObject {
     }
 
     addCollider(relativePoints) {
-        new StaticConvexCollider(this.pos, relativePoints);
+        this.collider = new StaticConvexCollider(this.pos, relativePoints);
     }
 }
 

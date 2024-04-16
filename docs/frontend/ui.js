@@ -297,11 +297,22 @@ class UiMenu {
                 joinRoom: null
             }));
         }));
-        this.buttons.push(new Button(new Vector2(this.center.x + 130 * activeCamera.zoom, this.center.y), 240, 40, "#20ff00", "JOIN CODE", 30, 10, 11));
-
+        this.buttons.push(new Button(new Vector2(this.center.x + 130 * activeCamera.zoom, this.center.y), 240, 40, "#20ff00", "JOIN CODE", 30, 10, 11, () => {
+            var gameDiv = document.createElement("div");
+            var input = document.createElement("input");
+            input.style.left = `${this.center.x - 100}px`;
+            input.style.top = `${this.center.y - 25}px`;
+            input.minLength = 5;
+            input.maxLength = 5;
+            input.classList.add("joinCode");
+            gameDiv.appendChild(input);
+            var gameSpace = document.getElementById("gameSpace");
+            gameSpace.appendChild(gameDiv);
+        }));
+        
         // Room Creation UI
         this.buttons.push(new Button(new Vector2(this.center.x + 130 * activeCamera.zoom, this.center.y), 240, 40, "#20ff00", "CREATE ROOM", 30, 0, 20));
-
+        
         this.buttons.push(new Button(new Vector2(this.center.x, this.center.y - 50 * activeCamera.zoom), 180, 40, "#ffb300", "PUBLIC", 30, 20, 21));
         this.buttons.push(new Button(new Vector2(this.center.x, this.center.y + 50 * activeCamera.zoom), 180, 40, "#20ff00", "CREATE", 30, 20, 1, (players) => {
             Resources.ws.send(JSON.stringify({
@@ -309,7 +320,7 @@ class UiMenu {
                 players: players
             }));
         }));
-
+        
         this.buttons.push(new Button(new Vector2(this.center.x, this.center.y - 50 * activeCamera.zoom), 180, 40, "#00a2ff", "PRIVATE", 30, 21, 20));
         this.buttons.push(new Button(new Vector2(this.center.x, this.center.y + 50 * activeCamera.zoom), 180, 40, "#20ff00", "CREATE", 30, 21, 1, (players) => {
             Resources.ws.send(JSON.stringify({
@@ -318,14 +329,14 @@ class UiMenu {
             }));
         }));
     }
-
+    
     /**
      * Draws the game window to the screen
-     */
-    draw() {
-        ctx.save()
-        for (var i = 0 ; i < this.buttons.length; i++) {
-            this.buttons[i].draw(this.windowState); 
+    */
+   draw() {
+       ctx.save()
+       for (var i = 0 ; i < this.buttons.length; i++) {
+           this.buttons[i].draw(this.windowState); 
         }
         ctx.textAlign = 'center';
         ctx.fillStyle = "black";
@@ -333,51 +344,51 @@ class UiMenu {
         ctx.fillText(this.title, this.origin.x + this.width / 2, this.origin.y + 50 * activeCamera.zoom);
         ctx.restore();
     }
-
+    
     /**
      * Processes clicks on the game window
      * @param {Vector2} position takes in the position of the mouse click
      * @returns {boolean} returns true if game window should close, false if otherwise
-     */
-    processClick(position) {
-        if (this.buttons[0].processClick(position, (condition) => {return !condition;})) {
-            return true;
+    */
+   processClick(position) {
+       if (this.buttons[0].processClick(position, (condition) => {return !condition;})) {
+           return true;
         } else {
             for (var i = 1; i < this.buttons.length; i++) {
                 if (this.buttons[i].windowState === this.windowState) {
                     var nextState = this.buttons[i].processClick(position, (condition, nextState, windowState) => {
-                    if (condition) {
-                        return nextState;
-                    } else {
-                        return windowState;
-                    }});
-                    if (this.buttons[i].process !== null) {
-                        this.buttons[i].process(this.source.maxPlayers);
-                    }
-                    if (nextState !== this.windowState) {
-                        this.windowState = nextState;
-                        return false;
+                        if (condition) {
+                            return nextState;
+                        } else {
+                            return windowState;
+                        }});
+                        if (this.buttons[i].process !== null) {
+                            this.buttons[i].process(this.source.maxPlayers);
+                        }
+                        if (nextState !== this.windowState) {
+                            this.windowState = nextState;
+                            return false;
+                        }
                     }
                 }
+                return false;
             }
-            return false;
         }
     }
-}
-
-class Button {
-    width;
-    height;
-    origin;
-    color;
-    windowState;
-    text;
-    nextState;
-    fontSize;
-    process;
-
-    /**
-     * Game Window buttons that run a specified function on click
+    
+    class Button {
+        width;
+        height;
+        origin;
+        color;
+        windowState;
+        text;
+        nextState;
+        fontSize;
+        process;
+        
+        /**
+         * Game Window buttons that run a specified function on click
      * @param {Vector2} origin top left corner of the button
      * @param {number} width width of button
      * @param {number} height height of button

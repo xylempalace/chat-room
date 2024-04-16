@@ -75,3 +75,13 @@ body{
     
     bottom: 0; right: 0;
 }
+
+.joinCode {
+    position: relative;
+
+    width: 200px; height: 50px;
+
+    font-size: 3rem; text-align: center;
+    
+    z-index: 10;
+}

@@ -42,6 +42,8 @@ const SpeechBubbleSprite = new NineSlicedSprite("speechBubble.png"  , [16, 16, 1
 // WebSocket Stuff
 const webSocket = new WebSocket('ws://localhost:443/');
 
+
+
 webSocket.onmessage = (event) => {
     var obj = JSON.parse(event.data);
     if ("expired" in obj) {
@@ -152,10 +154,6 @@ class TextInput {
         if (this.textInput.value.length > 0) {
             eval(this.sendFunction+"(this.textInput.value, this)");
         }
-    }
-
-    clearUsernameTextbox() {
-        document.getElementById("usernameInput").value = "";
     }
 
     setDisabled(state) {
@@ -454,7 +452,7 @@ document.addEventListener("readystatechange", (e) => {
             );
             textInputs.push(tI);
         }
-
+         document.getElementById("usernameInput").value = ""
        // let chatInput = TextInput.findInputByID("chatInput");
     
       //  chatInput.setDisabled(true);
@@ -515,9 +513,6 @@ function setUser(usr, textbox) {
             receiveMessage("Username set to "+userPlayer.username);
             cameraList.push(new Camera("playerCam", Vector2.zero, 0.01, [-1024, -1024, 1024, 1024]));
             activeCamera = cameraList[cameraList.length-1];
-            textbox.setDisabled(true);
-            TextInput.findInputByID("chatInput").setDisabled(false);
-            
             connect();
             startAnimating();
         }

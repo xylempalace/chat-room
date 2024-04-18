@@ -9,14 +9,13 @@
 
 <body>
 <!-- Pop up that asks for username on connection to website-->
-   <div class = "container">
+   <div class = "container" id = "container">
 
         <h1>Welcome to Lexicomm!</h1>
-
-        <input type="text" placeholder="Username" func="setUser" hasButton=true reqConnection=false minlength=3 maxlength=20>
-
+        <input placeholder="Username" class="inputText" minlength="3" maxlength="20" id="usernameInput">
+    
         <br /><br/>
-            <a href = "#" class = "button" id="loginButton">Enter</a> 
+            <a href = # class = "button" id="loginButton" onclick="setUser(usernameInput.value,usernameInput)">Enter</a> 
     </div>
 
     <div class="popup">
@@ -38,7 +37,7 @@
             <div id="chatInput" class="inputDiv" style="position: fixed; bottom: 44px;" placeholder="Chat..." func="sendMessage" hasButton=true reqConnection=true minlength=1 maxlength=50> </div>
         </div>
         
-        <div id = "gameSpace" style= "height: 80%; width:100%;"> 
+        <div id = "gameSpace" style= "height: 80%; width:100%;">
     
         </div>
 
@@ -47,6 +46,7 @@
     <script src="lemEngine.js"></script>
     <script src="games.js"></script>
     <script src="test.js"></script>
+    
 </body>
  
 </html>

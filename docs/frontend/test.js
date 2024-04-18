@@ -8,7 +8,6 @@ let connected = false;
 let loginState = "username";
 let userPlayer;
 let otherPlayers = [];
-
 //Tilemap
 const backgroundTiles = [
     0,
@@ -45,7 +44,6 @@ const webSocket = new WebSocket('ws://localhost:443/');
 
 webSocket.onmessage = (event) => {
     var obj = JSON.parse(event.data);
-
     if ("expired" in obj) {
         // Handles removing a disconnected player from the screen and printing a leave message
         let p = otherPlayers.findIndex((element) => {
@@ -85,11 +83,15 @@ webSocket.onmessage = (event) => {
         if (obj.invalidName) {
             receiveMessage(obj.usernameError);
             loginState = "username";
-            const textBox = textInputs.find((element) => element.textInput.getAttribute("placeholder") == "Username");
-            textBox.clearTextbox();
+          //  const textBox = textInputs.find((element) => element.textInput.getAttribute("placeholder") == "Username");
+          document.getElementById("usernameInput").value = "";
+            document.getElementById("container");
+            
         } else {
+            console.log("hi");
             loginState = "usernameVerified";
             const textBox = textInputs.find((element) => element.textInput.getAttribute("placeholder") == "Username");
+            console.log("set user after uV");
             setUser(obj.usr, textBox);
         }
     }
@@ -123,12 +125,18 @@ class TextInput {
         this.textDiv.append(this.textInput);
         
         if (hasButton) {
-            this.textButton = document.createElement("button");
+           /* this.textButton = document.createElement("button");
             this.textButton.setAttribute("class", "inputButton");
             this.textButton.addEventListener("click", () => {this.sendText()});
 
-            this.textButton.textContent = "🠊";
+            this.textButton.textContent = "🠊    ";
             this.textDiv.append(this.textButton);
+            */
+            this.textButton = document.getElementById("loginButton"); 
+            this.textButton.addEventListener("click", () => {this.sendText()});
+            //this.textDiv.append(this.textButton);
+            
+
         }
         
         this.constructor.textInputs.push(this);
@@ -146,8 +154,8 @@ class TextInput {
         }
     }
 
-    clearTextbox() {
-        this.textInput.value = "";
+    clearUsernameTextbox() {
+        document.getElementById("usernameInput").value = "";
     }
 
     setDisabled(state) {
@@ -425,25 +433,31 @@ class Prop extends GameObject {
 }
 
 //Called when the page is finished loading
+
 document.addEventListener("readystatechange", (e) => {
+
+    
     if (e.target.readyState === "complete") {
-        const foundInputs = document.getElementsByClassName("inputDiv");
+      //  setUser(document.getElementById("usernameInput"));
+
+
+            const foundInputs = document.getElementById("usernameInput");
         for (let i = 0; i < foundInputs.length; i++) {
             let tI = new TextInput(
-                foundInputs[i],
+               foundInputs[i],
                 foundInputs[i].getAttribute("placeholder"),
                 foundInputs[i].getAttribute("func"),
-                foundInputs[i].getAttribute("hasButton"),
-                foundInputs[i].getAttribute("reqConnection"),
-                foundInputs[i].getAttribute("minLength"),
-                foundInputs[i].getAttribute("maxLength")
+                //foundInputs[i].getAttribute("hasButton"),
+                //foundInputs[i].getAttribute("reqConnection"),
+               foundInputs[i].getAttribute("minLength"),
+               foundInputs[i].getAttribute("maxLength")
             );
             textInputs.push(tI);
         }
 
-        let chatInput = TextInput.findInputByID("chatInput");
-        chatInput.setDisabled(true);
-        
+       // let chatInput = TextInput.findInputByID("chatInput");
+    
+      //  chatInput.setDisabled(true);
         addCanvas();
         drawText(100, 100, "Connecting...");
     }
@@ -452,7 +466,7 @@ document.addEventListener("readystatechange", (e) => {
 
 function sendMessage(msg, textbox) {
     if (msg.length > 0) {
-        textbox.clearTextbox();
+        textbox.clearUsernameTextbox();
         if (connected) {
             webSocket.send(JSON.stringify({
                 id: userPlayer.username,
@@ -472,14 +486,22 @@ function receiveMessage(msg) {
 
 function updateUser(e) {
     if (e.key=="Enter") {
+        console.log("enter key pressed");
         setUser();
     }
 }
 
 function setUser(usr, textbox) {
+    
+    console.log("setUser called");
     if (!connected) {
+        console.log("test");
+        console.log("login state before check: " + loginState);
         if (loginState == "username") {
-            if (usr.length > 0) {
+            console.log(usr);
+            console.log("length:" + usr.length);
+            if (usr.length > 3 && usr.length < 20){
+                console.log("verfied login state: " +loginState);
                 userPlayer = new Player(usr, World.spawnPos, usr, "#FF0000");
                 webSocket.send(JSON.stringify({
                     id: `${userPlayer.username}`
@@ -487,6 +509,8 @@ function setUser(usr, textbox) {
             }
             loginState = "awaitingVerification";
         } else if (loginState == "usernameVerified") {
+            document.querySelector(".popup").style.display = "none";
+            document.querySelector(".container").style.display="none";
             loginState = "playing";
             receiveMessage("Username set to "+userPlayer.username);
             cameraList.push(new Camera("playerCam", Vector2.zero, 0.01, [-1024, -1024, 1024, 1024]));
@@ -541,6 +565,7 @@ function update() {
 
     GameObject.objs.sort(GameObject.sortVertically);
     GameObject.objs.forEach((element) => {
+        
         element.draw();
     })
     

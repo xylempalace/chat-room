@@ -241,7 +241,7 @@ class NineSlicedSprite extends Sprite {
     
     draw(pos, size) {
         for (let i = 0; i < this.segments.length; i++) {
-            ctx.drawImage(this.image, ...this.segments[i], this.getSlicePosX(i) + pos.x, this.getSlicePosY(i) + pos.y, this.getSliceWidth(i), this.getSliceHeight(i) * 4);
+            ctx.drawImage(this.image, ...this.segments[i], this.getSlicePosX(i) + pos.x, this.getSlicePosY(i) + pos.y, this.getSliceWidth(i), this.getSliceHeight(i) * 42);
             console.log(pos.x);
            /* console.log(
             "index: " + i + " " +

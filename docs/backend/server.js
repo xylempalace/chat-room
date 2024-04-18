@@ -124,6 +124,11 @@ sockserver.on('connection', (ws, req) => {
   ws.on('message', (str) => {
     // Handles recieving data from clients
     var obj = JSON.parse(str);
+    if ("posX" in obj) {
+
+    } else {
+      console.log(obj);
+    }
   
     if ("posX" in obj) {
       // This code handles recieving and distributing positional data from one client to the others
@@ -164,20 +169,20 @@ sockserver.on('connection', (ws, req) => {
         }
       }
 
-      gameRooms[gameID] = [obj.players, [ws.id]];
+      gameRooms[gameID] = [[ws.id], obj.playersMin, obj.playersMax];
       console.log(`New room created with game ID: ${gameID}`);
       ws.send(JSON.stringify({
-        newRoomID: gameID
+        joinRoom: gameID
       }));
     } else if ("leaveRoom" in obj) {  
       try {
-        for (var i = 0; i < gameRooms[obj.leaveRoom][1].length; i++) {
-          if (ws.id === gameRooms[obj.leaveRoom][1][i]) {
-            delete gameRooms[obj.leaveRoom][1].splice(i, 1);
+        for (var i = 0; i < gameRooms[obj.leaveRoom][0].length; i++) {
+          if (ws.id === gameRooms[obj.leaveRoom][0][i]) {
+            delete gameRooms[obj.leaveRoom][0].splice(i, 1);
             break;
           }
         }
-        if (gameRooms[obj.leaveRoom][1].length <= 0) {
+        if (gameRooms[obj.leaveRoom][0].length <= 0) {
           delete gameRooms[obj.leaveRoom];
         }
         console.log(gameRooms);
@@ -185,13 +190,36 @@ sockserver.on('connection', (ws, req) => {
         console.log(err);
       }
     } else if ("joinRoom" in obj) {
+      var privacy;
       if (obj.joinRoom === null) {
         for (const [key, value] of Object.entries(gameRooms)) {
-          if (key.includes("pub-")) {
-            
+          if (key.includes("pub-") && value[0].length < value[2]) {
+            value[0].push(ws.id);
+            ws.send(JSON.stringify({
+              joinRoom: key
+            }));
           }
         }
+        ws.send(JSON.stringify({
+          joinRoom: "error",
+          window: 10
+        }));
+      } else if ("pub-" + obj.joinRoom in gameRooms) {
+        privacy = "pub-";
+        gameRooms[privacy + obj.joinRoom][0].push(ws.id)
+      } else if ("priv-" + obj.joinRoom in gameRooms) {
+        privacy = "priv-";
+        gameRooms[privacy + obj.joinRoom][0].push(ws.id)
+      } else {
+        ws.send(JSON.stringify({
+          joinRoom: "error",
+          window: 11
+        }));
+        return;
       }
+      ws.send(JSON.stringify({
+        joinRoom: privacy + obj.joinRoom
+      }));
     } else if ("id" in obj) {
       // When a client selects a username
       var validName = true;

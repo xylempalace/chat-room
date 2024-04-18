@@ -148,8 +148,23 @@ webSocket.onmessage = (event) => {
             const textBox = textInputs.find((element) => element.textInput.getAttribute("placeholder") == "Username");
             setUser(obj.usr, textBox);
         }
-    } else if ("newRoomID" in obj) {
-        Resources.currentRoomID = obj.newRoomID;
+    } else if ("joinRoom" in obj) {
+        if (obj.joinRoom === "error") {
+            for (var i = 0; i < gameProps.length; i++) {
+                if (gameProps[i].drawMenu) {
+                    gameProps[i].drawMenu.windowState = obj.window;
+                }
+            }
+            console.log("error");
+        } else {
+            Resources.currentRoomID = obj.joinRoom;
+            console.log(Resources.currentRoomID);
+            for (var i = 0; i < gameProps.length; i++) {
+                if (gameProps[i].drawMenu) {
+                    gameProps[i].drawMenu.windowState = 1;
+                }
+            }
+        }
     }
 };
 
@@ -623,6 +638,10 @@ function onClick(event, canvasPos) {
                     if (gameProps[i].window.processClick(canvasPos)) {
                         gameProps[i].drawMenu = false;
                         freezePlayer = false;
+                        var input = document.getElementById("gameDiv");
+                        if (input !== null) {
+                            input.remove();
+                        }
                         if (Resources.currentRoomID !== null) {    
                             webSocket.send(JSON.stringify({
                                 leaveRoom: Resources.currentRoomID

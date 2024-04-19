@@ -257,7 +257,7 @@ class TileMap {
         
         for (let i = 0; i < this.cols; i++) {
             for (let k = 0; k < this.rows; k++) {
-                if (this.map[(i*this.rows) + k] != null && this.tiles[this.map[(i*this.rows) + k]] != null) { 
+                if (this.map[(i*this.rows) + k] != null && this.map[(i*this.rows) + k] != 0 && this.tiles[this.map[(i*this.rows) + k]] != null) { 
                     this.tiles[this.map[(i*this.rows) + k]].draw(new Vector2(
                         offsetPos.x + (i * this.tileSize),
                         offsetPos.y + (k * this.tileSize)).screenPos,

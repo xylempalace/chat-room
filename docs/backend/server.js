@@ -106,13 +106,14 @@ sockserver.on('connection', (ws, req) => {
       delete clients[ws.id];
       var del;
       for (const [key, value] of Object.entries(gameRooms)) {
-        for (var i = 0; i < value[1].length; i++) {
-          if (value[1][i] === ws.id) {
+        for (var i = 0; i < value[0].length; i++) {
+          if (value[0][i] === ws.id) {
+            value[0] = removeFromArray(value[0], i);
             del = key;
           }
         }
       }
-      if (del !== null) {
+      if (del !== null && gameRooms[del][0].length <= 0) {
         delete gameRooms[del];
         console.log(gameRooms);
       }
@@ -198,6 +199,7 @@ sockserver.on('connection', (ws, req) => {
             ws.send(JSON.stringify({
               joinRoom: key
             }));
+            return;
           }
         }
         ws.send(JSON.stringify({
@@ -207,9 +209,15 @@ sockserver.on('connection', (ws, req) => {
       } else if ("pub-" + obj.joinRoom in gameRooms) {
         privacy = "pub-";
         gameRooms[privacy + obj.joinRoom][0].push(ws.id)
+        ws.send(JSON.stringify({
+          joinRoom: privacy + obj.joinRoom
+        }));
       } else if ("priv-" + obj.joinRoom in gameRooms) {
         privacy = "priv-";
         gameRooms[privacy + obj.joinRoom][0].push(ws.id)
+        ws.send(JSON.stringify({
+          joinRoom: privacy + obj.joinRoom
+        }));
       } else {
         ws.send(JSON.stringify({
           joinRoom: "error",
@@ -217,9 +225,7 @@ sockserver.on('connection', (ws, req) => {
         }));
         return;
       }
-      ws.send(JSON.stringify({
-        joinRoom: privacy + obj.joinRoom
-      }));
+      console.log(gameRooms)
     } else if ("id" in obj) {
       // When a client selects a username
       var validName = true;
@@ -283,4 +289,12 @@ sockserver.on('connection', (ws, req) => {
 
 function distance(x1, x2, y1, y2) {
   return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+}
+
+function removeFromArray(arr, i) {
+  const halfBeforeTheUnwantedElement = arr.slice(0, i);
+
+  const halfAfterTheUnwantedElement = arr.splice(i + 1);
+
+  return halfBeforeTheUnwantedElement.concat(halfAfterTheUnwantedElement);
 }

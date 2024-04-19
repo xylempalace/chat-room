@@ -382,14 +382,11 @@ class UiMenu {
                             return nextState;
                         } else {
                             return windowState;
-                        }});
-                        if (this.buttons[i].process !== null) {
-                            this.buttons[i].process(this.source.minPlayers, this.source.maxPlayers);
-                        }
-                        if (nextState !== this.windowState) {
-                            this.windowState = nextState;
-                            return false;
-                        }
+                    }}, this.source.minPlayers, this.source.maxPlayers);
+                    if (nextState !== this.windowState) {
+                        this.windowState = nextState;
+                        return false;
+                    }
                     }
                 }
                 return false;
@@ -451,7 +448,11 @@ class UiMenu {
      * @param execute passed in function that determines what is done with the click
      * @returns returns output of the execute function
      */
-    processClick(position, execute) {
-        return execute(position.x >= this.origin.x && position.y >= this.origin.y && position.x <= this.origin.x + this.width && position.y <= this.origin.y + this.height, this.nextState, this.windowState);
+    processClick(position, execute, min, max) {
+        var condition = position.x >= this.origin.x && position.y >= this.origin.y && position.x <= this.origin.x + this.width && position.y <= this.origin.y + this.height;
+        if (condition && this.process !== null) {
+            this.process(min, max);
+        }
+        return execute(condition, this.nextState, this.windowState);
     }
 }

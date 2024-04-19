@@ -28,6 +28,17 @@ body{
     color: black;
 }
 
+.chatInput{
+    width: 160px;
+    top:25%;
+    left:-12%;
+    background-color: rgba(255, 255, 255,);
+    border:2px solid black;
+    border-radius: 10px;
+        height: 2%;
+}
+
+
 .chatBox { 
     height: -webkit-fill-available;
 
@@ -67,9 +78,6 @@ body{
 .inputDiv {
     min-height: min-content;
     width: max-content;
-    top:50%;
-    left:42%;
-    position: relative;
 }
 
 .darkModeButton {
@@ -132,12 +140,19 @@ position: relative;
 }
 
 input{
+    position:relative;
     margin: 20px auto;
     display: block;
     width: 9%;
     height: 20px;
     padding: 8px;
     border: 1px solid grey;
+    left:40.5%; 
+    top: 12.5%;
     
 }
 
+.chatButton{
+z-index: 12;
+
+}

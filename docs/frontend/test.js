@@ -448,7 +448,14 @@ document.addEventListener("readystatechange", (e) => {
     
     if (e.target.readyState === "complete") {
       //  setUser(document.getElementById("usernameInput"));
-
+      const textInput = document.getElementById('usernameInput');
+      const submitButton = document.getElementById('loginButton');
+      
+      textInput.addEventListener('keydown', function(event) {
+          if (event.key === 'Enter') {
+              submitButton.click();
+          }
+      });
 
             const foundInputs = document.getElementById("usernameInput");
         for (let i = 0; i < foundInputs.length; i++) {
@@ -464,18 +471,18 @@ document.addEventListener("readystatechange", (e) => {
             textInputs.push(tI);
         }
          document.getElementById("usernameInput").value = ""
-       // let chatInput = TextInput.findInputByID("chatInput");
+        let chatInput = TextInput.findInputByID("chatInput");
     
-      //  chatInput.setDisabled(true);
+      // chatInput.setDisabled(true);
         addCanvas();
         drawText(100, 100, "Connecting...");
     }
 
 });
 
-function sendMessage(msg, textbox) {
+function sendMessage(msg) {
     if (msg.length > 0) {
-        textbox.clearUsernameTextbox();
+        document.getElementById("chatInput").value = ""; 
         if (connected) {
             webSocket.send(JSON.stringify({
                 id: userPlayer.username,
@@ -499,6 +506,9 @@ function updateUser(e) {
         setUser();
     }
 }
+
+
+
 
 function setUser(usr, textbox) {
     
@@ -524,6 +534,9 @@ function setUser(usr, textbox) {
             receiveMessage("Username set to "+userPlayer.username);
             cameraList.push(new Camera("playerCam", Vector2.zero, 0.01, [-1024, -1024, 1024, 1024]));
             activeCamera = cameraList[cameraList.length-1];
+            //textbox.setDisabled(true);
+            //console.log(findInputByID)
+          //  TextInput.findInputByID("chatInput").setDisabled(false);
             connect();
             startAnimating();
         }

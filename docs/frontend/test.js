@@ -149,10 +149,14 @@ webSocket.onmessage = (event) => {
             setUser(obj.usr, textBox);
         }
     } else if ("joinRoom" in obj) {
+        var input = document.getElementById("gameDiv");
+        if (input !== null) {
+            input.remove();
+        }
         if (obj.joinRoom === "error") {
             for (var i = 0; i < gameProps.length; i++) {
                 if (gameProps[i].drawMenu) {
-                    gameProps[i].drawMenu.windowState = obj.window;
+                    gameProps[i].window.windowState = 10;
                 }
             }
             console.log("error");
@@ -161,7 +165,7 @@ webSocket.onmessage = (event) => {
             console.log(Resources.currentRoomID);
             for (var i = 0; i < gameProps.length; i++) {
                 if (gameProps[i].drawMenu) {
-                    gameProps[i].drawMenu.windowState = 1;
+                    gameProps[i].window.windowState = 1;
                 }
             }
         }

@@ -299,7 +299,7 @@ class UiMenu {
         }));
         this.buttons.push(new Button(new Vector2(this.center.x + 130 * activeCamera.zoom, this.center.y), 240, 40, "#20ff00", "JOIN CODE", 30, 10, 11, () => {
             var gameDiv = document.createElement("div");
-            gameDiv.id = "gameDiv";
+            gameDiv.setAttribute("id", "gameDiv");
             var input = document.createElement("input");
             input.style.left = `${this.center.x - 100}px`;
             input.style.top = `${this.center.y - 25}px`;
@@ -374,10 +374,6 @@ class UiMenu {
             for (var i = 1; i < this.buttons.length; i++) {
                 if (this.buttons[i].windowState === this.windowState) {
                     var nextState = this.buttons[i].processClick(position, (condition, nextState, windowState) => {
-                        var input = document.getElementById("gameDiv");
-                        if (input !== null) {
-                            input.remove();
-                        }
                         if (condition) {
                             return nextState;
                         } else {
@@ -449,7 +445,12 @@ class UiMenu {
      * @returns returns output of the execute function
      */
     processClick(position, execute, min, max) {
+        var input = document.getElementById("gameDiv");
+        if (input !== null) {
+            input.remove();
+        }
         var condition = position.x >= this.origin.x && position.y >= this.origin.y && position.x <= this.origin.x + this.width && position.y <= this.origin.y + this.height;
+        
         if (condition && this.process !== null) {
             this.process(min, max);
         }

@@ -203,25 +203,29 @@ sockserver.on('connection', (ws, req) => {
           }
         }
         ws.send(JSON.stringify({
-          joinRoom: "error",
-          window: 10
+          joinRoom: "error"
         }));
       } else if ("pub-" + obj.joinRoom in gameRooms) {
         privacy = "pub-";
-        gameRooms[privacy + obj.joinRoom][0].push(ws.id)
-        ws.send(JSON.stringify({
-          joinRoom: privacy + obj.joinRoom
-        }));
+        var room = gameRooms[privacy + obj.joinRoom];
+        if (room[0].length < room[2]) {
+          room[0].push(ws.id)
+          ws.send(JSON.stringify({
+            joinRoom: privacy + obj.joinRoom
+          }));
+        }
       } else if ("priv-" + obj.joinRoom in gameRooms) {
         privacy = "priv-";
-        gameRooms[privacy + obj.joinRoom][0].push(ws.id)
-        ws.send(JSON.stringify({
-          joinRoom: privacy + obj.joinRoom
-        }));
+        var room = gameRooms[privacy + obj.joinRoom];
+        if (room[0].length < room[2]) {
+          gameRooms[privacy + obj.joinRoom][0].push(ws.id)
+          ws.send(JSON.stringify({
+            joinRoom: privacy + obj.joinRoom
+          }));
+        }
       } else {
         ws.send(JSON.stringify({
-          joinRoom: "error",
-          window: 11
+          joinRoom: "error"
         }));
         return;
       }

@@ -83,7 +83,7 @@ webSocket.onmessage = (event) => {
     } else if ("invalidName" in obj) {
         // Handles recieving username selction errors and verification
         if (obj.invalidName) {
-            console.log(obj.usr);
+            
             console.log("Username is invalid!");
             receiveMessage(obj.usernameError);
             loginState = "username";
@@ -563,13 +563,13 @@ function setUser(usr, textbox) {
             console.log(usr);
             console.log("length:" + usr.length);
             if (usr.length > 3 && usr.length < 20){
-                userPlayer = new Player(usr, World.spawnPos, usr, "#FF0000");
                 webSocket.send(JSON.stringify({
-                    id: `${userPlayer.username}`
+                    id: `${usr}`
                 }));
                 loginState = "awaitingVerification";
             }
         } else if (loginState == "usernameVerified") {
+            userPlayer = new Player(usr, World.spawnPos, usr, "#FF0000");
             document.querySelector(".popup").style.display = "none";
             document.querySelector(".container").style.display="none";
             loginState = "playing";

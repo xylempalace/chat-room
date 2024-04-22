@@ -83,6 +83,8 @@ webSocket.onmessage = (event) => {
     } else if ("invalidName" in obj) {
         // Handles recieving username selction errors and verification
         if (obj.invalidName) {
+            console.log(obj.usr);
+            console.log("Username is invalid!");
             receiveMessage(obj.usernameError);
             loginState = "username";
           //  const textBox = textInputs.find((element) => element.textInput.getAttribute("placeholder") == "Username");
@@ -557,19 +559,16 @@ function setUser(usr, textbox) {
     
     console.log("setUser called");
     if (!connected) {
-        console.log("test");
-        console.log("login state before check: " + loginState);
         if (loginState == "username") {
             console.log(usr);
             console.log("length:" + usr.length);
             if (usr.length > 3 && usr.length < 20){
-                console.log("verfied login state: " +loginState);
                 userPlayer = new Player(usr, World.spawnPos, usr, "#FF0000");
                 webSocket.send(JSON.stringify({
                     id: `${userPlayer.username}`
                 }));
+                loginState = "awaitingVerification";
             }
-            loginState = "awaitingVerification";
         } else if (loginState == "usernameVerified") {
             document.querySelector(".popup").style.display = "none";
             document.querySelector(".container").style.display="none";
@@ -583,7 +582,10 @@ function setUser(usr, textbox) {
             connect();
             startAnimating();
         }
+
+        console.log("Final login state: " + loginState);
     }
+
 }
 
 function connect() {
@@ -710,3 +712,6 @@ function onClick(event, canvasPos) {
         userPlayer.walkTo(canvasPos.screenToWorldPos());
     }
 }
+
+
+document.addEventListener

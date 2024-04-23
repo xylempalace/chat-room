@@ -125,11 +125,6 @@ sockserver.on('connection', (ws, req) => {
   ws.on('message', (str) => {
     // Handles recieving data from clients
     var obj = JSON.parse(str);
-    if ("posX" in obj) {
-
-    } else {
-      console.log(obj);
-    }
   
     if ("posX" in obj) {
       // This code handles recieving and distributing positional data from one client to the others
@@ -161,6 +156,7 @@ sockserver.on('connection', (ws, req) => {
       var gameID;
       var cond;
       while (cond !== true) {
+        // Creates a new room ID and checks if it already exists
         cond = true;
         gameID = `${obj.newRoom == "public" ? "pub-" : "priv-"}${sockserver.getUniqueRoomID()}`;
         for (const [key, value] of Object.entries(gameRooms)) {
@@ -169,15 +165,17 @@ sockserver.on('connection', (ws, req) => {
           }
         }
       }
-
+      // Room created with its ID, then the id off the creator in a list as well as the min and max amt of players allowed in the room
       gameRooms[gameID] = [[ws.id], obj.playersMin, obj.playersMax];
       console.log(`New room created with game ID: ${gameID}`);
       ws.send(JSON.stringify({
         joinRoom: gameID
       }));
     } else if ("leaveRoom" in obj) {  
+      // Handles leaving game rooms
       try {
         for (var i = 0; i < gameRooms[obj.leaveRoom][0].length; i++) {
+          // Finds which room the player is in and removes them
           if (ws.id === gameRooms[obj.leaveRoom][0][i]) {
             delete gameRooms[obj.leaveRoom][0].splice(i, 1);
             break;
@@ -191,9 +189,11 @@ sockserver.on('connection', (ws, req) => {
         console.log(err);
       }
     } else if ("joinRoom" in obj) {
+      // Handles players joining rooms
       var privacy;
       if (obj.joinRoom === null) {
         for (const [key, value] of Object.entries(gameRooms)) {
+          // Finds the first available public room to join
           if (key.includes("pub-") && value[0].length < value[2]) {
             value[0].push(ws.id);
             ws.send(JSON.stringify({
@@ -206,6 +206,7 @@ sockserver.on('connection', (ws, req) => {
           joinRoom: "error"
         }));
       } else if ("pub-" + obj.joinRoom in gameRooms) {
+        // Adds the player to the specified room if its public
         privacy = "pub-";
         var room = gameRooms[privacy + obj.joinRoom];
         if (room[0].length < room[2]) {
@@ -215,6 +216,7 @@ sockserver.on('connection', (ws, req) => {
           }));
         }
       } else if ("priv-" + obj.joinRoom in gameRooms) {
+        // Adds the player to the specified room if its private
         privacy = "priv-";
         var room = gameRooms[privacy + obj.joinRoom];
         if (room[0].length < room[2]) {
@@ -224,6 +226,7 @@ sockserver.on('connection', (ws, req) => {
           }));
         }
       } else {
+        // Returns and error if no rooms were found
         ws.send(JSON.stringify({
           joinRoom: "error"
         }));

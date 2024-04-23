@@ -155,6 +155,10 @@ class Board {
 class Piece {
     value;
 
+    /**
+     * Pieces for boards
+     * @param value the piece
+     */
     constructor(value) {
         this.value = value;
     }
@@ -164,6 +168,11 @@ class Deck {
     cards = [];
     cardTypes = [];
 
+    /**
+     * Holds cards
+     * @param {Array} cards the cards that will be in the deck
+     * @param {*} hand whether or not the deck is a hand
+     */
     constructor(cards, hand = false) {
         if (hand) {
             this.cards = cards;
@@ -178,6 +187,9 @@ class Deck {
         }
     }
 
+    /**
+     * Shuffles the deck
+     */
     shuffle() {
         newDeck = [];
         while (this.cards.length > 0) {
@@ -188,6 +200,10 @@ class Deck {
         this.cards = newDeck;
     }
 
+    /**
+     * Draws a the top card from the deck
+     * @returns returns the drawn card
+     */
     draw() {
         returnCard = this.cards[0];
         delete this.cards[0];
@@ -199,6 +215,11 @@ class Card {
     value;
     amountInDeck;
 
+    /**
+     * Card object for card games
+     * @param value info of the card
+     * @param {number} amountInDeck amount of times the card appears in a deck
+     */
     constructor(value, amountInDeck) {
         this.value = value;
         this.amountInDeck = amountInDeck;
@@ -215,6 +236,14 @@ class Game {
     turn = 0;
     dimensions;
 
+    /**
+     * Game object that handles playing a game
+     * @param {string} title title of the game
+     * @param {number} maxPlayers max players allowed
+     * @param {number} minPlayers min players allowed
+     * @param {Board} board board of the game
+     * @param dimensions 
+     */
     constructor(title, maxPlayers, minPlayers, board, dimensions) {
         this.title = title;
         this.maxPlayers = maxPlayers;
@@ -223,15 +252,27 @@ class Game {
         this.dimensions = dimensions;
     }
 
+    /**
+     * starting game
+     * @param {number} players amount of players playing
+     */
     startGame(players) {
         this.players = players;
     }
 
+    /**
+     * Switches turn
+     */
     switchTurn() {
         turn++;
         turn %= this.players;
     }
 
+    /**
+     * tests if a player has won
+     * @param rules win condition
+     * @returns whether or not a player has one
+     */
     testWin(rules) {
         return rules(this.board, this.players, this.turn);
     }
@@ -244,17 +285,31 @@ class GameProp extends Prop {
     drawMenu = false;
     button;
 
+    /**
+     * The interactable sprite that appears in game to play a game
+     * @param {sprite} sprite image of the prop
+     * @param {Vector2} pos position of the prop
+     * @param {Vector2} offset defines the center of the prop
+     * @param {number} size size of the prop
+     * @param {number} interactionRange how close the player needs to be to the prop to interact with it
+     * @param {Game} game the game that this prop deals with
+     */
     constructor(sprite, pos, offset, size, interactionRange, game) {
         super(sprite, pos, offset, size);
 
         this.interactionRange = interactionRange;
         this.game = game;
-        this.window = new UiMenu(this.game);
+        this.window = new UiGameMenu(this.game);
 
         const canvas = document.getElementById("gameCanvas");
         this.button = new Button(new Vector2(canvas.width / 2, canvas.height - 45 * activeCamera.zoom), 350, 40, "#ffffff", "CLICK HERE TO PLAY", 30, null, 0);
     }
 
+    /**
+     * Displays the prompt to play when the player is close
+     * @param {Vector2} pos position of the player  
+     * @returns returns whether or not to display the prompt
+     */
     interactPrompt(pos) {
         var display = distance(pos.x, this.pos.x + this.drawOffset.x, pos.y, this.pos.y + this.drawOffset.y) <= this.interactionRange;
         if (!this.drawMenu && display) {
@@ -266,7 +321,7 @@ class GameProp extends Prop {
     }
 }
 
-class UiMenu {
+class UiGameMenu {
     source;
     title;
     maxPlayers;
@@ -277,6 +332,10 @@ class UiMenu {
     origin;
     windowState = 0;
 
+    /**
+     * The menu that manages joining and creating rooms for playing a specified game
+     * @param {Game} source the game that this UI Menu handles
+     */
     constructor(source) {
         this.source = source;
         this.title = source.title;
@@ -292,11 +351,13 @@ class UiMenu {
         // Room Joining UI
         this.buttons.push(new Button(new Vector2(this.center.x - 130 * activeCamera.zoom, this.center.y), 220, 40, "#20ff00", "JOIN ROOM", 30, 0, 10));
 
+        // Button for joining any public room
         this.buttons.push(new Button(new Vector2(this.center.x - 130 * activeCamera.zoom, this.center.y), 220, 40, "#20ff00", "JOIN ANY", 30, 10, 2, () => {
             Resources.ws.send(JSON.stringify({
                 joinRoom: null
             }));
         }));
+        // Button for joining a room by its id
         this.buttons.push(new Button(new Vector2(this.center.x + 130 * activeCamera.zoom, this.center.y), 240, 40, "#20ff00", "JOIN CODE", 30, 10, 11, () => {
             var gameDiv = document.createElement("div");
             gameDiv.setAttribute("id", "gameDiv");
@@ -328,7 +389,9 @@ class UiMenu {
         // Room Creation UI
         this.buttons.push(new Button(new Vector2(this.center.x + 130 * activeCamera.zoom, this.center.y), 240, 40, "#20ff00", "CREATE ROOM", 30, 0, 20));
         
+        // Toggle for switching to private room
         this.buttons.push(new Button(new Vector2(this.center.x, this.center.y - 50 * activeCamera.zoom), 180, 40, "#ffb300", "PUBLIC", 30, 20, 21));
+        // Room creation button
         this.buttons.push(new Button(new Vector2(this.center.x, this.center.y + 50 * activeCamera.zoom), 180, 40, "#20ff00", "CREATE", 30, 20, 1, (playersMin, playersMax) => {
             Resources.ws.send(JSON.stringify({
                 newRoom: "public",
@@ -337,7 +400,9 @@ class UiMenu {
             }));
         }));
         
+        // Toggle for switching to public room
         this.buttons.push(new Button(new Vector2(this.center.x, this.center.y - 50 * activeCamera.zoom), 180, 40, "#00a2ff", "PRIVATE", 30, 21, 20));
+        // Room creation button
         this.buttons.push(new Button(new Vector2(this.center.x, this.center.y + 50 * activeCamera.zoom), 180, 40, "#20ff00", "CREATE", 30, 21, 1, (playersMin, playersMax) => {
             Resources.ws.send(JSON.stringify({
                 newRoom: "private",
@@ -390,26 +455,28 @@ class UiMenu {
         }
     }
     
-    class Button {
-        width;
-        height;
-        origin;
-        color;
-        windowState;
-        text;
-        nextState;
-        fontSize;
-        process;
-        
-        /**
-         * Game Window buttons that run a specified function on click
+class Button {
+    width;
+    height;
+    origin;
+    color;
+    windowState;
+    text;
+    nextState;
+    fontSize;
+    process;
+    
+    /**
+     * Game Window buttons that run a specified function on click
      * @param {Vector2} origin top left corner of the button
      * @param {number} width width of button
      * @param {number} height height of button
      * @param {string} color color of button
-     * @param state the state number of the game window when this button should draw
      * @param {string} text text on button
-     * @param nextState the state the game window should switch upon click 
+     * @param {string} fontSize the font size of the text
+     * @param {number} state the state number of the game window when this button should draw
+     * @param {number} nextState the state the game window should switch upon click 
+     * @param {Function} processButton specialized code to run when pressed
      */
     constructor(origin, width, height, color, text, fontSize, state, nextState, processButton = null) {
         this.width = width * activeCamera.zoom;
@@ -441,7 +508,7 @@ class UiMenu {
     /**
      * 
      * @param {Vector2} position takes in the position of the mouse click
-     * @param execute passed in function that determines what is done with the click
+     * @param {Function} execute passed in function that determines what is done with the click
      * @returns returns output of the execute function
      */
     processClick(position, execute, min, max) {

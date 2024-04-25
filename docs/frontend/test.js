@@ -235,6 +235,13 @@ class Player extends GameObject {
         if (this.velX != 0 && this.velY != 0) {
             let nextX = this.x + (this.velX*deltaTime);
             let nextY = this.y + (this.velY*deltaTime);
+            let nextPos = new Vector2(nextX, nextY);
+
+            StaticConvexCollider.colliders.forEach((i) => {
+                if (i.isColliding(nextPos)) {
+                    this.destination = this.pos;
+                }
+            })
             
             // Checks if current X position is further than your "destination"
             // Stops you if it is, keeps moving forward otherwise
@@ -396,6 +403,7 @@ class Prop extends GameObject {
     center;
     centerProportion;
     ready = false;
+    collider;
 
     /**
      * 
@@ -428,8 +436,11 @@ class Prop extends GameObject {
                 this.pos.x - (this.scaler.x), // Correct position offset from scaling
                 this.pos.y - (this.scaler.y)
             ).screenPos, this.size.x * activeCamera.zoom, this.size.y * activeCamera.zoom);
-            console.log(activeCamera.zoom)
         }
+    }
+
+    addCollider(relativePoints) {
+        this.collider = new StaticConvexCollider(this.pos, relativePoints);
     }
 }
 
@@ -523,19 +534,32 @@ function connect() {
 }
 
 function startAnimating() {
+    let smallCollider = [
+        Vector2.up.mul(20), 
+        Vector2.left.mul(50), 
+        Vector2.down.mul(20), 
+        Vector2.right.mul(50)
+    ];
+    let treeCollider = [
+        Vector2.up.mul(20), 
+        Vector2.left.mul(50), 
+        Vector2.down.mul(20), 
+        Vector2.right.mul(50)
+    ];
+
     let treeA = new Sprite("tree.png");
     let treeB = new Sprite("tree2.png");
     let pillar_1 = new Sprite("pillar_1.png");
     let pillar_2 = new Sprite("pillar_2.png");
     let pillar_3 = new Sprite("pillar_3.png");
     let pillar_4 = new Sprite("pillar_4.png");
-    new Prop(treeB, new Vector2(-800, -450), new Vector2(256, 420), new Vector2(300, 300));
-    new Prop(treeA, new Vector2(-400, -250), new Vector2(256, 420), new Vector2(300, 300));
-    new Prop(treeB, new Vector2(50, -850), new Vector2(256, 420), new Vector2(500, 500));
-    new Prop(treeA, new Vector2(-650, -820), new Vector2(256, 420), new Vector2(350, 350));
-    new Prop(treeA, new Vector2(100, -450), new Vector2(256, 420), new Vector2(300, 300));
-    new Prop(treeA, new Vector2(775, 575), new Vector2(256, 420), new Vector2(300, 300));
-    new Prop(pillar_1, new Vector2(96, 96), new Vector2(256, 500), new Vector2(128, 105));
+    new Prop(treeB, new Vector2(-800, -450), new Vector2(256, 420), new Vector2(300, 300)).addCollider(treeCollider);
+    new Prop(treeA, new Vector2(-400, -250), new Vector2(170, 420), new Vector2(300, 300)).addCollider(treeCollider);
+    new Prop(treeB, new Vector2(50, -850), new Vector2(256, 420), new Vector2(500, 500)).addCollider([Vector2.up.mul(20), Vector2.left.mul(50), Vector2.down.mul(20), Vector2.right.mul(100)]);
+    new Prop(treeA, new Vector2(-650, -820), new Vector2(170, 420), new Vector2(350, 350)).addCollider(treeCollider);
+    new Prop(treeA, new Vector2(100, -450), new Vector2(170, 420), new Vector2(300, 300)).addCollider(treeCollider);
+    new Prop(treeA, new Vector2(775, 575), new Vector2(170, 420), new Vector2(300, 300)).addCollider(treeCollider);
+    new Prop(pillar_1, new Vector2(96, 96), new Vector2(256, 500), new Vector2(128, 105)).addCollider(smallCollider);
     
     startTime = Date.now(); 
     drawScreen();

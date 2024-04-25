@@ -1,5 +1,6 @@
 # Lexicomm
 ### A online web based chat room
+### lexicomm.xyz
 
 ## Features
 - A small world to wander around in and meet other players

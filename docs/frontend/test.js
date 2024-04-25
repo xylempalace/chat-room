@@ -444,6 +444,49 @@ class Prop extends GameObject {
     }
 }
 
+class Abyss {
+    static bgImage;
+    static bgImageLoaded = false;
+    static bgPattern;
+
+    static xOffset;
+    static moveScale;
+
+    static init() {
+        // Declare that the abyss isn't loaded yet
+        Abyss.bgImageLoaded = false;
+
+        // Declare its starting offset and speed
+        Abyss.xOffset = 0;
+        Abyss.moveScale = 0.1;
+
+        // Prepare image and update flag once ready
+        Abyss.bgImage = new Image();
+        Abyss.bgImage.onload = function () {
+
+            // Create pattern for filling rect when drawn
+            Abyss.bgPattern = ctx.createPattern(Abyss.bgImage, "repeat");
+            printMessage("aaaa")
+
+            Abyss.bgImageLoaded = true;
+        }
+        Abyss.bgImage.src = "./sprites/bg.png";
+    }
+
+    static draw(delta) {
+        if (Abyss.bgImageLoaded) {
+            ctx.save();
+            let offsetx = activeCamera.pos.x * -Abyss.moveScale;
+            let offsety = activeCamera.pos.y * -Abyss.moveScale;
+            ctx.translate(offsetx, offsety);
+
+            ctx.fillStyle = Abyss.bgPattern;
+            ctx.fillRect(-offsetx, -offsety, gameCanvas.width - offsetx, gameCanvas.height - offsety)
+            ctx.restore();
+        }
+    }
+}
+
 //Called when the page is finished loading
 document.addEventListener("readystatechange", (e) => {
     if (e.target.readyState === "complete") {
@@ -534,6 +577,8 @@ function connect() {
 }
 
 function startAnimating() {
+    Abyss.init();
+
     let smallCollider = [
         Vector2.up.mul(20), 
         Vector2.left.mul(50), 
@@ -571,6 +616,12 @@ function update() {
     activeCamera.follow(userPlayer.pos);
 
     ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+
+    Abyss.draw(1);
+    //ctx.save();
+    //ctx.fillStyle = Abyss.bgPattern;
+    //ctx.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
+    //ctx.restore();
 
     backgroundMap.draw();
 

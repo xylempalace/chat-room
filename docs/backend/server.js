@@ -67,6 +67,7 @@ const files = {
   '/sprites/tiles/pathNorthSouth.png' : ['image/png', '../frontend/sprites/tiles/pathNorthSouth.png'],
   '/sprites/speechBubble.png' : ['image/png', '../frontend/sprites/speechBubble.png'],
   '/sprites/speechBubbleOther.png' : ['image/png', '../frontend/sprites/speechBubbleOther.png'],
+  '/sprites/bg.png' : ['image/png', '../frontend/sprites/bg.png'],
 
   // Props
   '/sprites/tree.png' : ['image/png', '../frontend/sprites/tree.png'],

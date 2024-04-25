@@ -465,8 +465,6 @@ class Abyss {
 
             // Create pattern for filling rect when drawn
             Abyss.bgPattern = ctx.createPattern(Abyss.bgImage, "repeat");
-            printMessage("aaaa")
-
             Abyss.bgImageLoaded = true;
         }
         Abyss.bgImage.src = "./sprites/bg.png";
@@ -555,7 +553,7 @@ function updateUser(e) {
 
 
 
-function setUser(usr, textbox) {
+function setUser(usr) {
     
     console.log("setUser called");
     if (!connected) {
@@ -579,6 +577,14 @@ function setUser(usr, textbox) {
             //textbox.setDisabled(true);
             //console.log(findInputByID)
           //  TextInput.findInputByID("chatInput").setDisabled(false);
+          document.getElementById('chatInput').addEventListener('keypress', function(e){
+            console.log("TESSTTTT");    
+            if(e.key==="Enter"){
+                console.log("inside ekey pressed");
+                document.getElementById('sendMessageButton').click(); 
+                }
+        }
+        )
             connect();
             startAnimating();
         }
@@ -714,4 +720,4 @@ function onClick(event, canvasPos) {
 }
 
 
-document.addEventListener
+

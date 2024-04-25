@@ -117,7 +117,8 @@ sockserver.on('connection', (ws, req) => {
       });
       delete clients[ws.id];
     } catch (e) {
-      console.log(`Disconnect failed! Error: \n${e}`);
+      console.log("Disconnect failed! Error:");
+      console.log(e);
     }
   });
 
@@ -176,7 +177,8 @@ sockserver.on('connection', (ws, req) => {
         validName = false;
         ws.send(JSON.stringify({
           invalidName: true,
-          usernameError: "Invalid Username"
+          usernameError: "Invalid Username",
+          
         }));
       }
 

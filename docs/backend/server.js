@@ -158,18 +158,20 @@ sockserver.on('connection', (ws, req) => {
       while (cond !== true) {
         // Creates a new room ID and checks if it already exists
         cond = true;
-        gameID = `${obj.newRoom == "public" ? "pub-" : "priv-"}${sockserver.getUniqueRoomID()}`;
+        gameID = `${sockserver.getUniqueRoomID()}`;
         for (const [key, value] of Object.entries(gameRooms)) {
-          if (gameID === key) {
+          if (key.includes(gameID)) {
             cond = false;
           }
         }
       }
+      gameID = `${obj.newRoom == "public" ? "pub-" : "priv-"}${gameID}`;
       // Room created with its ID, then the id off the creator in a list as well as the min and max amt of players allowed in the room
       gameRooms[gameID] = [[ws.id], obj.playersMin, obj.playersMax];
       console.log(`New room created with game ID: ${gameID}`);
       ws.send(JSON.stringify({
-        joinRoom: gameID
+        joinRoom: gameID,
+        owner: true
       }));
     } else if ("leaveRoom" in obj) {  
       // Handles leaving game rooms
@@ -183,6 +185,14 @@ sockserver.on('connection', (ws, req) => {
         }
         if (gameRooms[obj.leaveRoom][0].length <= 0) {
           delete gameRooms[obj.leaveRoom];
+        } else {
+          sockserver.clients.forEach(client => {
+            if (client.id === gameRooms[obj.leaveRoom][0][0]) {
+              client.send(JSON.stringify({
+                owner: true
+              }));
+            }
+          });
         }
         console.log(gameRooms);
       } catch(err) {
@@ -197,7 +207,8 @@ sockserver.on('connection', (ws, req) => {
           if (key.includes("pub-") && value[0].length < value[2]) {
             value[0].push(ws.id);
             ws.send(JSON.stringify({
-              joinRoom: key
+              joinRoom: key,
+              owner: false
             }));
             return;
           }
@@ -212,7 +223,8 @@ sockserver.on('connection', (ws, req) => {
         if (room[0].length < room[2]) {
           room[0].push(ws.id)
           ws.send(JSON.stringify({
-            joinRoom: privacy + obj.joinRoom
+            joinRoom: privacy + obj.joinRoom,
+            owner: false
           }));
         }
       } else if ("priv-" + obj.joinRoom in gameRooms) {
@@ -222,7 +234,8 @@ sockserver.on('connection', (ws, req) => {
         if (room[0].length < room[2]) {
           gameRooms[privacy + obj.joinRoom][0].push(ws.id)
           ws.send(JSON.stringify({
-            joinRoom: privacy + obj.joinRoom
+            joinRoom: privacy + obj.joinRoom,
+            owner: false
           }));
         }
       } else {
@@ -233,6 +246,22 @@ sockserver.on('connection', (ws, req) => {
         return;
       }
       console.log(gameRooms)
+    } else if ("updateRoom" in obj) {
+      if (obj.updateRoom in gameRooms) {
+        var newID = obj.new + obj.updateRoom.substring(obj.updateRoom.indexOf("-") + 1);
+        gameRooms[newID] = [gameRooms[obj.updateRoom][0], gameRooms[obj.updateRoom][1], gameRooms[obj.updateRoom][2]];
+        delete gameRooms[obj.updateRoom];
+        console.log(gameRooms);
+        for (var i = 0; i < gameRooms[newID][0].length; i++) {
+          sockserver.clients.forEach(client => {
+            if (client.id === gameRooms[newID][0][i]) {
+              client.send(JSON.stringify({
+                joinRoom: newID
+              }));
+            }
+          });
+        }
+      }
     } else if ("id" in obj) {
       // When a client selects a username
       var validName = true;

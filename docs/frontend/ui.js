@@ -2,6 +2,8 @@ class Resources {
     static ws;
     static player;
     static currentRoomID;
+    static owner = false;
+    static playerNum;
 }
 
 class Board {
@@ -302,7 +304,7 @@ class GameProp extends Prop {
         this.window = new UiGameMenu(this.game);
 
         const canvas = document.getElementById("gameCanvas");
-        this.button = new Button(new Vector2(canvas.width / 2, canvas.height - 45 * activeCamera.zoom), 350, 40, "#ffffff", "CLICK HERE TO PLAY", 30, null, 0);
+        this.button = new Button(new Vector2(canvas.width / 2, canvas.height - 45 * activeCamera.zoom), 350, 40, "#ffffff", "CLICK HERE TO PLAY", 30, null, 0, null);
     }
 
     /**
@@ -346,19 +348,19 @@ class UiGameMenu {
         const canvas = document.getElementById("gameCanvas");
         this.origin = new Vector2(canvas.width / 2 - this.width / 2, canvas.height / 2 - this.height / 2);
         this.center = new Vector2(this.origin.x + this.width / 2, this.origin.y + this.height / 2);
-        this.buttons.push(new Button(this.center, source.dimensions.x, source.dimensions.y, "#cacaca", "", 30, null, 0));
+        this.buttons.push(new Button(this.center, source.dimensions.x, source.dimensions.y, "#cacaca", "", 30, null, 0, null));
 
         // Room Joining UI
-        this.buttons.push(new Button(new Vector2(this.center.x - 130 * activeCamera.zoom, this.center.y), 220, 40, "#20ff00", "JOIN ROOM", 30, 0, 10));
+        this.buttons.push(new Button(new Vector2(this.center.x - 130 * activeCamera.zoom, this.center.y), 220, 40, "#20ff00", "JOIN ROOM", 30, 0, 10, null));
 
         // Button for joining any public room
-        this.buttons.push(new Button(new Vector2(this.center.x - 130 * activeCamera.zoom, this.center.y), 220, 40, "#20ff00", "JOIN ANY", 30, 10, 2, () => {
+        this.buttons.push(new Button(new Vector2(this.center.x - 130 * activeCamera.zoom, this.center.y), 220, 40, "#20ff00", "JOIN ANY", 30, 10, 2, null, () => {
             Resources.ws.send(JSON.stringify({
                 joinRoom: null
             }));
         }));
         // Button for joining a room by its id
-        this.buttons.push(new Button(new Vector2(this.center.x + 130 * activeCamera.zoom, this.center.y), 240, 40, "#20ff00", "JOIN CODE", 30, 10, 11, () => {
+        this.buttons.push(new Button(new Vector2(this.center.x + 130 * activeCamera.zoom, this.center.y), 240, 40, "#20ff00", "JOIN CODE", 30, 10, 11, null, () => {
             var gameDiv = document.createElement("div");
             gameDiv.setAttribute("id", "gameDiv");
             var input = document.createElement("input");
@@ -387,12 +389,12 @@ class UiGameMenu {
         }));
         
         // Room Creation UI
-        this.buttons.push(new Button(new Vector2(this.center.x + 130 * activeCamera.zoom, this.center.y), 240, 40, "#20ff00", "CREATE ROOM", 30, 0, 20));
+        this.buttons.push(new Button(new Vector2(this.center.x + 130 * activeCamera.zoom, this.center.y), 240, 40, "#20ff00", "CREATE ROOM", 30, 0, 20, null));
         
         // Toggle for switching to private room
-        this.buttons.push(new Button(new Vector2(this.center.x, this.center.y - 50 * activeCamera.zoom), 180, 40, "#ffb300", "PUBLIC", 30, 20, 21));
+        this.buttons.push(new Button(new Vector2(this.center.x, this.center.y - 50 * activeCamera.zoom), 180, 40, "#ffb300", "PUBLIC", 30, 20, 21, null));
         // Room creation button
-        this.buttons.push(new Button(new Vector2(this.center.x, this.center.y + 50 * activeCamera.zoom), 180, 40, "#20ff00", "CREATE", 30, 20, 1, (playersMin, playersMax) => {
+        this.buttons.push(new Button(new Vector2(this.center.x, this.center.y + 50 * activeCamera.zoom), 180, 40, "#20ff00", "CREATE", 30, 20, 2, null, (playersMin, playersMax) => {
             Resources.ws.send(JSON.stringify({
                 newRoom: "public",
                 playersMin: playersMin,
@@ -401,17 +403,32 @@ class UiGameMenu {
         }));
         
         // Toggle for switching to public room
-        this.buttons.push(new Button(new Vector2(this.center.x, this.center.y - 50 * activeCamera.zoom), 180, 40, "#00a2ff", "PRIVATE", 30, 21, 20));
+        this.buttons.push(new Button(new Vector2(this.center.x, this.center.y - 50 * activeCamera.zoom), 180, 40, "#00a2ff", "PRIVATE", 30, 21, 20, null));
         // Room creation button
-        this.buttons.push(new Button(new Vector2(this.center.x, this.center.y + 50 * activeCamera.zoom), 180, 40, "#20ff00", "CREATE", 30, 21, 1, (playersMin, playersMax) => {
+        this.buttons.push(new Button(new Vector2(this.center.x, this.center.y + 50 * activeCamera.zoom), 180, 40, "#20ff00", "CREATE", 30, 21, 2, null, (playersMin, playersMax) => {
             Resources.ws.send(JSON.stringify({
                 newRoom: "private",
                 playersMin: playersMin,
                 playersMax: playersMax
             }));
         }));
+
+        this.buttons.push(new Button(new Vector2(this.center.x, this.center.y - 50 * activeCamera.zoom), 180, 40, "#ffb300", "PUBLIC", 30, 1, 4, () => Resources.owner && Resources.currentRoomID.includes("pub-"), () => {
+            Resources.ws.send(JSON.stringify({
+                updateRoom: Resources.currentRoomID,
+                new: "priv-"
+            }));
+        }));
+        this.buttons.push(new Button(new Vector2(this.center.x, this.center.y - 50 * activeCamera.zoom), 180, 40, "#00a2ff", "PRIVATE", 30, 1, 4, () => Resources.owner && Resources.currentRoomID.includes("priv-"), () => {
+            Resources.ws.send(JSON.stringify({
+                updateRoom: Resources.currentRoomID,
+                new: "pub-"
+            }));
+        }));
+
+        this.buttons.push(new Button(new Vector2(this.center.x, this.center.y + 50 * activeCamera.zoom), 180, 40, "#20ff00", "PLAY", 30, 1, 3, () => Resources.owner));
     }
-    
+
     /**
      * Draws the game window to the screen
     */
@@ -477,8 +494,9 @@ class Button {
      * @param {number} state the state number of the game window when this button should draw
      * @param {number} nextState the state the game window should switch upon click 
      * @param {Function} processButton specialized code to run when pressed
+     * @param {Function} extraCondition a function that tells the button to display when the specified condition is met
      */
-    constructor(origin, width, height, color, text, fontSize, state, nextState, processButton = null) {
+    constructor(origin, width, height, color, text, fontSize, state, nextState, extraCondition, processButton = null) {
         this.width = width * activeCamera.zoom;
         this.height = height * activeCamera.zoom;
         this.origin = new Vector2(origin.x - this.width / 2, origin.y - this.height / 2);
@@ -488,6 +506,7 @@ class Button {
         this.nextState = nextState;
         this.fontSize = fontSize;
         this.process = processButton;
+        this.extraCondition = extraCondition;
     }
 
     /**
@@ -495,7 +514,7 @@ class Button {
      * @param {number} state checked against the button's state 
      */
     draw(state) {
-        if (this.windowState === null || state === this.windowState) {
+        if ((this.windowState === null || state === this.windowState) && (this.extraCondition === null || this.extraCondition())) {
             ctx.fillStyle = this.color;
             ctx.fillRect(this.origin.x, this.origin.y, this.width, this.height);
             ctx.textAlign = 'center';

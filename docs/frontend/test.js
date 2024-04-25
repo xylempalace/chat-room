@@ -159,6 +159,7 @@ webSocket.onmessage = (event) => {
                     gameProps[i].window.windowState = 10;
                 }
             }
+            receiveMessage("No rooms available");
             console.log("error");
         } else {
             Resources.currentRoomID = obj.joinRoom;
@@ -169,6 +170,9 @@ webSocket.onmessage = (event) => {
                 }
             }
         }
+    }
+    if ("owner" in obj) {
+        Resources.owner = obj.owner;
     }
 };
 

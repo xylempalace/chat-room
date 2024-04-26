@@ -70,8 +70,12 @@ body{
     width: max-content;
 }
 
-.darkModeButton {
-    position: absolute; 
-    
+.CosmeticsButton {
+    position: absolute;
+
+    width: 150px; height: 150px;
+
+    margin-bottom: 5px; margin-right: 5px;
+
     bottom: 0; right: 0;
 }

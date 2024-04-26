@@ -190,6 +190,10 @@ class PlayerCosmetic {
             this.flippedSprite.draw(pos, size, size);
         }
     }
+
+    getSpritePath() {
+        return this.sprite.image.src;
+    }
 }
 
 class Player extends GameObject {
@@ -211,11 +215,35 @@ class Player extends GameObject {
         super ("PLAYER-"+username, pos);
         this.username = username;
         this.color = color;
-        this.cosmetics = cosmetics;
+        this.setCosmetics(cosmetics);
+    }
+
+
+    hasCosmeticEquipped(cosmeticName) {
+        cosmeticName = "player/" + cosmeticName;
+        for (i = 0; i < this.cosmetics.length; i++) {
+            if (this.cosmetics[i].getSpritePath());
+        }
     }
 
     setCosmetics(cosmeticArr) {
-        this.cosmetics = cosmeticArr;
+        cosmeticArr.forEach((i) => {
+            this.cosmetics.push(i);
+        })
+    }
+
+    addCosmetic(cosmeticName) {
+        console.log(this.cosmetics[0].getSpritePath());
+        if (this.cosmetics.includes(new PlayerCosmetic("player/" + cosmeticName + ".png", "player/" + cosmeticName + "_flipped.png"))) {
+            console.log("your mom");
+        
+        }
+        else {this.cosmetics.push(new PlayerCosmetic("player/" + cosmeticName + ".png", "player/" + cosmeticName + "_flipped.png"));
+        }
+    }
+
+    removeCosmetic(cosmeticName) {
+        
     }
     
     warpTo(pos) {
@@ -262,6 +290,7 @@ class Player extends GameObject {
     }
 
     sayMessage(message) {
+        this.addCosmetic("fedora");
         var newBubble = new SpeechBubble(message);
         this.speechBubbles.unshift(newBubble);
     }
@@ -347,7 +376,6 @@ class SpeechBubble {
 
             for (var i = 1; i < words.length; i++) {
                 var word = words[i];
-                console.log("what the width should be: " + ctx.measureText(currentLine + " " + word).width);
                 var width = ctx.measureText(currentLine + " " + word).width;
                 if (width < this.constructor.maxWidth) {
                     currentLine += " " + word;
@@ -655,28 +683,10 @@ function rgb(r, g, b){
     return ["rgb(",r,",",g,",",b,")"].join("");
 }
     
-function ToggleDarkMode() {
+function ToggleCosmeticsMenu() {
 
-    const chatBoxReference = document.getElementById("chatBox");
-    if (!isDark) {
-        /* enables dark mode flag */
-        isDark = !isDark;
+    userPlayer.addCosmetic("fedora");
 
-        /* changes color of webpage's background */
-        document.body.style.background = rgb(54, 54, 54);
-
-    }
-
-    else {
-        /* changes color of webpage's background */
-        document.body.style.background = "white";
-
-        /* changes color of the chatbox itself */
-        chatBoxReference.style.background = "lightgrey";
-
-        /* disables off dark mode */
-        isDark = !isDark;
-    }
 }
 
 function onClick(event, canvasPos) {

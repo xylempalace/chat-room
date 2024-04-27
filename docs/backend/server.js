@@ -5,7 +5,9 @@
 const express = require('express')
 const app = express()
 const { WebSocketServer } = require('ws')
-const sockserver = new WebSocketServer({ port: 443 })
+const http = require('http');
+
+const sockserver = new WebSocketServer({ clientTracking: true, noServer: true })
 
 // Creates a unique uid
 sockserver.getUniqueID = function () {
@@ -95,10 +97,6 @@ app.get('/*', (req, res) => {
     console.log(req.url);
     console.log(err);
   }
-});
-
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
 });
 
 // Socket Server Code
@@ -216,3 +214,13 @@ sockserver.on('connection', (ws, req) => {
 function distance(x1, x2, y1, y2) {
   return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
 }
+
+const server = http.createServer(app);
+
+server.on('upgrade', (request, socket, head) => {
+  sockserver.handleUpgrade(request, socket, head, (ws) => {
+    sockserver.emit('connection', ws, request);
+  });
+});
+
+server.listen(port, () => console.log(`Listening on http://localhost:${port}`));

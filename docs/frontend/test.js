@@ -97,8 +97,7 @@ const SpeechBubbleSprite = new NineSlicedSprite("speechBubble.png"  , [16, 16, 1
 
 // WebSocket Stuff
 const webSocket = new WebSocket('ws://localhost:3000/');
-
-
+Resources.ws = webSocket;
 
 webSocket.onmessage = (event) => {
     var obj = JSON.parse(event.data);
@@ -492,53 +491,6 @@ class SpeechBubble {
     }
 }
 
-class Prop extends GameObject {
-    sprite;
-    size;
-    center;
-    centerProportion;
-    ready = false;
-    collider;
-
-    /**
-     * 
-     * @param {Sprite} sprite Sprite object representing the image of this prop
-     * @param {Vector2} pos Position in the world to draw this prop, drawing from center
-     * @param {Vector2} center Center of the sprite, affecting z-sort position and where this is drawn from
-     * @param {Vector2} size How large to draw this prop
-     */
-    constructor (sprite, pos, center, size) {
-        super("PROP-"+sprite.image.src, pos);
-
-        this.sprite = sprite;
-        this.size = size;
-        this.drawOffset = Vector2.zero;
-
-        //this.center = center;
-        setTimeout(() => {
-            this.scaler = new Vector2(
-                ((this.size.x * center.x) / this.sprite.width), 
-                ((this.size.y * center.y) / this.sprite.height)
-                )
-            this.ready = true;
-            console.log(this.scaler)
-        }, 10);
-    }
-
-    draw() {
-        if (this.ready) {
-            this.sprite.draw(new Vector2(
-                this.pos.x - (this.scaler.x), // Correct position offset from scaling
-                this.pos.y - (this.scaler.y)
-            ).screenPos, this.size.x * activeCamera.zoom, this.size.y * activeCamera.zoom);
-        }
-    }
-
-    addCollider(relativePoints) {
-        this.collider = new StaticConvexCollider(this.pos, relativePoints);
-    }
-}
-
 class Abyss {
     static bgImage;
     static bgImageLoaded = false;
@@ -656,7 +608,7 @@ function setUser(usr) {
         if (loginState == "username") {
             console.log(usr);
             console.log("length:" + usr.length);
-            if (usr.length > 3 && usr.length < 20){
+            if (usr.length > 2 && usr.length < 20){
                 webSocket.send(JSON.stringify({
                     id: `${usr}`
                 }));
@@ -726,7 +678,7 @@ function startAnimating() {
     let pillar_3 = new Sprite("pillar_3.png");
     let pillar_4 = new Sprite("pillar_4.png");
     let tictactoeBoard = new Sprite("minigame/tictactoe/tictactoeBoardInteract.png");
-    gameProps.push(new GameProp(tictactoeBoard, new Vector2(500, -225), new Vector2(50, 42), 100 * activeCamera.zoom, 60, tictactoe));
+    gameProps.push(new GameProp(tictactoeBoard, new Vector2(500, -225), new Vector2(50, 42), new Vector2(100, 100), 60, tictactoe));
     new Prop(treeB, new Vector2(-800, -450), new Vector2(256, 420), new Vector2(300, 300)).addCollider(treeCollider);
     new Prop(treeA, new Vector2(-400, -250), new Vector2(170, 420), new Vector2(300, 300)).addCollider(treeCollider);
     new Prop(treeB, new Vector2(50, -850), new Vector2(256, 420), new Vector2(500, 500)).addCollider([Vector2.up.mul(20), Vector2.left.mul(50), Vector2.down.mul(20), Vector2.right.mul(100)]);

@@ -364,7 +364,7 @@ class UiGameMenu {
             var gameDiv = document.createElement("div");
             gameDiv.setAttribute("id", "gameDiv");
             var input = document.createElement("input");
-            input.style.left = `${this.center.x - 100}px`;
+            input.style.left = `${this.center.x - 200}px`;
             input.style.top = `${this.center.y - 25}px`;
             input.minLength = 5;
             input.maxLength = 5;

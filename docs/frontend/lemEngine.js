@@ -656,18 +656,47 @@ class Camera extends GameObject {
 class Prop extends GameObject {
     sprite;
     size;
-    offset;
+    center;
+    centerProportion;
+    ready = false;
+    collider;
 
-    constructor (sprite, pos, offset, size) {
+    /**
+     * 
+     * @param {Sprite} sprite Sprite object representing the image of this prop
+     * @param {Vector2} pos Position in the world to draw this prop, drawing from center
+     * @param {Vector2} center Center of the sprite, affecting z-sort position and where this is drawn from
+     * @param {Vector2} size How large to draw this prop
+     */
+    constructor (sprite, pos, center, size) {
         super("PROP-"+sprite.image.src, pos);
 
         this.sprite = sprite;
         this.size = size;
-        this.drawOffset = offset;
+        this.drawOffset = Vector2.zero;
+
+        //this.center = center;
+        setTimeout(() => {
+            this.scaler = new Vector2(
+                ((this.size.x * center.x) / this.sprite.width), 
+                ((this.size.y * center.y) / this.sprite.height)
+                )
+            this.ready = true;
+            console.log(this.scaler)
+        }, 10);
     }
 
-    draw() {    
-        this.sprite.draw(this.pos.screenPos, this.size);
+    draw() {
+        if (this.ready) {
+            this.sprite.draw(new Vector2(
+                this.pos.x - (this.scaler.x), // Correct position offset from scaling
+                this.pos.y - (this.scaler.y)
+            ).screenPos, this.size.x * activeCamera.zoom, this.size.y * activeCamera.zoom);
+        }
+    }
+
+    addCollider(relativePoints) {
+        this.collider = new StaticConvexCollider(this.pos, relativePoints);
     }
 }
 

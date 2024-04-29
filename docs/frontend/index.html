@@ -8,26 +8,51 @@
 </head>
 
 <body>
+<!-- Pop up that asks for username on connection to website-->
+   <div class = "container" id = "container">
+
+        <h1>Welcome to Lexicomm!</h1>
+        <input placeholder="Username" class="inputText" minlength="3" maxlength="20" id="usernameInput">
+    
+        <br /><br/>
+            <a href = # class = "button" id="loginButton" onclick="setUser(usernameInput.value,usernameInput)">Enter</a> 
+    </div>
+
+    <div class="popup">
+        <div class= "popup-content">
+        </div>
+
+    </div>
+
     <button type="button" class="darkModeButton" onclick="ToggleDarkMode()"> Toggle Dark Mode </button>
 
     <div style="width:100%; height: 100%;">
 
         <div id = "chatBox" class="chatBox" >
-            
-            <div class="inputDiv" style="position: fixed; top: 12px;" placeholder="Username" func="setUser" hasButton=true reqConnection=false minlength=3 maxlength=20> </div>
-            
+           
             <div><p id="values" class="chatLog"></p> </div>
+            <br /><br/>
             
-            <div id="chatInput" class="inputDiv" style="position: fixed; bottom: 44px;" placeholder="Chat..." func="sendMessage" hasButton=true reqConnection=true minlength=1 maxlength=50> </div>
-        </div>
+            <input placeholder="Chat..." type="text" minlength="1" maxlength="50" id="chatInput" class="chatInput" func="sendMessage">
+            
+            
+            <button class = "chatButton" id = "sendMessageButton" onclick="sendMessage(chatInput.value)">Enter</button> 
         
-        <div id = "gameSpace" style= "height: 80%; width:100%;"> </div>
+        </div>
+            
+           <!-- <div id="chatInput" class="inputDiv" style="position: fixed; bottom: 44px;" placeholder="Chat..." func="sendMessage" hasButton=true reqConnection=true minlength=1 maxlength=50> </div>
+        </div>////
+    -->
+        <div id = "gameSpace" style= "height: 80%; width:100%;">
+    
+        </div>
 
     </div>
     
     <script src="lemEngine.js"></script>
     <script src="ui.js"></script>
     <script src="test.js"></script>
+    
 </body>
  
 </html>

@@ -5,7 +5,9 @@
 const express = require('express')
 const app = express()
 const { WebSocketServer } = require('ws')
-const sockserver = new WebSocketServer({ port: 443 })
+const http = require('http');
+
+const sockserver = new WebSocketServer({ clientTracking: true, noServer: true })
 
 // Creates a unique uid
 sockserver.getUniqueID = function () {
@@ -45,6 +47,9 @@ const files = {
   '/favicon.ico' : ['image/vnd.microsoft.icon', '../images/favicon.ico'],
   '/lemEngine.js' : ['text/javascript', '../frontend/lemEngine.js'],
   '/ui.js' : ['text/javascript', '../frontend/ui.js'],
+  '/imageManipulator.js' : ['text/javascript', '../tools/imageTools/imageManipulator.js'],
+
+  // Tiles
   '/sprites/tiles/floor.png' : ['image/png', '../frontend/sprites/tiles/floor.png'],
   '/sprites/tiles/wall.png' : ['image/png', '../frontend/sprites/tiles/wall.png'],
   '/sprites/tiles/grass.png' : ['image/png', '../frontend/sprites/tiles/grass.png'],
@@ -65,9 +70,22 @@ const files = {
   '/sprites/tiles/pathEastWest.png' : ['image/png', '../frontend/sprites/tiles/pathEastWest.png'],
   '/sprites/tiles/pathNorthSouth.png' : ['image/png', '../frontend/sprites/tiles/pathNorthSouth.png'],
   '/sprites/speechBubble.png' : ['image/png', '../frontend/sprites/speechBubble.png'],
+  '/sprites/bg.png' : ['image/png', '../frontend/sprites/bg.png'],
+
+  // Props
   '/sprites/tree.png' : ['image/png', '../frontend/sprites/tree.png'],
   '/sprites/tree2.png' : ['image/png', '../frontend/sprites/tree2.png'],
-  '/sprites/minigame/tictactoe/tictactoeBoardInteract.png' : ['image/png', '../frontend/sprites/minigame/tictactoe/tictactoeBoardInteract.png']
+  '/sprites/minigame/tictactoe/tictactoeBoardInteract.png' : ['image/png', '../frontend/sprites/minigame/tictactoe/tictactoeBoardInteract.png'],
+  '/sprites/pillar_1.png' : ['image/png', '../frontend/sprites/pillar_1.png'],
+  '/sprites/pillar_2.png' : ['image/png', '../frontend/sprites/pillar_2.png'],
+  '/sprites/pillar_3.png' : ['image/png', '../frontend/sprites/pillar_3.png'],
+  '/sprites/pillar_4.png' : ['image/png', '../frontend/sprites/pillar_4.png'],
+
+  //Player
+  '/sprites/player/base.png' : ['image/png', '../frontend/sprites/player/base.png'],
+  '/sprites/player/base_flipped.png' : ['image/png', '../frontend/sprites/player/base_flipped.png'],
+  '/sprites/player/flower.png' : ['image/png', '../frontend/sprites/player/flower.png'],
+  '/sprites/player/flower_flipped.png' : ['image/png', '../frontend/sprites/player/flower_flipped.png'],
 };
 
 var clients = {};
@@ -83,10 +101,6 @@ app.get('/*', (req, res) => {
     console.log(req.url);
     console.log(err);
   }
-});
-
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
 });
 
 // Socket Server Code
@@ -118,6 +132,7 @@ sockserver.on('connection', (ws, req) => {
         console.log(gameRooms);
       }
     } catch (e) {
+      console.log("Disconnect failed! Error:");
       console.log(e);
     }
   });
@@ -288,7 +303,8 @@ sockserver.on('connection', (ws, req) => {
         validName = false;
         ws.send(JSON.stringify({
           invalidName: true,
-          usernameError: "Invalid Username"
+          usernameError: "Invalid Username",
+          
         }));
       }
 
@@ -326,6 +342,17 @@ sockserver.on('connection', (ws, req) => {
 function distance(x1, x2, y1, y2) {
   return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
 }
+
+const server = http.createServer(app);
+
+server.on('upgrade', (request, socket, head) => {
+  sockserver.handleUpgrade(request, socket, head, (ws) => {
+    sockserver.emit('connection', ws, request);
+  });
+});
+
+server.listen(port, () => console.log(`Listening on http://localhost:${port}`));
+
 
 function removeFromArray(arr, i) {
   const halfBeforeTheUnwantedElement = arr.slice(0, i);

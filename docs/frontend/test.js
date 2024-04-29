@@ -91,17 +91,17 @@ const winCondition = (gameBoard, players, turn) => {
 const tictactoe = new Game("Tic Tac Toe", 2, 2, gameBoard, new Vector2(800, 400));
 
 const backgroundMap = new TileMap(new Vector2(0,0), backgroundTiles, 64, 32, 32, [
-    11,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,13,5,16,7,7,7,7,7,7,7,7,7,7,7,14,4,4,4,4,16,7,7,7,7,7,7,7,7,7,7,7,14,6,5,6,3,3,3,3,3,3,3,3,3,3,3,10,14,4,16,7,12,3,3,3,3,3,1,3,3,3,3,3,5,6,5,6,3,3,3,3,3,3,3,3,3,9,3,3,5,16,12,3,3,3,3,3,3,3,3,3,3,1,3,3,5,6,5,6,3,3,3,3,3,3,3,3,3,3,3,11,15,6,3,3,9,3,3,3,3,3,3,1,3,3,3,3,5,6,5,6,1,3,3,3,3,3,3,3,3,3,3,5,4,6,3,3,3,3,3,3,3,3,3,1,1,1,3,3,5,6,10,12,1,1,3,3,3,3,3,3,3,3,3,5,4,6,3,3,3,3,3,3,3,3,3,1,1,1,1,3,5,6,2,2,2,1,3,3,3,3,3,3,3,3,3,10,14,6,3,3,3,3,3,3,3,3,1,1,1,1,1,3,5,6,2,2,2,1,3,3,3,3,3,3,3,3,3,3,5,17,13,3,3,3,3,3,3,3,1,1,1,3,1,3,5,6,1,1,1,1,3,3,3,3,3,3,3,3,3,3,10,14,6,3,3,3,3,3,3,3,1,1,1,1,1,3,5,6,1,1,1,1,3,3,3,3,3,3,3,3,3,3,3,5,6,3,3,3,3,3,3,3,1,3,1,1,3,3,5,6,1,1,1,3,3,3,3,3,3,3,3,11,8,8,8,15,17,8,8,8,13,3,3,3,3,3,1,3,3,3,5,6,2,2,2,3,3,3,3,3,3,3,3,5,16,7,7,14,16,7,7,14,6,3,3,3,1,3,3,3,1,3,5,6,2,2,2,1,3,3,3,3,3,3,3,5,6,3,3,10,12,3,3,5,6,3,3,3,3,3,1,3,3,3,5,6,2,2,2,1,3,3,3,3,3,3,3,5,6,3,2,1,1,2,3,5,6,3,3,3,3,3,3,3,3,3,5,6,2,2,2,3,3,3,3,3,3,3,3,5,17,13,1,1,1,1,11,15,6,3,3,3,3,3,3,3,3,3,5,6,11,13,1,3,3,3,3,3,3,3,3,5,16,12,1,1,1,1,10,14,6,2,3,2,3,2,3,2,3,2,5,6,5,6,3,3,3,3,3,3,3,3,3,5,6,3,2,1,1,2,3,5,6,3,3,3,3,3,3,3,3,3,5,6,5,6,3,3,3,3,3,3,3,3,3,5,6,3,3,11,13,3,3,5,6,3,3,3,3,3,3,3,3,3,5,6,5,6,3,3,3,3,3,3,3,3,3,5,17,8,8,15,17,8,8,15,17,13,3,3,3,3,3,3,3,3,5,6,5,6,3,3,11,19,19,19,13,3,3,10,7,7,7,7,7,7,7,14,4,6,3,3,3,3,3,3,3,3,5,6,5,6,3,11,12,1,1,1,10,13,3,3,3,3,3,3,2,3,3,10,14,17,13,3,3,3,3,3,3,3,5,6,5,6,3,18,1,11,19,13,1,18,3,3,3,3,3,3,3,3,3,3,10,14,17,8,8,13,3,3,3,3,5,6,5,6,3,18,1,18,2,18,1,18,3,3,3,3,3,3,2,3,3,3,3,10,7,14,4,17,8,13,3,3,5,6,5,6,3,18,1,10,19,12,1,18,3,3,3,3,3,3,3,3,3,3,3,3,3,5,4,4,4,6,3,3,5,6,5,6,3,10,13,1,1,1,11,12,3,3,3,3,3,3,2,3,3,3,3,3,3,10,14,4,4,6,3,3,5,6,5,6,3,3,10,19,19,19,12,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,10,14,4,17,8,8,15,6,5,6,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,3,3,3,3,3,3,3,3,10,14,4,4,4,4,6,5,6,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,5,16,7,14,4,6,5,6,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,3,3,3,3,3,3,3,11,8,15,6,3,5,4,6,5,17,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,15,4,4,17,8,15,4,6,10,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,12
+    11,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,13,5,16,7,7,7,7,7,7,7,7,7,7,7,14,4,4,4,4,16,7,7,7,7,7,7,7,7,7,7,7,14,6,5,6,3,3,3,3,3,3,3,3,3,3,3,10,14,4,16,7,12,3,3,3,3,3,1,3,3,3,3,3,5,6,5,6,3,3,3,3,3,3,3,3,3,9,3,3,5,16,12,3,3,3,3,3,3,3,3,3,3,1,3,3,5,6,5,6,3,3,3,3,3,3,3,3,3,3,3,11,15,6,3,3,9,3,3,3,3,3,3,1,3,3,3,3,5,6,5,6,1,3,3,3,3,3,3,3,3,3,3,5,4,6,3,3,3,3,3,3,3,3,3,1,1,1,3,3,5,6,10,12,1,1,3,3,3,3,3,3,3,3,3,5,4,6,3,3,3,3,3,3,3,3,3,1,1,1,1,3,5,6,2,2,2,1,3,3,3,3,3,3,3,3,3,10,14,6,3,3,3,3,3,3,3,3,1,1,1,1,1,3,5,6,2,2,2,1,3,3,3,3,3,3,3,3,3,3,5,17,13,3,3,3,3,3,3,3,1,1,1,3,1,3,5,6,1,1,1,1,3,3,3,3,3,3,3,3,3,3,10,14,6,3,3,3,3,3,3,3,1,1,1,1,1,3,5,6,1,1,1,1,3,3,3,3,3,3,3,3,3,3,3,5,6,3,3,3,3,3,3,3,1,3,1,1,3,3,5,6,1,1,1,3,3,3,3,3,3,3,3,11,8,8,8,15,17,8,8,8,13,3,3,3,3,3,1,3,3,3,5,6,2,2,2,3,3,3,3,3,3,3,3,5,16,7,7,14,16,7,7,14,6,3,3,3,1,3,3,3,1,3,5,6,2,2,2,1,3,3,3,3,3,3,3,5,6,3,3,5,6,3,3,5,6,3,3,3,3,3,1,3,3,3,5,6,2,2,2,1,3,3,3,3,3,3,3,5,6,3,2,1,1,2,3,5,6,3,3,3,3,3,3,3,3,3,5,6,2,2,2,3,3,3,3,3,3,3,3,5,17,8,1,1,1,1,8,15,6,3,3,3,3,3,3,3,3,3,5,6,5,6,1,3,3,3,3,3,3,3,3,5,16,7,1,1,1,1,7,14,6,2,3,2,3,2,3,2,3,2,5,6,5,6,3,3,3,3,3,3,3,3,3,5,6,3,2,1,1,2,3,5,6,3,3,3,3,3,3,3,3,3,5,6,5,6,3,3,3,3,3,3,3,3,3,5,6,3,3,5,6,3,3,5,6,3,3,3,3,3,3,3,3,3,5,6,5,6,3,3,3,3,3,3,3,3,3,5,17,8,8,15,17,8,8,15,17,13,3,3,3,3,3,3,3,3,5,6,5,6,3,3,11,19,19,19,13,3,3,10,7,7,7,7,7,7,7,14,4,6,3,3,3,3,3,3,3,3,5,6,5,6,3,11,12,1,1,1,10,13,3,3,3,3,3,3,2,3,3,10,14,17,13,3,3,3,3,3,3,3,5,6,5,6,3,18,1,11,19,13,1,18,3,3,3,3,3,3,3,3,3,3,10,14,17,8,8,13,3,3,3,3,5,6,5,6,3,18,1,18,2,18,1,18,3,3,3,3,3,3,2,3,3,3,3,10,7,14,4,17,8,13,3,3,5,6,5,6,3,18,1,10,19,12,1,18,3,3,3,3,3,3,3,3,3,3,3,3,3,5,4,4,4,6,3,3,5,6,5,6,3,10,13,1,1,1,11,12,3,3,3,3,3,3,2,3,3,3,3,3,3,10,14,4,4,6,3,3,5,6,5,6,3,3,10,19,19,19,12,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,10,14,4,17,8,8,15,6,5,6,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,3,3,3,3,3,3,3,3,10,14,4,4,4,4,6,5,6,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,5,16,7,14,4,6,5,6,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,3,3,3,3,3,3,3,11,8,15,6,3,5,4,6,5,17,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,15,4,4,17,8,15,4,6,10,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,12
 ]);
 const SpeechBubbleSprite = new NineSlicedSprite("speechBubble.png"  , [16, 16, 16, 24]);
 
 // WebSocket Stuff
-const webSocket = new WebSocket('ws://localhost:443/');
-Resources.ws = webSocket;
+const webSocket = new WebSocket('ws://localhost:3000/');
+
+
 
 webSocket.onmessage = (event) => {
     var obj = JSON.parse(event.data);
-
     if ("expired" in obj) {
         // Handles removing a disconnected player from the screen and printing a leave message
         let p = otherPlayers.findIndex((element) => {
@@ -139,13 +139,19 @@ webSocket.onmessage = (event) => {
     } else if ("invalidName" in obj) {
         // Handles recieving username selction errors and verification
         if (obj.invalidName) {
+            
+            console.log("Username is invalid!");
             receiveMessage(obj.usernameError);
             loginState = "username";
-            const textBox = textInputs.find((element) => element.textInput.getAttribute("placeholder") == "Username");
-            textBox.clearTextbox();
+          //  const textBox = textInputs.find((element) => element.textInput.getAttribute("placeholder") == "Username");
+          document.getElementById("usernameInput").value = "";
+            document.getElementById("container");
+            
         } else {
+            console.log("hi");
             loginState = "usernameVerified";
             const textBox = textInputs.find((element) => element.textInput.getAttribute("placeholder") == "Username");
+            console.log("set user after uV");
             setUser(obj.usr, textBox);
         }
     } else if ("joinRoom" in obj) {
@@ -204,12 +210,18 @@ class TextInput {
         this.textDiv.append(this.textInput);
         
         if (hasButton) {
-            this.textButton = document.createElement("button");
+           /* this.textButton = document.createElement("button");
             this.textButton.setAttribute("class", "inputButton");
             this.textButton.addEventListener("click", () => {this.sendText()});
 
-            this.textButton.textContent = "🠊";
+            this.textButton.textContent = "🠊    ";
             this.textDiv.append(this.textButton);
+            */
+            this.textButton = document.getElementById("loginButton"); 
+            this.textButton.addEventListener("click", () => {this.sendText()});
+            //this.textDiv.append(this.textButton);
+            
+
         }
         
         this.constructor.textInputs.push(this);
@@ -225,10 +237,6 @@ class TextInput {
         if (this.textInput.value.length > 0) {
             eval(this.sendFunction+"(this.textInput.value, this)");
         }
-    }
-
-    clearTextbox() {
-        this.textInput.value = "";
     }
 
     setDisabled(state) {
@@ -250,22 +258,33 @@ class World {
     static spawnPos = new Vector2(0, 0);
 }
 
-class Cosmetic extends GameObject {
-    order;
-    halfHeight;
-    halfWidth;
-    img;
-    player;
+class PlayerCosmetic {
+    color;
+    sprite;
+    flippedSprite;
 
-    constructor(id, image, player) {
-        super("COSMET-" + id, player.pos);
-        this.img = image;
+    /**
+     * 
+     * @param {String} spritePath 
+     * @param {String} flippedSpritePath 
+     */
+    constructor (spritePath, flippedSpritePath) {
+        this.sprite = new Sprite(spritePath);
+        this.flippedSprite = new Sprite(flippedSpritePath)
+    }
+
+    draw(pos, size, flipped = false) {
+        if (!flipped) {
+            this.sprite.draw(pos, size);
+        } else {
+            this.flippedSprite.draw(pos, size);
+        }
     }
 }
 
 class Player extends GameObject {
-    static playerSizeX = 50;
-    static playerSizeY = 50;
+    static playerSizeX = 75;
+    static playerSizeY = 75;
     static playerMoveSpeed = 5;
     expired = false;
     destination = Vector2.zero;
@@ -275,11 +294,14 @@ class Player extends GameObject {
     speechBubbles = [];
     color;
     cosmetics = [];
+    static baseCosmetics = [new PlayerCosmetic("player/base.png", "player/base_flipped.png"), new PlayerCosmetic("player/flower.png", "player/flower_flipped.png")];
+    flipped = false;
 
-    constructor(id, pos, username, color) {
+    constructor(id, pos, username, color, cosmetics = Player.baseCosmetics) {
         super ("PLAYER-"+username, pos);
         this.username = username;
         this.color = color;
+        this.cosmetics = cosmetics;
     }
 
     setCosmetics(cosmeticArr) {
@@ -296,17 +318,20 @@ class Player extends GameObject {
         this.velX = Math.cos(angle)*this.constructor.playerMoveSpeed;
         this.velY = Math.sin(angle)*this.constructor.playerMoveSpeed;
         
-        /*
-        receiveMessage("Vel X: " + truncateNumber(this.velX,1) + "   Vel Y: " + truncateNumber(this.velY,1));
-        receiveMessage("Angle: " + truncateNumber(angle,1));
-        receiveMessage("Cam X: " + truncateNumber(activeCamera.x,1) + "   Cam Y: " + truncateNumber(activeCamera.y,1)+"\n");
-        */
+        this.flipped = this.velX < 0;
     }
     
     update(deltaTime) {
         if (this.velX != 0 && this.velY != 0) {
             let nextX = this.x + (this.velX*deltaTime);
             let nextY = this.y + (this.velY*deltaTime);
+            let nextPos = new Vector2(nextX, nextY);
+
+            StaticConvexCollider.colliders.forEach((i) => {
+                if (i.isColliding(nextPos)) {
+                    this.destination = this.pos;
+                }
+            })
             
             // Checks if current X position is further than your "destination"
             // Stops you if it is, keeps moving forward otherwise
@@ -379,23 +404,28 @@ class Player extends GameObject {
         if (!this.expired) {
             ctx.save();
 
-            ctx.fillStyle = this.color;
-            ctx.fillRect(
-                this.pos.screenPos.x - (this.constructor.playerSizeX * activeCamera.zoom) / 2, 
-                this.pos.screenPos.y - (this.constructor.playerSizeY * activeCamera.zoom) / 2, 
-                this.constructor.playerSizeX * activeCamera.zoom, 
-                this.constructor.playerSizeY * activeCamera.zoom
-            );
+            let playerDrawPos = new Vector2(this.left, this.top).screenPos;
+            this.cosmetics.forEach((i) => {
+                i.draw(playerDrawPos, Player.playerSizeX * activeCamera.zoom, this.flipped);
+            })
 
             ctx.fillStyle = "#000000";
             ctx.textAlign = 'center';
             ctx.scale(activeCamera.zoom, activeCamera.zoom);
             ctx.font = this.constructor.font;
         
-            ctx.fillText("<" + this.username + ">", this.pos.screenPos.x / activeCamera.zoom, (this.pos.screenPos.y + (this.constructor.playerSizeY * 1.1 * activeCamera.zoom)) / activeCamera.zoom);
+            ctx.fillText("<" + this.username + ">", this.pos.screenPos.x / activeCamera.zoom, (this.pos.screenPos.y + (this.constructor.playerSizeY * 0.8 * activeCamera.zoom)) / activeCamera.zoom);
 
             ctx.restore();
         }
+    }
+
+    get top () {
+        return this.pos.y - (this.constructor.playerSizeY / 2);
+    }
+
+    get left () {
+        return this.pos.x - (this.constructor.playerSizeX / 2);
     }
 }
 
@@ -462,35 +492,136 @@ class SpeechBubble {
     }
 }
 
+class Prop extends GameObject {
+    sprite;
+    size;
+    center;
+    centerProportion;
+    ready = false;
+    collider;
+
+    /**
+     * 
+     * @param {Sprite} sprite Sprite object representing the image of this prop
+     * @param {Vector2} pos Position in the world to draw this prop, drawing from center
+     * @param {Vector2} center Center of the sprite, affecting z-sort position and where this is drawn from
+     * @param {Vector2} size How large to draw this prop
+     */
+    constructor (sprite, pos, center, size) {
+        super("PROP-"+sprite.image.src, pos);
+
+        this.sprite = sprite;
+        this.size = size;
+        this.drawOffset = Vector2.zero;
+
+        //this.center = center;
+        setTimeout(() => {
+            this.scaler = new Vector2(
+                ((this.size.x * center.x) / this.sprite.width), 
+                ((this.size.y * center.y) / this.sprite.height)
+                )
+            this.ready = true;
+            console.log(this.scaler)
+        }, 10);
+    }
+
+    draw() {
+        if (this.ready) {
+            this.sprite.draw(new Vector2(
+                this.pos.x - (this.scaler.x), // Correct position offset from scaling
+                this.pos.y - (this.scaler.y)
+            ).screenPos, this.size.x * activeCamera.zoom, this.size.y * activeCamera.zoom);
+        }
+    }
+
+    addCollider(relativePoints) {
+        this.collider = new StaticConvexCollider(this.pos, relativePoints);
+    }
+}
+
+class Abyss {
+    static bgImage;
+    static bgImageLoaded = false;
+    static bgPattern;
+
+    static xOffset;
+    static moveScale;
+
+    static init() {
+        // Declare that the abyss isn't loaded yet
+        Abyss.bgImageLoaded = false;
+
+        // Declare its starting offset and speed
+        Abyss.xOffset = 0;
+        Abyss.moveScale = 0.1;
+
+        // Prepare image and update flag once ready
+        Abyss.bgImage = new Image();
+        Abyss.bgImage.onload = function () {
+
+            // Create pattern for filling rect when drawn
+            Abyss.bgPattern = ctx.createPattern(Abyss.bgImage, "repeat");
+            Abyss.bgImageLoaded = true;
+        }
+        Abyss.bgImage.src = "./sprites/bg.png";
+    }
+
+    static draw(delta) {
+        if (Abyss.bgImageLoaded) {
+            ctx.save();
+            let offsetx = activeCamera.pos.x * -Abyss.moveScale;
+            let offsety = activeCamera.pos.y * -Abyss.moveScale;
+            ctx.translate(offsetx, offsety);
+
+            ctx.fillStyle = Abyss.bgPattern;
+            ctx.fillRect(-offsetx, -offsety, gameCanvas.width - offsetx, gameCanvas.height - offsety)
+            ctx.restore();
+        }
+    }
+}
+
 //Called when the page is finished loading
+
 document.addEventListener("readystatechange", (e) => {
+
+    
     if (e.target.readyState === "complete") {
-        const foundInputs = document.getElementsByClassName("inputDiv");
+      //  setUser(document.getElementById("usernameInput"));
+      const textInput = document.getElementById('usernameInput');
+      const submitButton = document.getElementById('loginButton');
+      
+      textInput.addEventListener('keydown', function(event) {
+          if (event.key === 'Enter') {
+              submitButton.click();
+          }
+      });
+
+            const foundInputs = document.getElementById("usernameInput");
         for (let i = 0; i < foundInputs.length; i++) {
             let tI = new TextInput(
-                foundInputs[i],
+               foundInputs[i],
                 foundInputs[i].getAttribute("placeholder"),
                 foundInputs[i].getAttribute("func"),
-                foundInputs[i].getAttribute("hasButton"),
-                foundInputs[i].getAttribute("reqConnection"),
-                foundInputs[i].getAttribute("minLength"),
-                foundInputs[i].getAttribute("maxLength")
+                //foundInputs[i].getAttribute("hasButton"),
+                //foundInputs[i].getAttribute("reqConnection"),
+               foundInputs[i].getAttribute("minLength"),
+               foundInputs[i].getAttribute("maxLength")
             );
             textInputs.push(tI);
         }
-
+         document.getElementById("usernameInput").value = ""
         let chatInput = TextInput.findInputByID("chatInput");
-        chatInput.setDisabled(true);
-        
+    
+      // chatInput.setDisabled(true);
         addCanvas();
         drawText(100, 100, "Connecting...");
     }
 
 });
 
-function sendMessage(msg, textbox) {
+function sendMessage(msg) {
     if (msg.length > 0) {
-        textbox.clearTextbox();
+        document.getElementById("chatInput").value = ""; 
         if (connected) {
             webSocket.send(JSON.stringify({
                 id: userPlayer.username,
@@ -510,32 +641,53 @@ function receiveMessage(msg) {
 
 function updateUser(e) {
     if (e.key=="Enter") {
+        console.log("enter key pressed");
         setUser();
     }
 }
 
-function setUser(usr, textbox) {
+
+
+
+function setUser(usr) {
+    
+    console.log("setUser called");
     if (!connected) {
         if (loginState == "username") {
-            if (usr.length > 0) {
+            console.log(usr);
+            console.log("length:" + usr.length);
+            if (usr.length > 3 && usr.length < 20){
                 webSocket.send(JSON.stringify({
                     id: `${usr}`
                 }));
+                loginState = "awaitingVerification";
             }
-            loginState = "awaitingVerification";
         } else if (loginState == "usernameVerified") {
             userPlayer = new Player(usr, World.spawnPos, usr, "#FF0000");
+            document.querySelector(".popup").style.display = "none";
+            document.querySelector(".container").style.display="none";
             loginState = "playing";
             receiveMessage("Username set to "+userPlayer.username);
             cameraList.push(new Camera("playerCam", Vector2.zero, 0.01, [-1024, -1024, 1024, 1024]));
             activeCamera = cameraList[cameraList.length-1];
-            textbox.setDisabled(true);
-            TextInput.findInputByID("chatInput").setDisabled(false);
-            
+            //textbox.setDisabled(true);
+            //console.log(findInputByID)
+          //  TextInput.findInputByID("chatInput").setDisabled(false);
+          document.getElementById('chatInput').addEventListener('keypress', function(e){
+            console.log("TESSTTTT");    
+            if(e.key==="Enter"){
+                console.log("inside ekey pressed");
+                document.getElementById('sendMessageButton').click(); 
+                }
+        }
+        )
             connect();
             startAnimating();
         }
+
+        console.log("Final login state: " + loginState);
     }
+
 }
 
 function connect() {
@@ -552,16 +704,36 @@ function connect() {
 }
 
 function startAnimating() {
+    Abyss.init();
+
+    let smallCollider = [
+        Vector2.up.mul(20), 
+        Vector2.left.mul(50), 
+        Vector2.down.mul(20), 
+        Vector2.right.mul(50)
+    ];
+    let treeCollider = [
+        Vector2.up.mul(20), 
+        Vector2.left.mul(50), 
+        Vector2.down.mul(20), 
+        Vector2.right.mul(50)
+    ];
+
     let treeA = new Sprite("tree.png");
     let treeB = new Sprite("tree2.png");
+    let pillar_1 = new Sprite("pillar_1.png");
+    let pillar_2 = new Sprite("pillar_2.png");
+    let pillar_3 = new Sprite("pillar_3.png");
+    let pillar_4 = new Sprite("pillar_4.png");
     let tictactoeBoard = new Sprite("minigame/tictactoe/tictactoeBoardInteract.png");
     gameProps.push(new GameProp(tictactoeBoard, new Vector2(500, -225), new Vector2(50, 42), 100 * activeCamera.zoom, 60, tictactoe));
-    new Prop(treeB, new Vector2(-950, -600), new Vector2(0, 240), 300*activeCamera.zoom);
-    new Prop(treeA, new Vector2(-500, -450), new Vector2(0, 250), 300*activeCamera.zoom);
-    new Prop(treeB, new Vector2(-150, -1150), new Vector2(0, 340), 400*activeCamera.zoom);
-    new Prop(treeA, new Vector2(-800, -1100), new Vector2(0, 300), 350*activeCamera.zoom);
-    new Prop(treeA, new Vector2(100, -850), new Vector2(0, 250), 300*activeCamera.zoom);
-    new Prop(treeA, new Vector2(775, 575), new Vector2(0, 200), 250*activeCamera.zoom);
+    new Prop(treeB, new Vector2(-800, -450), new Vector2(256, 420), new Vector2(300, 300)).addCollider(treeCollider);
+    new Prop(treeA, new Vector2(-400, -250), new Vector2(170, 420), new Vector2(300, 300)).addCollider(treeCollider);
+    new Prop(treeB, new Vector2(50, -850), new Vector2(256, 420), new Vector2(500, 500)).addCollider([Vector2.up.mul(20), Vector2.left.mul(50), Vector2.down.mul(20), Vector2.right.mul(100)]);
+    new Prop(treeA, new Vector2(-650, -820), new Vector2(170, 420), new Vector2(350, 350)).addCollider(treeCollider);
+    new Prop(treeA, new Vector2(100, -450), new Vector2(170, 420), new Vector2(300, 300)).addCollider(treeCollider);
+    new Prop(treeA, new Vector2(775, 575), new Vector2(170, 420), new Vector2(300, 300)).addCollider(treeCollider);
+    new Prop(pillar_1, new Vector2(96, 96), new Vector2(256, 500), new Vector2(128, 105)).addCollider(smallCollider);
     
     startTime = Date.now(); 
     drawScreen();
@@ -572,10 +744,17 @@ function update() {
 
     ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
 
+    Abyss.draw(1);
+    //ctx.save();
+    //ctx.fillStyle = Abyss.bgPattern;
+    //ctx.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
+    //ctx.restore();
+
     backgroundMap.draw();
 
     GameObject.objs.sort(GameObject.sortVertically);
     GameObject.objs.forEach((element) => {
+        
         element.draw();
     })
     
@@ -672,3 +851,6 @@ function onClick(event, canvasPos) {
         }
     }
 }
+
+
+

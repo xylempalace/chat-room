@@ -532,7 +532,7 @@ class Button {
      */
     processClick(position, execute, min, max) {
         var input = document.getElementById("gameDiv");
-        if (input !== null) {
+        if (input !== null && this.windowState !== null) {
             input.remove();
         }
         var condition = position.x >= this.origin.x && position.y >= this.origin.y && position.x <= this.origin.x + this.width && position.y <= this.origin.y + this.height;

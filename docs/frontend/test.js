@@ -678,7 +678,7 @@ function startAnimating() {
     let pillar_3 = new Sprite("pillar_3.png");
     let pillar_4 = new Sprite("pillar_4.png");
     let tictactoeBoard = new Sprite("minigame/tictactoe/tictactoeBoardInteract.png");
-    gameProps.push(new GameProp(tictactoeBoard, new Vector2(500, -225), new Vector2(50, 42), new Vector2(100, 100), 60, tictactoe));
+    gameProps.push(new GameProp(tictactoeBoard, new Vector2(500, -225), new Vector2(32, 32), new Vector2(100, 100), 60, tictactoe));
     new Prop(treeB, new Vector2(-800, -450), new Vector2(256, 420), new Vector2(300, 300)).addCollider(treeCollider);
     new Prop(treeA, new Vector2(-400, -250), new Vector2(170, 420), new Vector2(300, 300)).addCollider(treeCollider);
     new Prop(treeB, new Vector2(50, -850), new Vector2(256, 420), new Vector2(500, 500)).addCollider([Vector2.up.mul(20), Vector2.left.mul(50), Vector2.down.mul(20), Vector2.right.mul(100)]);

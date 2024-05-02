@@ -5,7 +5,9 @@
 const express = require('express')
 const app = express()
 const { WebSocketServer } = require('ws')
-const sockserver = new WebSocketServer({ port: 443 })
+const http = require('http');
+
+const sockserver = new WebSocketServer({ clientTracking: true, noServer: true })
 
 // Creates a unique uid
 sockserver.getUniqueID = function () {
@@ -97,10 +99,6 @@ app.get('/*', (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
-});
-
 // Socket Server Code
 sockserver.on('connection', (ws, req) => {
   console.log(`New client connected with IP ${req.socket.remoteAddress}`); 
@@ -117,7 +115,8 @@ sockserver.on('connection', (ws, req) => {
       });
       delete clients[ws.id];
     } catch (e) {
-      console.log(`Disconnect failed! Error: \n${e}`);
+      console.log("Disconnect failed! Error:");
+      console.log(e);
     }
   });
 
@@ -176,7 +175,8 @@ sockserver.on('connection', (ws, req) => {
         validName = false;
         ws.send(JSON.stringify({
           invalidName: true,
-          usernameError: "Invalid Username"
+          usernameError: "Invalid Username",
+          
         }));
       }
 
@@ -214,3 +214,13 @@ sockserver.on('connection', (ws, req) => {
 function distance(x1, x2, y1, y2) {
   return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
 }
+
+const server = http.createServer(app);
+
+server.on('upgrade', (request, socket, head) => {
+  sockserver.handleUpgrade(request, socket, head, (ws) => {
+    sockserver.emit('connection', ws, request);
+  });
+});
+
+server.listen(port, () => console.log(`Listening on http://localhost:${port}`));

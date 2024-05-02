@@ -357,6 +357,16 @@ sockserver.on('connection', (ws, req) => {
           });
         }
       }
+    } else if ("startRoom" in obj) {
+      sockserver.clients.forEach(client => {
+        for (var i = 0; i < gameRooms[obj.roomID][0].length; i++) {
+          if (client.id === gameRooms[obj.roomID][0][i]) {
+            client.send(JSON.stringify({
+              startRoom: obj.roomID
+            }));
+          }
+        }
+      });
     } else if ("id" in obj) {
       // When a client selects a username
       var validName = true;

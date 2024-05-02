@@ -414,21 +414,24 @@ class UiGameMenu {
         }));
 
         this.buttons.push(new Button(new Vector2(this.center.x, this.center.y - 50 * activeCamera.zoom), 180, 40, "#ffb300", "PUBLIC", 30, 1, 4, () => Resources.owner && Resources.currentRoomID.includes("pub-"), () => {
-            console.log("pub button click");
             Resources.ws.send(JSON.stringify({
                 updateRoom: Resources.currentRoomID,
                 new: "priv-"
             }));
         }));
         this.buttons.push(new Button(new Vector2(this.center.x, this.center.y - 50 * activeCamera.zoom), 180, 40, "#00a2ff", "PRIVATE", 30, 1, 4, () => Resources.owner && Resources.currentRoomID.includes("priv-"), () => {
-            console.log("priv button click");
             Resources.ws.send(JSON.stringify({
                 updateRoom: Resources.currentRoomID,
                 new: "pub-"
             }));
         }));
 
-        this.buttons.push(new Button(new Vector2(this.center.x, this.center.y + 50 * activeCamera.zoom), 180, 40, "#20ff00", "PLAY", 30, 1, 3, (playersMin) => Resources.owner && Resources.playerNum >= playersMin));
+        this.buttons.push(new Button(new Vector2(this.center.x, this.center.y + 50 * activeCamera.zoom), 180, 40, "#20ff00", "PLAY", 30, 1, 3, (playersMin) => Resources.owner && Resources.playerNum >= playersMin, () => {
+            Resources.ws.send(JSON.stringify({
+                startRoom: true,
+                roomID: Resources.currentRoomID
+            }));
+        }));
     }
 
     /**

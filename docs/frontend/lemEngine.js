@@ -707,14 +707,9 @@ function drawScreen() {
     startTime = Date.now();
     var fpsDecimalPlaces = 1;
     var measuredFPS = ((startTime-beginTime))*(fpsDecimalPlaces*10);
-    drawText(25, 25, "FPS: " + truncateNumber(measuredFPS, fpsDecimalPlaces));
-    drawText(25, 50, "Target MSPF: "+ truncateNumber(fpms, fpsDecimalPlaces)); //Target miliseconds per frame
     
     frameLength = Math.min(fpms-(Date.now()-beginTime),fpms);
 
-    //Updates FPS graph
-    DebugGraph.updateFPSGraph(frameLength);
-    DebugGraph.drawFPSGraph(0, 30, 250, 100, 3); 
 }
 
 function update() {}

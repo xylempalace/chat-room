@@ -80,7 +80,7 @@ webSocket.onmessage = (event) => {
         } else {
             otherPlayers.push(new Player(obj.id, new Vector2(obj.posX, obj.posY), obj.id, "#FF0000"));
         }
-    } else if ("invalidName" in obj) {
+    } else if ("invalidName" in obj || obj.invalidName) {
         // Handles recieving username selction errors and verification
         if (obj.invalidName) {
             

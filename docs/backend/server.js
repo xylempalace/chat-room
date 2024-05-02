@@ -127,9 +127,19 @@ sockserver.on('connection', (ws, req) => {
           }
         }
       }
-      if (del !== null && gameRooms[del][0].length <= 0) {
-        delete gameRooms[del];
-        console.log(gameRooms);
+      if (del !== null) {
+        if (gameRooms[del][0].length <= 0) {
+          delete gameRooms[del];
+          console.log(gameRooms);
+        } else {
+          sockserver.clients.forEach(client => {
+            if (client.id === gameRooms[del][0][0]) {
+              client.send(JSON.stringify({
+                owner: true
+              }));
+            }
+          });
+        }
       }
     } catch (e) {
       console.log("Disconnect failed! Error:");
@@ -264,7 +274,9 @@ sockserver.on('connection', (ws, req) => {
     } else if ("updateRoom" in obj) {
       if (obj.updateRoom in gameRooms) {
         var newID = obj.new + obj.updateRoom.substring(obj.updateRoom.indexOf("-") + 1);
+        console.log(newID);
         gameRooms[newID] = [gameRooms[obj.updateRoom][0], gameRooms[obj.updateRoom][1], gameRooms[obj.updateRoom][2]];
+        console.log(gameRooms);
         delete gameRooms[obj.updateRoom];
         console.log(gameRooms);
         for (var i = 0; i < gameRooms[newID][0].length; i++) {
@@ -355,9 +367,7 @@ server.listen(port, () => console.log(`Listening on http://localhost:${port}`));
 
 
 function removeFromArray(arr, i) {
-  const halfBeforeTheUnwantedElement = arr.slice(0, i);
-
-  const halfAfterTheUnwantedElement = arr.splice(i + 1);
-
+  var halfBeforeTheUnwantedElement = arr.slice(0, i);
+  var halfAfterTheUnwantedElement = arr.splice(i + 1);
   return halfBeforeTheUnwantedElement.concat(halfAfterTheUnwantedElement);
 }

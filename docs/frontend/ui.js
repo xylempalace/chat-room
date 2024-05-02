@@ -414,12 +414,14 @@ class UiGameMenu {
         }));
 
         this.buttons.push(new Button(new Vector2(this.center.x, this.center.y - 50 * activeCamera.zoom), 180, 40, "#ffb300", "PUBLIC", 30, 1, 4, () => Resources.owner && Resources.currentRoomID.includes("pub-"), () => {
+            console.log("pub button click");
             Resources.ws.send(JSON.stringify({
                 updateRoom: Resources.currentRoomID,
                 new: "priv-"
             }));
         }));
         this.buttons.push(new Button(new Vector2(this.center.x, this.center.y - 50 * activeCamera.zoom), 180, 40, "#00a2ff", "PRIVATE", 30, 1, 4, () => Resources.owner && Resources.currentRoomID.includes("priv-"), () => {
+            console.log("priv button click");
             Resources.ws.send(JSON.stringify({
                 updateRoom: Resources.currentRoomID,
                 new: "pub-"
@@ -449,28 +451,36 @@ class UiGameMenu {
      * @param {Vector2} position takes in the position of the mouse click
      * @returns {boolean} returns true if game window should close, false if otherwise
     */
-   processClick(position) {
-       if (this.buttons[0].processClick(position, (condition) => {return !condition;})) {
-           return true;
+    processClick(position) {
+        if (this.buttons[0].processClick(position, (condition) => {return !condition;})) {
+            // Returns true if the click happened outside of the menu and returns true to close the window
+            return true;
         } else {
+            // Start at index 1 and go through each button
             for (var i = 1; i < this.buttons.length; i++) {
-                if (this.buttons[i].windowState === this.windowState) {
+                // Figures out if the button is even visible
+                if (this.buttons[i].windowState === this.windowState && (this.buttons[i].extraCondition === null || this.buttons[i].extraCondition())) {
+                    // Checks if the button was clicked and runs any code specific to the button
                     var nextState = this.buttons[i].processClick(position, (condition, nextState, windowState) => {
                         if (condition) {
                             return nextState;
                         } else {
                             return windowState;
                     }}, this.source.minPlayers, this.source.maxPlayers);
+
+                    // Checks if the window state changed and if so change the state of the menu and return false
                     if (nextState !== this.windowState) {
                         this.windowState = nextState;
                         return false;
                     }
-                    }
                 }
-                return false;
             }
+
+            // If mouse is outside of any valid buttons, return false
+            return false;
         }
     }
+}
     
 class Button {
     width;

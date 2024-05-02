@@ -21,24 +21,84 @@ addEventListener("resize", (event) => {
     })
 });
 
+class LMath {
+    static mod(n, d) {
+        return ((n % d) + d) % d;
+    }
+
+    static clamp(val, min, max) {
+        if (val > max) {
+            return max;
+        }
+        return Math.max(min, val);
+    }
+}
+
 class Vector2 {
-    
+   
     x;
     y;
-    
+   
+    static zero = new Vector2( 0, 0);
+    static up   = new Vector2( 0,-1);
+    static down = new Vector2( 0, 1);
+    static right= new Vector2( 1, 0);
+    static left = new Vector2(-1, 0);
+   
     constructor(x, y) {
         this.x = x;
         this.y = y;
     }
-    
-    get screenToWorldPos() {
+   
+    screenToWorldPos() {
         let v = new Vector2(
             ((this.x + (activeCamera.pos.x * activeCamera.zoom)) - activeCamera.halfWidth)  / activeCamera.zoom,
             ((this.y + (activeCamera.pos.y * activeCamera.zoom)) - activeCamera.halfHeight) / activeCamera.zoom
         );
         return v;
     }
+ 
+    /**
+     * Adds this vector to vector v, does not effect the original vector
+     * @param {Vector2} v component
+     * @returns {Vector2} The sum x and y values between the two vectors
+     */
+    add (v) {
+        let o = new Vector2(this.x + v.x, this.y + v.y);
+        return o;
+    }
+ 
+    /**
+     * Subtracts this vector by vector v, does not effect the original vector
+     * @param {Vector2} v Subtrahend
+     * @returns {Vector2} The difference of x and y values between the two vectors
+     */
+    sub (v) {
+        let o = new Vector2(this.x - v.x, this.y - v.y);
+        return o;
+    }
     
+    /**
+     * Scales the vector by number n, does not effect original vector
+     * @param {Number} n 
+     * @returns {Vector2} The scaled vector
+     */
+    mul (n) {
+        let o = new Vector2(this.x * n, this.y * n);
+        return o;
+    }
+
+    /**
+     * Divides the vector by number n, does not effect original vector
+     * o = (x/n, y/n)
+     * @param {Number} n 
+     * @returns {Vector2} The divided vector
+     */
+    div (n) {
+        let o = new Vector2(this.x / n, this.y / n);
+        return o;
+    }
+ 
     get screenPos() {
         let v = new Vector2(
             (activeCamera.zoom * this.x + activeCamera.halfWidth)  - (activeCamera.pos.x * activeCamera.zoom),
@@ -46,20 +106,19 @@ class Vector2 {
         );
         return v;
     }
-    
+   
     get normalized() {
         let a = Math.atan2(this.y, this.x);
         return new Vector2(Math.cos(a), Math.sin(a));
     }
-
+ 
+    get magnitude() {
+        return Math.sqrt((this.x * this.x) + (this.y * this.y));
+    }
+ 
     get toString() {
         return "X: " + truncateNumber(this.x, 1) + "   Y: " + truncateNumber(this.y, 1);
     }
-
-    static get zero() {
-        return new Vector2(0,0);
-    }
-
 }
 
 class GameObject {
@@ -127,6 +186,259 @@ class NineSlicedSprite extends Sprite {
         foreach ((element) => {
             ctx.drawImage(this.image, element[0], element[1], element[2], element[3], pos.x + element[0], pos.y + element[1], s * element[2], s * element[3]);
         })
+    }
+}
+
+
+class ColliderEdge {
+
+    start;
+    end;
+ 
+    angle;
+
+    normalQuad;
+    normalAngle;
+   
+    static renderNormals = true;
+    static renderPlane = true;
+ 
+    debugFlag = false;
+   
+    /**
+     * Creates a new edge between two points, with the inside edge being determined as the clockwise perpendicular angle to this angle
+     * @param {Vector2} start Sets the start of the edge
+     * @param {Vector2} end End of the edge
+     */
+    constructor (start, end) {
+        
+        this.start = start;
+        this.end = end;
+
+        this.pos = start;
+
+        let d = this.start.sub(this.end); // Find the difference between our start and end
+        this.angle = Math.atan2(d.y, d.x); // Use that difference to calculate the angle of this line
+
+        this.normalAngle = this.angle - (Math.PI / 2);
+        this.normalQuad = LMath.mod(Math.floor(this.normalAngle * 0.6366197724), 4) + 1; // Calculate the quadrant the plane's normal will be facing towards
+
+    }
+   
+    /**
+     * Calculates Y position of this slope based on X
+     * @param {Number} x
+     * @returns The Y position on the slope of this plane at position X
+     */
+    calc(x) {
+        let val = x - this.pos.x;
+        val *= Math.tan(this.angle);
+        val += this.pos.y;
+        return val;
+    }
+   
+    /**
+     * Calculates X position of this slope based on Y
+     * @param {Number} y
+     * @returns The X position on the slope of this plane at position Y
+     */
+    invCalc(y) {
+        let val = y - this.pos.y;
+        val /= Math.tan(this.angle);
+        val += this.pos.x;
+        return val;
+    }
+   
+    /**
+     *
+     * @param {Vector2} point Point to evaluate based on its position
+     * @returns {boolean} Returns true if the point is colliding with the plane
+     */
+    isColliding(point) {
+ 
+        //Assume that the point will not be within the plane
+        let x_collide = false;
+        let y_collide = false;
+ 
+        // If plane faces up,
+        if (this.normalQuad == 3 || this.normalQuad == 4) {
+            // Check if point is beneath plane
+            y_collide = this.calc(point.x) < point.y;
+ 
+        // Otherwise the plane faces down
+        } else {
+            // Check if point is above plave
+            y_collide = this.calc(point.x) > point.y;
+        }
+ 
+        // If plane is in 1 or 4
+        if(this.normalQuad == 1 || this.normalQuad == 4) {
+            // Check if point is to the left of the plane
+            x_collide = this.invCalc(point.y) > point.x;
+ 
+        // Otherwise plane is in quadrant 2 or 3
+        } else {
+            // Check if point is to the right of the plane
+            x_collide = this.invCalc(point.y) < point.x;
+        }
+ 
+        // If the point is colliding on both the x and y planes, return true
+        return (x_collide && y_collide);
+    }
+   
+    draw() {
+        if(this.renderPlane) {
+            if (this.debugFlag) {
+                ctx.fillStyle = "red";
+            }
+ 
+            ctx.beginPath(); // Start a new line
+ 
+            // Calculate where to start the line
+                // These two calculations could better account for slopes that have very small y components
+            if (Math.abs(Math.sin(this.angle)) > 0.00005) {
+                ctx.moveTo(
+                    this.invCalc(0),
+                    0 // 0 because we are drawing from the top side of the screen
+                    )
+ 
+                // Calculate where to end the line
+                ctx.lineTo(
+                    this.invCalc(1080),
+                    1080 // 1080 because we are assuming that the viewport ends after 1080 pixels
+                    );
+            } else {
+                ctx.moveTo(
+                    0,
+                    this.calc(0) // 0 because we are drawing from the top side of the screen
+                    )
+ 
+                // Calculate where to end the line
+                ctx.lineTo(
+                    1920,
+                    this.calc(1920) // 1920 because we are assuming that the viewport ends after 1080 pixels
+                    );
+            }
+ 
+            ctx.stroke(); // Render the line
+ 
+            if (PlaneComponent.renderNormals) {
+                ctx.beginPath();
+                ctx.arc(this.pos.x, this.pos.y, 20, 0, 2 * Math.PI);
+                ctx.stroke();
+               
+                ctx.beginPath();
+                ctx.moveTo(this.pos.x, this.pos.y);
+                ctx.lineTo(this.pos.x + (Math.cos(this.normalAngle) * 50), this.pos.y + (Math.sin(this.normalAngle) * 50));
+                ctx.stroke();
+            }
+ 
+            if (this.debugFlag) {
+                ctx.fillStyle = "black";
+                this.debugFlag = false;
+            }
+        }
+    }
+}
+
+class StaticConvexCollider  {
+
+    static colliders = []
+
+    points = []
+    edges = []
+
+    // Rough bounds for cheap collision detection
+    rt //rough top
+    rb //rough bottom
+    rl //rough left
+    rr //rough right
+
+    pos;
+
+    /**
+     * A static convex collider
+     * @param {Vector2} position Center position of this collider
+     * @param {Array<Vector2>} relativePoints Array of vectors representing the postions of the points that make up this collider, ordered in counter clockwise order
+     */
+    constructor (position, relativePoints) {
+
+        // Check if collider has enough points to be a shape
+        if (relativePoints.length < 3) {
+            throw (`Static convex collider attempted to be created with less than 3 points, please add more points to this collider`);
+        }
+
+        this.pos = position;
+
+        let start = relativePoints[0].add(this.pos);
+        let end;
+
+        this.points = [start];
+
+        let len = relativePoints.length;
+
+        // Create variables to store the rough bounds
+        this.rt = start.y; //rough top
+        this.rb = start.y; //rough bottom
+        this.rl = start.x; //rough left
+        this.rr = start.x; //rough right
+
+        for (let i = 1; i < len; i++) {
+            end = relativePoints[i].add(this.pos); // Convert relative point position to world position
+
+            this.points.push(end); // Add this point to our list of points
+            this.edges.push(new ColliderEdge(start, end)); // Connect an edge from start to end
+
+            start = end; // Start from the previous point
+
+            // Check if new point is the farthest of each side to set rough edges
+            if (end.x < this.rl) {
+                this.rl = end.x;
+            }
+            if (end.x > this.rr) {
+                this.rr = end.x;
+            }
+            if (end.y < this.rt) {
+                this.rt = end.y;
+            }
+            if (end.y > this.rb) {
+                this.rb = end.y;
+            }
+        }
+        this.edges.push(new ColliderEdge(start, this.points[0]));
+
+        StaticConvexCollider.colliders.push(this);
+    }
+
+    /**
+     * 
+     * @param {Vector2} point 
+     * @returns {Boolean} Returns true if the point is colliding with
+     */
+    isColliding(point) {
+
+        // Check if point is within the rough bounds
+        if (point.x < this.rr && point.x > this.rl && point.y < this.rb && point.y > this.rt) {
+
+            // Remember how many of the edges we are colliding with
+            let score = 0;
+
+            // Count how many edges we are colliding with
+            this.edges.forEach((i) => {
+                if (i.isColliding(point)) {
+                    score++;
+                }
+            })
+
+            // If we are colliding with all edges, and the shape is convex, then the point is inside the collider
+            return score == this.edges.length;
+        }
+
+        return false;
+    }
+
+    set pos (v) {
+        throw("Static collider cannot be moved");
     }
 }
 
@@ -316,6 +628,15 @@ function addCanvas() {
         );
         canvasClick(worldClick);
     });
+
+    canvas.addEventListener("mousedown", (e) => {
+        let canvasRect = canvas.getBoundingClientRect();
+        let worldClick = new Vector2(
+            e.clientX - canvasRect.left, 
+            e.clientY - canvasRect.top
+        );
+        canvasClickDown(worldClick);
+    });
     
     cameraList.push(new Camera("default", Vector2.zero, 0.01, []));
     activeCamera = cameraList[0];
@@ -326,6 +647,10 @@ function addCanvas() {
 }
 
 function canvasClick(pos) {
+    
+}
+
+function canvasClickDown(pos) {
     
 }
 

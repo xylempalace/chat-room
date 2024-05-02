@@ -154,8 +154,11 @@ sockserver.on('connection', (ws, req) => {
       var validName = true;
 
       // Checks if the username is taken and if so tells the client to select a different username
+      console.log(clients);
       for (const [key, value] of Object.entries(clients)) {
-        if (obj.id == value) {
+        
+        if (obj.id == value[0]) {
+          console.log("Duplicate username detected");
           validName = false;
           ws.send(JSON.stringify({
             invalidName: true,

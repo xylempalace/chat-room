@@ -16,6 +16,8 @@
     
         <br /><br/>
             <a href = # class = "button" id="loginButton" onclick="setUser(usernameInput.value,usernameInput)">Enter</a> 
+
+            <p id = usernameErrorMsg></p>  
     </div>
 
     <div class="popup">
@@ -36,7 +38,8 @@
             <input placeholder="Chat..." type="text" minlength="1" maxlength="50" id="chatInput" class="chatInput" func="sendMessage">
             
             
-            <button class = "chatButton" id = "sendMessageButton" onclick="sendMessage(chatInput.value)">Enter</button> 
+            <button class = "chatButton" id = "sendMessageButton" onclick="sendMessage(chatInput.value)">Enter</button>
+            
         
         </div>
             

@@ -83,6 +83,15 @@ webSocket.onmessage = (event) => {
     } else if ("invalidName" in obj || obj.invalidName) {
         // Handles recieving username selction errors and verification
         if (obj.invalidName) {
+            document.getElementById("usernameErrorMsg").innerHTML=("That username is not allowed!");
+            if(obj.usernameError === ("Username Taken")){
+                document.getElementById("usernameErrorMsg").innerHTML=("That username is taken!");
+            }
+            else{
+                document.getElementById("usernameErrorMsg").innerHTML=("That username is not allowed!");
+            }
+            
+            
             
             console.log("Username is invalid!");
             receiveMessage(obj.usernameError);
@@ -560,11 +569,15 @@ function setUser(usr) {
         if (loginState == "username") {
             console.log(usr);
             console.log("length:" + usr.length);
-            if (usr.length > 3 && usr.length < 20){
+            if (usr.length > 2 && usr.length < 12){
                 webSocket.send(JSON.stringify({
                     id: `${usr}`
                 }));
+                
                 loginState = "awaitingVerification";
+            }
+            else{
+                document.getElementById("usernameErrorMsg").innerHTML=("Username must be between 2 and 12 characters!");
             }
         } else if (loginState == "usernameVerified") {
             userPlayer = new Player(usr, World.spawnPos, usr, "#FF0000");

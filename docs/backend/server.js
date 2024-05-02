@@ -138,6 +138,13 @@ sockserver.on('connection', (ws, req) => {
                 owner: true
               }));
             }
+            for (var i = 0; i < gameRooms[del][0].length; i++) {
+              if (client.id === gameRooms[del][0][i]) {
+                client.send(JSON.stringify({
+                  playerNum: gameRooms[del][0].length
+                }));
+              }
+            }
           });
         }
       }
@@ -190,13 +197,17 @@ sockserver.on('connection', (ws, req) => {
           }
         }
       }
+
       gameID = `${obj.newRoom == "public" ? "pub-" : "priv-"}${gameID}`;
       // Room created with its ID, then the id off the creator in a list as well as the min and max amt of players allowed in the room
       gameRooms[gameID] = [[ws.id], obj.playersMin, obj.playersMax];
       console.log(`New room created with game ID: ${gameID}`);
+
+      // Notifies the client of the newly created room
       ws.send(JSON.stringify({
         joinRoom: gameID,
-        owner: true
+        owner: true,
+        playerNum: gameRooms[gameID][0].length
       }));
     } else if ("leaveRoom" in obj) {  
       // Handles leaving game rooms
@@ -209,13 +220,25 @@ sockserver.on('connection', (ws, req) => {
           }
         }
         if (gameRooms[obj.leaveRoom][0].length <= 0) {
+          // Deletes room if its empty
           delete gameRooms[obj.leaveRoom];
         } else {
+          // Changes the owner of the room if the owner was the player who left
           sockserver.clients.forEach(client => {
             if (client.id === gameRooms[obj.leaveRoom][0][0]) {
               client.send(JSON.stringify({
                 owner: true
               }));
+            }
+
+            // Updates all the players in the room of the new player count
+            for (var i = 0; i < gameRooms[obj.leaveRoom][0].length; i++) {
+              console.log(client.id === gameRooms[obj.leaveRoom][0][i]);
+              if (client.id === gameRooms[obj.leaveRoom][0][i]) {
+                client.send(JSON.stringify({
+                  playerNum: gameRooms[obj.leaveRoom][0].length
+                }));
+              }
             }
           });
         }
@@ -235,9 +258,23 @@ sockserver.on('connection', (ws, req) => {
               joinRoom: key,
               owner: false
             }));
+
+            // Updates the player count of all players in the room
+            for (var i = 0; i < value[0].length; i++) {
+              sockserver.clients.forEach(client => {
+                console.log(client.id === value[0][i]);
+                if (client.id === value[0][i]) {
+                  client.send(JSON.stringify({
+                    playerNum: value[0].length
+                  }));
+                }
+              });
+            }
             return;
           }
         }
+
+        // Sends an error if the game is full
         ws.send(JSON.stringify({
           joinRoom: "error"
         }));
@@ -251,6 +288,18 @@ sockserver.on('connection', (ws, req) => {
             joinRoom: privacy + obj.joinRoom,
             owner: false
           }));
+
+          // Updates the player count of all players in the room
+          for (var i = 0; i < room[0].length; i++) {
+            sockserver.clients.forEach(client => {
+              console.log(client.id === room[0][i]);
+              if (client.id === room[0][i]) {
+                client.send(JSON.stringify({
+                  playerNum: room[0].length
+                }));
+              }
+            });
+          }
         }
       } else if ("priv-" + obj.joinRoom in gameRooms) {
         // Adds the player to the specified room if its private
@@ -262,6 +311,18 @@ sockserver.on('connection', (ws, req) => {
             joinRoom: privacy + obj.joinRoom,
             owner: false
           }));
+
+          // Updates the player count of all players in the room
+          for (var i = 0; i < room[0].length; i++) {
+            sockserver.clients.forEach(client => {
+              console.log(client.id === room[0][i]);
+              if (client.id === room[0][i]) {
+                client.send(JSON.stringify({
+                  playerNum: room[0].length
+                }));
+              }
+            });
+          }
         }
       } else {
         // Returns and error if no rooms were found
@@ -272,13 +333,20 @@ sockserver.on('connection', (ws, req) => {
       }
       console.log(gameRooms)
     } else if ("updateRoom" in obj) {
+      // Updates the privacy of a game room
       if (obj.updateRoom in gameRooms) {
+        // Finds the room and creates an edited ID
         var newID = obj.new + obj.updateRoom.substring(obj.updateRoom.indexOf("-") + 1);
         console.log(newID);
+
+        // Creates a new room with all the same data but with new ID
         gameRooms[newID] = [gameRooms[obj.updateRoom][0], gameRooms[obj.updateRoom][1], gameRooms[obj.updateRoom][2]];
         console.log(gameRooms);
+        // Removes old room
         delete gameRooms[obj.updateRoom];
         console.log(gameRooms);
+
+        // Updates all clients in the room of the change in privacy
         for (var i = 0; i < gameRooms[newID][0].length; i++) {
           sockserver.clients.forEach(client => {
             if (client.id === gameRooms[newID][0][i]) {

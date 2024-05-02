@@ -428,7 +428,7 @@ class UiGameMenu {
             }));
         }));
 
-        this.buttons.push(new Button(new Vector2(this.center.x, this.center.y + 50 * activeCamera.zoom), 180, 40, "#20ff00", "PLAY", 30, 1, 3, () => Resources.owner));
+        this.buttons.push(new Button(new Vector2(this.center.x, this.center.y + 50 * activeCamera.zoom), 180, 40, "#20ff00", "PLAY", 30, 1, 3, (playersMin) => Resources.owner && Resources.playerNum >= playersMin));
     }
 
     /**
@@ -437,7 +437,7 @@ class UiGameMenu {
    draw() {
        ctx.save()
        for (var i = 0 ; i < this.buttons.length; i++) {
-           this.buttons[i].draw(this.windowState); 
+           this.buttons[i].draw(this.windowState, this.source.minPlayers); 
         }
         ctx.textAlign = 'center';
         ctx.fillStyle = "black";
@@ -459,7 +459,7 @@ class UiGameMenu {
             // Start at index 1 and go through each button
             for (var i = 1; i < this.buttons.length; i++) {
                 // Figures out if the button is even visible
-                if (this.buttons[i].windowState === this.windowState && (this.buttons[i].extraCondition === null || this.buttons[i].extraCondition())) {
+                if (this.buttons[i].windowState === this.windowState && (this.buttons[i].extraCondition === null || this.buttons[i].extraCondition(this.source.minPlayers))) {
                     // Checks if the button was clicked and runs any code specific to the button
                     var nextState = this.buttons[i].processClick(position, (condition, nextState, windowState) => {
                         if (condition) {
@@ -523,8 +523,8 @@ class Button {
      * Draws the button if the game window state matches the button's state
      * @param {number} state checked against the button's state 
      */
-    draw(state) {
-        if ((this.windowState === null || state === this.windowState) && (this.extraCondition === null || this.extraCondition())) {
+    draw(state, playersMin) {
+        if ((this.windowState === null || state === this.windowState) && (this.extraCondition === null || this.extraCondition(playersMin))) {
             ctx.fillStyle = this.color;
             ctx.fillRect(this.origin.x, this.origin.y, this.width, this.height);
             ctx.textAlign = 'center';

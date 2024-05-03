@@ -42,7 +42,7 @@ const SpeechBubbleSprite = new NineSlicedSprite("speechBubble.png"  , [16, 16, 1
 // WebSocket Stuff
 const webSocket = new WebSocket('ws://localhost:3000/');
 
-
+ImageManipulator.init();
 
 webSocket.onmessage = (event) => {
     var obj = JSON.parse(event.data);
@@ -189,7 +189,13 @@ class PlayerCosmetic {
      */
     constructor (spritePath, flippedSpritePath) {
         this.sprite = new Sprite(spritePath);
-        this.flippedSprite = new Sprite(flippedSpritePath)
+        this.flippedSprite = this.sprite;
+
+        this.sprite.image.onload = (e) => {
+            ImageManipulator.manip(this.sprite.image, ["flipX"]).then((out) => {
+                this.flippedSprite = new Sprite(out);
+            });
+        };
     }
 
     draw(pos, size, flipped = false) {

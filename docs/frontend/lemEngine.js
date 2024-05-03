@@ -164,9 +164,16 @@ class Sprite {
      * @param {String} image String file path to the image, starting in the sprites folder, including file type 
      */
     constructor (image) {
-        this.id = image;
-        this.image = new Image();
-        this.image.src = './sprites/'+image; // Is this dangerous, given a custom input, eg "../[FILE NAME]", could a user potentially access files not intended?
+        if (typeof image === 'string' || image instanceof String) {
+            this.id = image;
+            this.image = new Image();
+            this.image.src = './sprites/'+image; // Is this dangerous, given a custom input, eg "../[FILE NAME]", could a user potentially access files not intended?
+        } else {
+            this.image = image;
+            this.id = image.src;
+            
+            document.body.appendChild(this.image);
+        }
 
         this.centeredOffset = new Vector2(
             -(this.image.width  / 2),

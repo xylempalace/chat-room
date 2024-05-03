@@ -42,7 +42,7 @@ const SpeechBubbleSprite = new NineSlicedSprite("speechBubble.png"  , [16, 16, 1
 // WebSocket Stuff
 const webSocket = new WebSocket('ws://localhost:3000/');
 
-
+ImageManipulator.init();
 
 webSocket.onmessage = (event) => {
     var obj = JSON.parse(event.data);
@@ -83,15 +83,6 @@ webSocket.onmessage = (event) => {
     } else if ("invalidName" in obj || obj.invalidName) {
         // Handles recieving username selction errors and verification
         if (obj.invalidName) {
-            document.getElementById("usernameErrorMsg").innerHTML=("That username is not allowed!");
-            if(obj.usernameError === ("Username Taken")){
-                document.getElementById("usernameErrorMsg").innerHTML=("That username is taken!");
-            }
-            else{
-                document.getElementById("usernameErrorMsg").innerHTML=("That username is not allowed!");
-            }
-            
-            
             
             console.log("Username is invalid!");
             receiveMessage(obj.usernameError);
@@ -198,7 +189,13 @@ class PlayerCosmetic {
      */
     constructor (spritePath, flippedSpritePath) {
         this.sprite = new Sprite(spritePath);
-        this.flippedSprite = new Sprite(flippedSpritePath)
+        this.flippedSprite = this.sprite;
+
+        this.sprite.image.onload = (e) => {
+            ImageManipulator.manip(this.sprite.image, ["flipX"]).then((out) => {
+                this.flippedSprite = new Sprite(out);
+            });
+        };
     }
 
     draw(pos, size, flipped = false) {
@@ -502,12 +499,65 @@ document.addEventListener("readystatechange", (e) => {
       //  setUser(document.getElementById("usernameInput"));
       const textInput = document.getElementById('usernameInput');
       const submitButton = document.getElementById('loginButton');
+
+        ImageManipulator.init();
+    
+        let sliceAtlas = function (base, tilesWide, tilesHigh) {
+            let prom = new Promise(outerResolve => {
+                let slice = function (x, y) {
+                    let params = [
+                        `canvasScale ${tileWidth} ${tileHeight}`,
+                        `translate ${-tileWidth * x} ${-tileHeight * y}`
+                    ]
+
+                    // This causes problems because the for loop does not wait for promises
+                    // eg, if x = 1 and y = 2 are used to set the tile, then by the time the correct index is set and references x and y again, x and y will have already changed for other loops
+                    // declaring an index value seperately does not fix it
+                    let index = (x * tilesWide) + y;
+                    ImageManipulator.manip(base, params).then((out) => {
+                        seperated[index] = out;
+                        if (seperated.length === tilesWide*tilesHigh) {
+                            //printMessage(index);
+                            outerResolve(seperated);
+                        }
+                    });
+                }
+
+                let tileWidth = base.width / tilesWide; // Calculate how wide each tile is
+                let tileHeight = base.height / tilesHigh; // Same, but for height
+
+                // Create an array to store each seperated tile
+                let seperated = [];
+                
+                for (let j = 0; j < tilesWide; j++) { // Go through each column
+                    for (let k = 0; k < tilesHigh; k++) { // Then each tile in that column
+                        //printMessage((j * tilesWide) + k)
+                        slice(j + 0, k + 0);
+                    }
+                }
+            })
+
+            // Once each tile is sliced, add them to background tiles in a group
+            // With multiple atlases, these groups might get swapped depending on which finishes first
+            prom.then((out) => {
+                console.log(out);
+                out.forEach((i) => {
+                    backgroundTiles.push(new Sprite(i));
+                })
+                backgroundMap.tiles = backgroundTiles;
+                console.log(`Tilemap: \n ${backgroundMap.tiles}`)
+            });
+        }
+
+        let path = new Image();
+        path.src = '/sprites/tiles/pathAtlas.png';
+        sliceAtlas(path, 4, 4);
       
-      textInput.addEventListener('keydown', function(event) {
-          if (event.key === 'Enter') {
-              submitButton.click();
-          }
-      });
+        textInput.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                submitButton.click();
+            }
+        });
 
             const foundInputs = document.getElementById("usernameInput");
         for (let i = 0; i < foundInputs.length; i++) {
@@ -569,15 +619,11 @@ function setUser(usr) {
         if (loginState == "username") {
             console.log(usr);
             console.log("length:" + usr.length);
-            if (usr.length > 2 && usr.length < 12){
+            if (usr.length > 3 && usr.length < 20){
                 webSocket.send(JSON.stringify({
                     id: `${usr}`
                 }));
-                
                 loginState = "awaitingVerification";
-            }
-            else{
-                document.getElementById("usernameErrorMsg").innerHTML=("Username must be between 2 and 12 characters!");
             }
         } else if (loginState == "usernameVerified") {
             userPlayer = new Player(usr, World.spawnPos, usr, "#FF0000");
@@ -731,6 +777,3 @@ function onClick(event, canvasPos) {
         userPlayer.walkTo(canvasPos.screenToWorldPos());
     }
 }
-
-
-

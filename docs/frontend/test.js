@@ -181,15 +181,43 @@ class PlayerCosmetic {
     color;
     sprite;
     flippedSprite;
+    name;
+    type;
+
+    static defaultAnchor = new Vector2(0, 0);
+    static headAnchor = new Vector2(0.25, -0.25);
+
+    anchor;
 
     /**
      * 
      * @param {String} spritePath 
-     * @param {String} flippedSpritePath 
+     * @param {String} name Name of cosmetic
+     * @param {String} type 
      */
-    constructor (spritePath, flippedSpritePath) {
+    constructor (spritePath, name, type = 'default') {
         this.sprite = new Sprite(spritePath);
         this.flippedSprite = this.sprite;
+
+        switch (type) {
+            case 'default':
+                this.type = 'default';
+                this.anchor = PlayerCosmetic.defaultAnchor;
+                break;
+            case 'head':
+                this.type = 'head';
+                this.anchor = PlayerCosmetic.headAnchor;
+                break;
+
+            case 'body':
+                this.type = 'body';
+                this.anchor = PlayerCosmetic.defaultAnchor;
+                break;
+
+            default:
+                throw new Error(`Cosmetic type "${type}" is invalid`);
+                break;
+        }
 
         this.sprite.image.onload = (e) => {
             ImageManipulator.manip(this.sprite.image, ["flipX"]).then((out) => {
@@ -200,9 +228,11 @@ class PlayerCosmetic {
 
     draw(pos, size, flipped = false) {
         if (!flipped) {
-            this.sprite.draw(pos, size);
+            let drawPos = new Vector2(pos.x + (size * this.anchor.x), pos.y + (size * this.anchor.y));
+            this.sprite.draw(drawPos, size);
         } else {
-            this.flippedSprite.draw(pos, size);
+            let drawPos = new Vector2(pos.x - (size * this.anchor.x), pos.y + (size * this.anchor.y));
+            this.flippedSprite.draw(drawPos, size);
         }
     }
 }
@@ -219,7 +249,7 @@ class Player extends GameObject {
     speechBubbles = [];
     color;
     cosmetics = [];
-    static baseCosmetics = [new PlayerCosmetic("player/base.png", "player/base_flipped.png"), new PlayerCosmetic("player/flower.png", "player/flower_flipped.png")];
+    static baseCosmetics = [new PlayerCosmetic("player/base.png", "base", 'body')];
     flipped = false;
 
     constructor(id, pos, username, color, cosmetics = Player.baseCosmetics) {
@@ -490,8 +520,9 @@ class Abyss {
     }
 }
 
-//Called when the page is finished loading
-
+/**
+ * Called when the page is finished loading
+ */
 document.addEventListener("readystatechange", (e) => {
 
     
@@ -582,6 +613,10 @@ document.addEventListener("readystatechange", (e) => {
 
 });
 
+/**
+ * Sends the string in the message box to the server
+ * @param {String} msg 
+ */
 function sendMessage(msg) {
     if (msg.length > 0) {
         document.getElementById("chatInput").value = ""; 
@@ -594,10 +629,18 @@ function sendMessage(msg) {
     }
 }
 
+/**
+ * Adds the given string to the chatlog
+ * @param {String} msg 
+ */
 function printMessage(msg) {
     log.textContent += msg+"\n";
 }
 
+/**
+ * Adds the given string to the chatlog
+ * @param {String} msg 
+ */
 function receiveMessage(msg) {
     log.textContent += msg+"\n";
 }
@@ -609,9 +652,10 @@ function updateUser(e) {
     }
 }
 
-
-
-
+/**
+ * Attempts to create a new user in accordance with the server, and, if successful, begins the game
+ * @param {String} usr 
+ */
 function setUser(usr) {
     
     console.log("setUser called");
@@ -633,19 +677,17 @@ function setUser(usr) {
             receiveMessage("Username set to "+userPlayer.username);
             cameraList.push(new Camera("playerCam", Vector2.zero, 0.01, [-1024, -1024, 1024, 1024]));
             activeCamera = cameraList[cameraList.length-1];
-            //textbox.setDisabled(true);
-            //console.log(findInputByID)
-          //  TextInput.findInputByID("chatInput").setDisabled(false);
-          document.getElementById('chatInput').addEventListener('keypress', function(e){
-            console.log("TESSTTTT");    
-            if(e.key==="Enter"){
-                console.log("inside ekey pressed");
-                document.getElementById('sendMessageButton').click(); 
+
+            document.getElementById('chatInput').addEventListener('keypress', function(e){
+                console.log("TESSTTTT");    
+                if(e.key==="Enter"){
+                    console.log("inside ekey pressed");
+                    document.getElementById('sendMessageButton').click(); 
+                    }
                 }
-        }
-        )
+            )
+
             connect();
-            startAnimating();
         }
 
         console.log("Final login state: " + loginState);
@@ -653,17 +695,13 @@ function setUser(usr) {
 
 }
 
+/**
+ * Starts the game
+ */
 function connect() {
-    
-    //otherPlayers.push(new Player("(0, 0)", new Vector2(0, 0), "(0, 0)", "#00FF00"));
-
-    let centerDist = 500;
-    otherPlayers.push(new Player("(0, " + centerDist + ")", new Vector2(0, centerDist), "(0, " + centerDist + ")", "#FF0000"));
-    otherPlayers.push(new Player("(0, -" + centerDist + ")", new Vector2(0, -centerDist), "(0, -" + centerDist + ")", "#FFFF00"));
-    otherPlayers.push(new Player("(" + centerDist + ", 0)", new Vector2(centerDist, 0), "(" + centerDist + ", 0)", "#0000FF"));
-    otherPlayers.push(new Player("(-" + centerDist + ", 0)", new Vector2(-centerDist, 0), "(-" + centerDist + ", 0)", "#00FFFF"));
     connected = true;
     serverUpdate();
+    startAnimating();
 }
 
 function startAnimating() {
@@ -705,34 +743,34 @@ function update() {
 
     ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
 
+    // Draw the background abyss
     Abyss.draw(1);
-    //ctx.save();
-    //ctx.fillStyle = Abyss.bgPattern;
-    //ctx.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
-    //ctx.restore();
 
+    // Draw the tiles
     backgroundMap.draw();
 
+    // Draw the game objects
     GameObject.objs.sort(GameObject.sortVertically);
     GameObject.objs.forEach((element) => {
         
         element.draw();
     })
     
-    //userPlayer.drawPlayer(gameCanvas);
+    // Render the client's speech bubbles
     userPlayer.drawSpeechBubbles(gameCanvas);
     userPlayer.update((Date.now()-startTime) / fpms);
     
+    // Render the other players's speech bubbles
     otherPlayers.forEach((element) => {
-        //element.drawPlayer(gameCanvas);
         element.drawSpeechBubbles(gameCanvas);
         element.update((Date.now()-startTime)/fpms);
     });
 
-    //let treeSprite = new Sprite("tree.png");
-    //treeSprite.draw(new Vector2(-256, -256).screenPos, 400);
 }
 
+/**
+ * Sends actively updated info to the server
+ */
 function serverUpdate() {
     setTimeout(() => {
         serverUpdate();

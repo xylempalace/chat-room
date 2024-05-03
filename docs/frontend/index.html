@@ -8,10 +8,10 @@
 </head>
 
 <body>
-    <button type="button" class="CosmeticsButton" onclick="ToggleCosmeticsMenu()"> Customize your creature </button>
-
+    
+    
     <div style="width:100%; height: 100%;">
-
+        
         <div id = "chatBox" class="chatBox" >
             
             <div class="inputDiv" style="position: fixed; top: 12px;" placeholder="Username" func="setUser" hasButton=true reqConnection=false minlength=3 maxlength=20> </div>
@@ -22,7 +22,13 @@
         </div>
         
         <div id = "gameSpace" style= "height: 80%; width:100%;"> </div>
-
+        
+        <div id = "otherSpace" style="height: 20%; width: 100%; right: 0; bottom: 0;"> 
+            <label for="oash">Checkbox:</label>
+            <input type="checkbox" id="oash" class="toggleCosmeticsButton" onclick="ToggleCosmetics()"> 
+        </div>
+        
+        
     </div>
     
     <script src="imageManipulator.js"></script>

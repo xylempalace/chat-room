@@ -192,7 +192,12 @@ class PlayerCosmetic {
     }
 
     getSpritePath() {
-        return this.sprite.image.src;
+        let finalString = this.sprite.image.src;
+        let pos = finalString.search("/player/");
+
+        finalString = finalString.substr(pos + 1);
+
+        return finalString;
     }
 }
 
@@ -218,12 +223,15 @@ class Player extends GameObject {
         this.setCosmetics(cosmetics);
     }
 
-
+//bookmark
     hasCosmeticEquipped(cosmeticName) {
-        cosmeticName = "player/" + cosmeticName;
-        for (i = 0; i < this.cosmetics.length; i++) {
-            if (this.cosmetics[i].getSpritePath());
+        cosmeticName = "player/" + cosmeticName + ".png";
+        for (let i = 0; i < this.cosmetics.length; i++) {
+            if (this.cosmetics[i].getSpritePath() === cosmeticName) {
+                return i;
+            }
         }
+        return -1;
     }
 
     setCosmetics(cosmeticArr) {
@@ -243,7 +251,11 @@ class Player extends GameObject {
     }
 
     removeCosmetic(cosmeticName) {
-        
+        let i = this.hasCosmeticEquipped(cosmeticName);
+        if (i >= 0) {
+            cosmeticName = "player/" + cosmeticName + ".png";
+            this.cosmetics.splice(i, 2);
+        }
     }
     
     warpTo(pos) {
@@ -682,10 +694,16 @@ function serverUpdate() {
 function rgb(r, g, b){
     return ["rgb(",r,",",g,",",b,")"].join("");
 }
-    
-function ToggleCosmeticsMenu() {
-
-    userPlayer.addCosmetic("fedora");
+    //bookmark
+function ToggleCosmetics() {
+    if (userPlayer.hasCosmeticEquipped("fedora") >= 0) {
+        userPlayer.removeCosmetic("fedora");
+    }
+    else {
+        userPlayer.addCosmetic("fedora");
+    }
+    //console.log(userPlayer.hasCosmeticEquipped("fedora"));
+    //userPlayer.addCosmetic("fedora");
 
 }
 

@@ -31,12 +31,13 @@ body{
 .chatInput{
     position: absolute; 
     width: 160px;
-    top: 93.5%;
+    top: 96%;
     left: .3%;
     background-color: rgba(255, 255, 255,);
     border: 2px solid black;
     border-radius: 10px;
-    height: 2%;
+    height: 3%;
+    width: 72%; 
 }
 
 
@@ -66,8 +67,14 @@ body{
 /* username and chatbox thingies */
 .inputText {
     position: fixed;
-    left: 45.5%;
-    height:25px; width: 170px; 
+ 
+    left: 45%; top: 12.5%;
+ 
+    height: 25px; width: 170px;
+ 
+    margin: 20px auto; padding: 8px;
+ 
+    display: block;
 }
 
 .inputButton {
@@ -141,16 +148,7 @@ position: relative;
 }
 
 input{
-    position:relative;
-    margin: 20px auto;
-    display: block;
-    width: 9%;
-    height: 20px;
-    padding: 8px;
-    border: 1px solid grey;
-    left:40.5%; 
-    top: 12.5%;
-    
+    border: 1px solid grey;  
 }
 
 .chatButton{

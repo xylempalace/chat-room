@@ -164,9 +164,21 @@ class Sprite {
      * @param {String} image String file path to the image, starting in the sprites folder, including file type 
      */
     constructor (image) {
-        this.id = image;
-        this.image = new Image();
-        this.image.src = './sprites/'+image; // Is this dangerous, given a custom input, eg "../[FILE NAME]", could a user potentially access files not intended?
+        if (typeof image === 'string' || image instanceof String) {
+            this.id = image;
+            this.image = new Image();
+            this.image.src = './sprites/'+image; // Is this dangerous, given a custom input, eg "../[FILE NAME]", could a user potentially access files not intended?
+        } else {
+            this.image = image;
+            this.id = image.src;
+            
+            document.body.appendChild(this.image);
+        }
+
+        this.centeredOffset = new Vector2(
+            -(this.image.width  / 2),
+            -(this.image.height / 2)
+        )
     }
 
     /**
@@ -752,14 +764,9 @@ function drawScreen() {
     startTime = Date.now();
     var fpsDecimalPlaces = 1;
     var measuredFPS = ((startTime-beginTime))*(fpsDecimalPlaces*10);
-    drawText(25, 25, "FPS: " + truncateNumber(measuredFPS, fpsDecimalPlaces));
-    drawText(25, 50, "Target MSPF: "+ truncateNumber(fpms, fpsDecimalPlaces)); //Target miliseconds per frame
     
     frameLength = Math.min(fpms-(Date.now()-beginTime),fpms);
 
-    //Updates FPS graph
-    DebugGraph.updateFPSGraph(frameLength);
-    DebugGraph.drawFPSGraph(0, 30, 250, 100, 3); 
 }
 
 function update() {}

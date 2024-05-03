@@ -8,7 +8,6 @@ let connected = false;
 let loginState = "username";
 let userPlayer;
 let otherPlayers = [];
-
 //Tilemap
 const backgroundTiles = [
     0,
@@ -40,11 +39,12 @@ const backgroundMap = new TileMap(new Vector2(0,0), backgroundTiles, 64, 32, 32,
 ]);
 
 // WebSocket Stuff
-const webSocket = new WebSocket('ws://localhost:443/');
+const webSocket = new WebSocket('ws://localhost:3000/');
+
+ImageManipulator.init();
 
 webSocket.onmessage = (event) => {
     var obj = JSON.parse(event.data);
-
     if ("expired" in obj) {
         // Handles removing a disconnected player from the screen and printing a leave message
         let p = otherPlayers.findIndex((element) => {
@@ -79,16 +79,22 @@ webSocket.onmessage = (event) => {
         } else {
             otherPlayers.push(new Player(obj.id, new Vector2(obj.posX, obj.posY), obj.id, "#FF0000"));
         }
-    } else if ("invalidName" in obj) {
+    } else if ("invalidName" in obj || obj.invalidName) {
         // Handles recieving username selction errors and verification
         if (obj.invalidName) {
+            
+            console.log("Username is invalid!");
             receiveMessage(obj.usernameError);
             loginState = "username";
-            const textBox = textInputs.find((element) => element.textInput.getAttribute("placeholder") == "Username");
-            textBox.clearTextbox();
+          //  const textBox = textInputs.find((element) => element.textInput.getAttribute("placeholder") == "Username");
+          document.getElementById("usernameInput").value = "";
+            document.getElementById("container");
+            
         } else {
+            console.log("hi");
             loginState = "usernameVerified";
             const textBox = textInputs.find((element) => element.textInput.getAttribute("placeholder") == "Username");
+            console.log("set user after uV");
             setUser(obj.usr, textBox);
         }
     }
@@ -122,12 +128,18 @@ class TextInput {
         this.textDiv.append(this.textInput);
         
         if (hasButton) {
-            this.textButton = document.createElement("button");
+           /* this.textButton = document.createElement("button");
             this.textButton.setAttribute("class", "inputButton");
             this.textButton.addEventListener("click", () => {this.sendText()});
 
-            this.textButton.textContent = "🠊";
+            this.textButton.textContent = "🠊    ";
             this.textDiv.append(this.textButton);
+            */
+            this.textButton = document.getElementById("loginButton"); 
+            this.textButton.addEventListener("click", () => {this.sendText()});
+            //this.textDiv.append(this.textButton);
+            
+
         }
         
         this.constructor.textInputs.push(this);
@@ -143,10 +155,6 @@ class TextInput {
         if (this.textInput.value.length > 0) {
             eval(this.sendFunction+"(this.textInput.value, this)");
         }
-    }
-
-    clearTextbox() {
-        this.textInput.value = "";
     }
 
     setDisabled(state) {
@@ -180,7 +188,13 @@ class PlayerCosmetic {
      */
     constructor (spritePath, flippedSpritePath) {
         this.sprite = new Sprite(spritePath);
-        this.flippedSprite = new Sprite(flippedSpritePath)
+        this.flippedSprite = this.sprite;
+
+        this.sprite.image.onload = (e) => {
+            ImageManipulator.manip(this.sprite.image, ["flipX"]).then((out) => {
+                this.flippedSprite = new Sprite(out);
+            });
+        };
     }
 
     draw(pos, size, flipped = false) {
@@ -506,8 +520,6 @@ class Abyss {
 
             // Create pattern for filling rect when drawn
             Abyss.bgPattern = ctx.createPattern(Abyss.bgImage, "repeat");
-            printMessage("aaaa")
-
             Abyss.bgImageLoaded = true;
         }
         Abyss.bgImage.src = "./sprites/bg.png";
@@ -528,34 +540,100 @@ class Abyss {
 }
 
 //Called when the page is finished loading
+
 document.addEventListener("readystatechange", (e) => {
+
+    
     if (e.target.readyState === "complete") {
-        const foundInputs = document.getElementsByClassName("inputDiv");
+      //  setUser(document.getElementById("usernameInput"));
+      const textInput = document.getElementById('usernameInput');
+      const submitButton = document.getElementById('loginButton');
+
+        ImageManipulator.init();
+    
+        let sliceAtlas = function (base, tilesWide, tilesHigh) {
+            let prom = new Promise(outerResolve => {
+                let slice = function (x, y) {
+                    let params = [
+                        `canvasScale ${tileWidth} ${tileHeight}`,
+                        `translate ${-tileWidth * x} ${-tileHeight * y}`
+                    ]
+
+                    // This causes problems because the for loop does not wait for promises
+                    // eg, if x = 1 and y = 2 are used to set the tile, then by the time the correct index is set and references x and y again, x and y will have already changed for other loops
+                    // declaring an index value seperately does not fix it
+                    let index = (x * tilesWide) + y;
+                    ImageManipulator.manip(base, params).then((out) => {
+                        seperated[index] = out;
+                        if (seperated.length === tilesWide*tilesHigh) {
+                            //printMessage(index);
+                            outerResolve(seperated);
+                        }
+                    });
+                }
+
+                let tileWidth = base.width / tilesWide; // Calculate how wide each tile is
+                let tileHeight = base.height / tilesHigh; // Same, but for height
+
+                // Create an array to store each seperated tile
+                let seperated = [];
+                
+                for (let j = 0; j < tilesWide; j++) { // Go through each column
+                    for (let k = 0; k < tilesHigh; k++) { // Then each tile in that column
+                        //printMessage((j * tilesWide) + k)
+                        slice(j + 0, k + 0);
+                    }
+                }
+            })
+
+            // Once each tile is sliced, add them to background tiles in a group
+            // With multiple atlases, these groups might get swapped depending on which finishes first
+            prom.then((out) => {
+                console.log(out);
+                out.forEach((i) => {
+                    backgroundTiles.push(new Sprite(i));
+                })
+                backgroundMap.tiles = backgroundTiles;
+                console.log(`Tilemap: \n ${backgroundMap.tiles}`)
+            });
+        }
+
+        let path = new Image();
+        path.src = '/sprites/tiles/pathAtlas.png';
+        sliceAtlas(path, 4, 4);
+      
+        textInput.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                submitButton.click();
+            }
+        });
+
+            const foundInputs = document.getElementById("usernameInput");
         for (let i = 0; i < foundInputs.length; i++) {
             let tI = new TextInput(
-                foundInputs[i],
+               foundInputs[i],
                 foundInputs[i].getAttribute("placeholder"),
                 foundInputs[i].getAttribute("func"),
-                foundInputs[i].getAttribute("hasButton"),
-                foundInputs[i].getAttribute("reqConnection"),
-                foundInputs[i].getAttribute("minLength"),
-                foundInputs[i].getAttribute("maxLength")
+                //foundInputs[i].getAttribute("hasButton"),
+                //foundInputs[i].getAttribute("reqConnection"),
+               foundInputs[i].getAttribute("minLength"),
+               foundInputs[i].getAttribute("maxLength")
             );
             textInputs.push(tI);
         }
-
+         document.getElementById("usernameInput").value = ""
         let chatInput = TextInput.findInputByID("chatInput");
-        chatInput.setDisabled(true);
-        
+    
+      // chatInput.setDisabled(true);
         addCanvas();
         drawText(100, 100, "Connecting...");
     }
 
 });
 
-function sendMessage(msg, textbox) {
+function sendMessage(msg) {
     if (msg.length > 0) {
-        textbox.clearTextbox();
+        document.getElementById("chatInput").value = ""; 
         if (connected) {
             webSocket.send(JSON.stringify({
                 id: userPlayer.username,
@@ -575,32 +653,53 @@ function receiveMessage(msg) {
 
 function updateUser(e) {
     if (e.key=="Enter") {
+        console.log("enter key pressed");
         setUser();
     }
 }
 
-function setUser(usr, textbox) {
+
+
+
+function setUser(usr) {
+    
+    console.log("setUser called");
     if (!connected) {
         if (loginState == "username") {
-            if (usr.length > 0) {
-                userPlayer = new Player(usr, World.spawnPos, usr, "#FF0000");
+            console.log(usr);
+            console.log("length:" + usr.length);
+            if (usr.length > 3 && usr.length < 20){
                 webSocket.send(JSON.stringify({
-                    id: `${userPlayer.username}`
+                    id: `${usr}`
                 }));
+                loginState = "awaitingVerification";
             }
-            loginState = "awaitingVerification";
         } else if (loginState == "usernameVerified") {
+            userPlayer = new Player(usr, World.spawnPos, usr, "#FF0000");
+            document.querySelector(".popup").style.display = "none";
+            document.querySelector(".container").style.display="none";
             loginState = "playing";
             receiveMessage("Username set to "+userPlayer.username);
             cameraList.push(new Camera("playerCam", Vector2.zero, 0.01, [-1024, -1024, 1024, 1024]));
             activeCamera = cameraList[cameraList.length-1];
-            textbox.setDisabled(true);
-            TextInput.findInputByID("chatInput").setDisabled(false);
-            
+            //textbox.setDisabled(true);
+            //console.log(findInputByID)
+          //  TextInput.findInputByID("chatInput").setDisabled(false);
+          document.getElementById('chatInput').addEventListener('keypress', function(e){
+            console.log("TESSTTTT");    
+            if(e.key==="Enter"){
+                console.log("inside ekey pressed");
+                document.getElementById('sendMessageButton').click(); 
+                }
+        }
+        )
             connect();
             startAnimating();
         }
+
+        console.log("Final login state: " + loginState);
     }
+
 }
 
 function connect() {
@@ -667,6 +766,7 @@ function update() {
 
     GameObject.objs.sort(GameObject.sortVertically);
     GameObject.objs.forEach((element) => {
+        
         element.draw();
     })
     

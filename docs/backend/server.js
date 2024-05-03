@@ -5,7 +5,9 @@
 const express = require('express')
 const app = express()
 const { WebSocketServer } = require('ws')
-const sockserver = new WebSocketServer({ port: 443 })
+const http = require('http');
+
+const sockserver = new WebSocketServer({ clientTracking: true, noServer: true })
 
 // Creates a unique uid
 sockserver.getUniqueID = function () {
@@ -65,6 +67,7 @@ const files = {
   '/sprites/tiles/pathSouthWestInner.png' : ['image/png', '../frontend/sprites/tiles/pathSouthWestInner.png'],
   '/sprites/tiles/pathEastWest.png' : ['image/png', '../frontend/sprites/tiles/pathEastWest.png'],
   '/sprites/tiles/pathNorthSouth.png' : ['image/png', '../frontend/sprites/tiles/pathNorthSouth.png'],
+  '/sprites/tiles/pathAtlas.png' : ['image/png', '../frontend/sprites/tiles/pathAtlas.png'],
   '/sprites/speechBubble.png' : ['image/png', '../frontend/sprites/speechBubble.png'],
   '/sprites/speechBubbleOther.png' : ['image/png', '../frontend/sprites/speechBubbleOther.png'],
   '/sprites/bg.png' : ['image/png', '../frontend/sprites/bg.png'],
@@ -98,10 +101,6 @@ app.get('/*', (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
-});
-
 // Socket Server Code
 sockserver.on('connection', (ws, req) => {
   console.log(`New client connected with IP ${req.socket.remoteAddress}`); 
@@ -118,7 +117,8 @@ sockserver.on('connection', (ws, req) => {
       });
       delete clients[ws.id];
     } catch (e) {
-      console.log(`Disconnect failed! Error: \n${e}`);
+      console.log("Disconnect failed! Error:");
+      console.log(e);
     }
   });
 
@@ -156,8 +156,11 @@ sockserver.on('connection', (ws, req) => {
       var validName = true;
 
       // Checks if the username is taken and if so tells the client to select a different username
+      console.log(clients);
       for (const [key, value] of Object.entries(clients)) {
-        if (obj.id == value) {
+        
+        if (obj.id == value[0]) {
+          console.log("Duplicate username detected");
           validName = false;
           ws.send(JSON.stringify({
             invalidName: true,
@@ -177,7 +180,8 @@ sockserver.on('connection', (ws, req) => {
         validName = false;
         ws.send(JSON.stringify({
           invalidName: true,
-          usernameError: "Invalid Username"
+          usernameError: "Invalid Username",
+          
         }));
       }
 
@@ -215,3 +219,13 @@ sockserver.on('connection', (ws, req) => {
 function distance(x1, x2, y1, y2) {
   return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
 }
+
+const server = http.createServer(app);
+
+server.on('upgrade', (request, socket, head) => {
+  sockserver.handleUpgrade(request, socket, head, (ws) => {
+    sockserver.emit('connection', ws, request);
+  });
+});
+
+server.listen(port, () => console.log(`Listening on http://localhost:${port}`));

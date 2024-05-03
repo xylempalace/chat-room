@@ -246,12 +246,13 @@ class Game {
      * @param {Board} board board of the game
      * @param dimensions 
      */
-    constructor(title, maxPlayers, minPlayers, board, dimensions) {
+    constructor(title, maxPlayers, minPlayers, board, dimensions, rules) {
         this.title = title;
         this.maxPlayers = maxPlayers;
         this.minPlayers = minPlayers;
         this.gameBoard = board;
         this.dimensions = dimensions;
+        this.rules = rules;
     }
 
     /**
@@ -275,8 +276,8 @@ class Game {
      * @param rules win condition
      * @returns whether or not a player has one
      */
-    testWin(rules) {
-        return rules(this.board, this.players, this.turn);
+    testWin() {
+        return rules[0](this.board, this.players, this.turn);
     }
 }
 

@@ -47,6 +47,7 @@ const files = {
   '/favicon.ico' : ['image/vnd.microsoft.icon', '../images/favicon.ico'],
   '/lemEngine.js' : ['text/javascript', '../frontend/lemEngine.js'],
   '/ui.js' : ['text/javascript', '../frontend/ui.js'],
+  '/tictactoe.js' : ['text/javascript', '../frontend/tictactoe.js'],
   '/imageManipulator.js' : ['text/javascript', '../tools/imageTools/imageManipulator.js'],
 
   // Tiles

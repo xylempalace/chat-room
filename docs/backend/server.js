@@ -85,6 +85,8 @@ const files = {
   '/sprites/player/base_flipped.png' : ['image/png', '../frontend/sprites/player/base_flipped.png'],
   '/sprites/player/flower.png' : ['image/png', '../frontend/sprites/player/flower.png'],
   '/sprites/player/flower_flipped.png' : ['image/png', '../frontend/sprites/player/flower_flipped.png'],
+  '/sprites/player/fedora.png' : ['image/png', '../frontend/sprites/player/fedora.png'],
+  '/sprites/player/fedora_flipped.png' : ['image/png', '../frontend/sprites/player/fedora_flipped.png'],
 };
 
 var clients = {};

@@ -777,7 +777,7 @@ function update() {
 function serverUpdate() {
     setTimeout(() => {
         serverUpdate();
-    }, 20);
+    }, 10);
     webSocket.send(JSON.stringify({
         id: userPlayer.username,
         posX: userPlayer.pos.x,

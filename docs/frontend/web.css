@@ -31,13 +31,12 @@ body{
 .chatInput{
     position: absolute; 
     width: 160px;
-    top: 96%;
+    top: 93.5%;
     left: .3%;
     background-color: rgba(255, 255, 255,);
     border: 2px solid black;
     border-radius: 10px;
-    height: 3%;
-    width: 72%; 
+    height: 2%;
 }
 
 
@@ -166,4 +165,7 @@ input{
     transform: scale(1.1);
 }
 
-
+.settingsCSS{
+    cursor: pointer;
+    size: 200%;
+}

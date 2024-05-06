@@ -82,11 +82,13 @@ const files = {
 
   //Player
   '/sprites/player/base.png' : ['image/png', '../frontend/sprites/player/base.png'],
-  '/sprites/player/base_flipped.png' : ['image/png', '../frontend/sprites/player/base_flipped.png'],
-  '/sprites/player/flower.png' : ['image/png', '../frontend/sprites/player/flower.png'],
-  '/sprites/player/flower_flipped.png' : ['image/png', '../frontend/sprites/player/flower_flipped.png'],
   '/sprites/player/fedora.png' : ['image/png', '../frontend/sprites/player/fedora.png'],
-  '/sprites/player/fedora_flipped.png' : ['image/png', '../frontend/sprites/player/fedora_flipped.png'],
+  '/sprites/player/flower.png' : ['image/png', '../frontend/sprites/player/flower.png'],
+  '/sprites/player/big_glasses.png' : ['image/png', '../frontend/sprites/player/big_glasses.png'],
+  '/sprites/player/horns.png' : ['image/png', '../frontend/sprites/player/horns.png'],
+  '/sprites/player/tail.png' : ['image/png', '../frontend/sprites/player/tail.png'],
+  '/sprites/player/lil_glasses.png' : ['image/png', '../frontend/sprites/player/lil_glasses.png'],
+
 };
 
 var clients = {};

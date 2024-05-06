@@ -736,6 +736,9 @@ function startAnimating() {
     new Prop(treeA, new Vector2(100, -450), new Vector2(170, 420), new Vector2(300, 300)).addCollider(treeCollider);
     new Prop(treeA, new Vector2(775, 575), new Vector2(170, 420), new Vector2(300, 300)).addCollider(treeCollider);
     new Prop(pillar_1, new Vector2(96, 96), new Vector2(256, 500), new Vector2(128, 105)).addCollider(smallCollider);
+    new Prop(pillar_2, new Vector2(-96, -96), new Vector2(256, 500), new Vector2(128, 105)).addCollider(smallCollider);
+    new Prop(pillar_3, new Vector2(96, -96), new Vector2(256, 500), new Vector2(128, 105)).addCollider(smallCollider);
+    new Prop(pillar_4, new Vector2(-96, 96), new Vector2(256, 500), new Vector2(128, 105)).addCollider(smallCollider);
     
     startTime = Date.now(); 
     drawScreen();

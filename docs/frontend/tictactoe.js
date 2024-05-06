@@ -3,8 +3,8 @@ function createTicTacToe() {
     for (var i = 0; i < 3; i++) {
         gameBoard.setRow(i, [new Piece("")], () => true);
     }
-    function moveCondition(inSpot) {
-        return inSpot.value == "";
+    function moveCondition(inSpot, turn) {
+        return inSpot.value === "" && turn === Resources.order;
     };
     const winCondition = (gameBoard, players, turn) => {
         const getWinner = arr => {

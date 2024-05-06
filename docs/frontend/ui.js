@@ -4,6 +4,7 @@ class Resources {
     static currentRoomID;
     static owner = false;
     static playerNum;
+    static order;
 }
 
 class Board {
@@ -104,8 +105,8 @@ class Board {
      * @param obj the new object to replace the old
      * @param condition the function that determines whether or not to run set the position to the new object 
      */
-    setPos(pos, obj, condition) {
-        if (condition(this.get(pos))) {
+    setPos(pos, obj, condition, turn) {
+        if (condition(this.get(pos), turn)) {
             this.set(pos, obj);
         }
     }
@@ -116,8 +117,8 @@ class Board {
      * @param {Vector2} toPos the destination of the moving object
      * @param condition the function that determines whether or not to move the object
      */
-    move(fromPos, toPos, condition) {
-        if (condition(this.get(fromPos), this.get(toPos))) {
+    move(fromPos, toPos, condition, turn) {
+        if (condition(this.get(fromPos), this.get(toPos), turn)) {
             this.set(toPos, this.get(fromPos));
             this.set(fromPos, null);
         }
@@ -129,25 +130,25 @@ class Board {
      * @param {Vector2} toPos the position of the second object to be swapped
      * @param condition the function that determines whether or not to swap the objects
      */
-    swap(fromPos, toPos, condition) {
-        if (condition(this.get(fromPos), this.get(toPos))) {
+    swap(fromPos, toPos, condition, turn) {
+        if (condition(this.get(fromPos), this.get(toPos), turn)) {
             var temp = this.get(toPos);
             this.set(toPos, this.get(fromPos));
             this.set(fromPos, temp);
         }
     }
 
-    setRow(row, objs, condition) {
+    setRow(row, objs, condition, turn) {
         for (var i = 0; i < this.columns; i++) {
-            if (condition(this.get(new Vector2(i, row)))) {
+            if (condition(this.get(new Vector2(i, row)), turn)) {
                 this.set(new Vector2(i, row), objs[i % objs.length]);
             }
         }
     }
 
-    setColumn(column, objs, condition) {
+    setColumn(column, objs, condition, turn) {
         for (var i = 0; i < this.rows; i++) {
-            if (condition(this.get(new Vector2(column, i)))) {
+            if (condition(this.get(new Vector2(column, i)), turn)) {
                 this.set(new Vector2(column, i), objs[i % objs.length]);
             }
         }

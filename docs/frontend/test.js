@@ -127,6 +127,9 @@ webSocket.onmessage = (event) => {
     if ("owner" in obj) {
         Resources.owner = obj.owner;
     }
+    if ("order" in obj) {
+        Resources.order = obj.order;
+    }
     if ("playerNum" in obj) {
         Resources.playerNum = obj.playerNum;
         console.log(Resources.playerNum);

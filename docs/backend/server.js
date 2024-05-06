@@ -142,7 +142,8 @@ sockserver.on('connection', (ws, req) => {
             for (var i = 0; i < gameRooms[del][0].length; i++) {
               if (client.id === gameRooms[del][0][i]) {
                 client.send(JSON.stringify({
-                  playerNum: gameRooms[del][0].length
+                  playerNum: gameRooms[del][0].length,
+                  order: i
                 }));
               }
             }
@@ -208,7 +209,8 @@ sockserver.on('connection', (ws, req) => {
       ws.send(JSON.stringify({
         joinRoom: gameID,
         owner: true,
-        playerNum: gameRooms[gameID][0].length
+        playerNum: gameRooms[gameID][0].length,
+        order: 0
       }));
     } else if ("leaveRoom" in obj) {  
       // Handles leaving game rooms
@@ -237,7 +239,8 @@ sockserver.on('connection', (ws, req) => {
               console.log(client.id === gameRooms[obj.leaveRoom][0][i]);
               if (client.id === gameRooms[obj.leaveRoom][0][i]) {
                 client.send(JSON.stringify({
-                  playerNum: gameRooms[obj.leaveRoom][0].length
+                  playerNum: gameRooms[obj.leaveRoom][0].length,
+                  order: i
                 }));
               }
             }
@@ -266,7 +269,8 @@ sockserver.on('connection', (ws, req) => {
                 console.log(client.id === value[0][i]);
                 if (client.id === value[0][i]) {
                   client.send(JSON.stringify({
-                    playerNum: value[0].length
+                    playerNum: value[0].length,
+                    order: i
                   }));
                 }
               });
@@ -296,7 +300,8 @@ sockserver.on('connection', (ws, req) => {
               console.log(client.id === room[0][i]);
               if (client.id === room[0][i]) {
                 client.send(JSON.stringify({
-                  playerNum: room[0].length
+                  playerNum: room[0].length,
+                  order: i
                 }));
               }
             });
@@ -319,7 +324,8 @@ sockserver.on('connection', (ws, req) => {
               console.log(client.id === room[0][i]);
               if (client.id === room[0][i]) {
                 client.send(JSON.stringify({
-                  playerNum: room[0].length
+                  playerNum: room[0].length,
+                  order: i
                 }));
               }
             });

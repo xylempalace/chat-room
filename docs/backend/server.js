@@ -135,13 +135,14 @@ sockserver.on('connection', (ws, req) => {
         client.send(JSON.stringify({
           id: obj.id,
           posX: obj.posX,
-          posY: obj.posY
+          posY: obj.posY,
+          flipped: obj.flipped
         }));
       });
     } else if ("msg" in obj) {
       // When a message is sent this code distributes that message to other clients
       sockserver.clients.forEach(client => {
-        if (distance(clients[client.id][1], clients[ws.id][1], clients[client.id][2], clients[ws.id][2]) < 800) {
+        if (distance(clients[client.id][1], clients[ws.id][1], clients[client.id][2], clients[ws.id][2]) < 700) {
           const matches = matcher.getAllMatches(obj.msg);
           var newmsg = (censor.applyTo(obj.msg, matches));
           obj.msg = newmsg; 

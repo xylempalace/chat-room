@@ -76,9 +76,12 @@ webSocket.onmessage = (event) => {
         })
         if (p != null) {
             p.pos.x = obj.posX;
-            p.pos.y = obj.posY; 
+            p.pos.y = obj.posY;
+            p.flipped = obj.flipped;
         } else {
-            otherPlayers.push(new Player(obj.id, new Vector2(obj.posX, obj.posY), obj.id, "#FF0000"));
+            var newPlayer = new Player(obj.id, new Vector2(obj.posX, obj.posY), obj.id, "#FF0000");
+            newPlayer.flipped = obj.flipped;
+            otherPlayers.push(newPlayer);
         }
     } else if ("invalidName" in obj || obj.invalidName) {
         // Handles recieving username selction errors and verification
@@ -663,7 +666,7 @@ function setUser(usr) {
         if (loginState == "username") {
             console.log(usr);
             console.log("length:" + usr.length);
-            if (usr.length > 3 && usr.length < 20){
+            if (usr.length > 2 && usr.length < 20){
                 webSocket.send(JSON.stringify({
                     id: `${usr}`
                 }));
@@ -778,7 +781,8 @@ function serverUpdate() {
     webSocket.send(JSON.stringify({
         id: userPlayer.username,
         posX: userPlayer.pos.x,
-        posY: userPlayer.pos.y
+        posY: userPlayer.pos.y,
+        flipped: userPlayer.flipped
     }));
 }
 

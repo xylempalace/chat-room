@@ -48,8 +48,6 @@ class ImageManipulator {
 						// Preform canvas manipulations
 						args.forEach((i) => {
 							ImageManipulator.alterCanvas(i, image);
-							//ImageManipulator.context.scale(-1, 1);
-							//ImageManipulator.context.translate(-ImageManipulator.canvas.width, 0);
 						});
 
 						// Draw the image onto the manipulated canvas
@@ -110,6 +108,25 @@ class ImageManipulator {
                 ImageManipulator.canvas.width = params[0];
                 ImageManipulator.canvas.height = params[1];
                 break;
+
+			case 'hsv':
+				// Recolor image using HSV
+				ImageManipulator.context.filter = `hue-rotate(${params[0]}deg) saturate(${params[1]}%) brightness(${params[2]}%)`;
+				console.log("a");
+				break;
 		}
+	}
+
+	// Stolen code from stack overflow
+	static rgb2hsv(r,g,b) {
+		let v=Math.max(r,g,b), c=v-Math.min(r,g,b);
+		let h= c && ((v==r) ? (g-b)/c : ((v==g) ? 2+(b-r)/c : 4+(r-g)/c)); 
+		return [60*(h<0?h+6:h), v&&c/v, v];
+	}
+
+	// Stolen code from stack overflow
+	static hsv2rgb(h,s,v) {   
+		let f= (n,k=(n+h/60)%6) => v - v*s*Math.max( Math.min(k,4-k,1), 0);
+		return [f(5),f(3),f(1)];
 	}
 }

@@ -238,6 +238,7 @@ class Game {
     deck;
     turn = 0;
     dimensions;
+    buttons;
 
     /**
      * Game object that handles playing a game
@@ -247,13 +248,14 @@ class Game {
      * @param {Board} board board of the game
      * @param dimensions 
      */
-    constructor(title, maxPlayers, minPlayers, board, dimensions, rules) {
+    constructor(title, maxPlayers, minPlayers, board, dimensions, rules, buttons) {
         this.title = title;
         this.maxPlayers = maxPlayers;
         this.minPlayers = minPlayers;
         this.gameBoard = board;
         this.dimensions = dimensions;
         this.rules = rules;
+        this.buttons = buttons;
     }
 
     /**
@@ -349,7 +351,7 @@ class UiGameMenu {
         this.height = source.dimensions.y * activeCamera.zoom;
         const canvas = document.getElementById("gameCanvas");
         this.origin = new Vector2(canvas.width / 2 - this.width / 2, canvas.height / 2 - this.height / 2);
-        this.center = new Vector2(this.origin.x + this.width / 2, this.origin.y + this.height / 2);
+        this.center = new Vector2(canvas.width / 2, canvas.height / 2);
         this.buttons.push(new Button(this.center, source.dimensions.x, source.dimensions.y, "#cacaca", "", 30, null, 0, null));
 
         // Room Joining UI
@@ -440,9 +442,14 @@ class UiGameMenu {
      * Draws the game window to the screen
     */
    draw() {
-       ctx.save()
-       for (var i = 0 ; i < this.buttons.length; i++) {
+        ctx.save()
+        for (var i = 0 ; i < this.buttons.length; i++) {
            this.buttons[i].draw(this.windowState, this.source.minPlayers); 
+        }
+        if (this.windowState === 3) {    
+            for (var i = 0; i < this.source.buttons.length; i++) {
+                this.source.buttons[i].draw(this.windowState);
+            }
         }
         ctx.textAlign = 'center';
         ctx.fillStyle = "black";
@@ -509,7 +516,7 @@ class Button {
      * @param {number} state the state number of the game window when this button should draw
      * @param {number} nextState the state the game window should switch upon click 
      * @param {Function} processButton specialized code to run when pressed
-     * @param {Function} extraCondition a function that tells the button to display when the specified condition is met
+     * @param extraCondition a function that tells the button to display when the specified condition is met
      */
     constructor(origin, width, height, color, text, fontSize, state, nextState, extraCondition, processButton = null) {
         this.width = width * activeCamera.zoom;

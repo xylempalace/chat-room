@@ -3,9 +3,11 @@ function createTicTacToe() {
     for (var i = 0; i < 3; i++) {
         gameBoard.setRow(i, [new Piece("")], () => true);
     }
+
     function moveCondition(inSpot, turn) {
         return inSpot.value === "" && turn === Resources.order;
     };
+
     const winCondition = (gameBoard, players, turn) => {
         const getWinner = arr => {
             if (arr.every(val => val.value === arr[0].value)) {
@@ -49,6 +51,17 @@ function createTicTacToe() {
         return win;
     };
 
+    const canvas = document.getElementById("gameCanvas");
+    var dimensions = new Vector2(800, 400);
+    var width = dimensions.x * activeCamera.zoom;
+    var height = dimensions.y * activeCamera.zoom;
+    var origin = new Vector2(canvas.width / 2 - width / 2, canvas.height / 2 - height / 2)
+    var center = new Vector2(canvas.width / 2, canvas.height / 2);
+    var buttons = [];
     
-    return new Game("Tic Tac Toe", 2, 2, gameBoard, new Vector2(800, 400), [winCondition, moveCondition]);
+    for (var i = 0; i < 9; i++) {
+        buttons.push(new Button(new Vector2(center.x + (-70 + (i % 3) * 70) * activeCamera.zoom, center.y + (-70 + Math.floor(i / 3) * 70) * activeCamera.zoom), 60, 60, "#7d7d7d", "", 30, 3, 3, null));
+    }
+
+    return new Game("Tic Tac Toe", 2, 2, gameBoard, dimensions, [winCondition, moveCondition], buttons);
 }

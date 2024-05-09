@@ -270,8 +270,8 @@ class Game {
      * Switches turn
      */
     switchTurn() {
-        turn++;
-        turn %= this.players;
+        this.turn++;
+        this.turn %= this.players;
     }
 
     /**
@@ -488,6 +488,17 @@ class UiGameMenu {
                 }
             }
 
+            for (var i = 0; i < this.source.buttons.length; i++) {
+                if (this.source.buttons[i].windowState === this.windowState && (this.source.buttons[i].extraCondition === null || this.source.buttons[i].extraCondition(this.source.minPlayers))) {
+                    var nextState = this.source.buttons[i].processClick(position, (condition, nextState, windowState) => {
+                        if (condition) {
+                            return nextState;
+                        } else {
+                            return windowState;
+                    }}, this.source.minPlayers, this.source.maxPlayers, this.source);
+                }
+            }
+
             // If mouse is outside of any valid buttons, return false
             return false;
         }
@@ -552,7 +563,7 @@ class Button {
      * @param {Function} execute passed in function that determines what is done with the click
      * @returns returns output of the execute function
      */
-    processClick(position, execute, min, max) {
+    processClick(position, execute, min, max, game) {
         var input = document.getElementById("gameDiv");
         if (input !== null && this.windowState !== null) {
             input.remove();
@@ -560,7 +571,7 @@ class Button {
         var condition = position.x >= this.origin.x && position.y >= this.origin.y && position.x <= this.origin.x + this.width && position.y <= this.origin.y + this.height;
         
         if (condition && this.process !== null) {
-            this.process(min, max);
+            this.process(min, max, this, game);
         }
         return execute(condition, this.nextState, this.windowState);
     }

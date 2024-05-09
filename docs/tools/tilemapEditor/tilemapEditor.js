@@ -9,6 +9,13 @@ const rowSelect = document.getElementById("rows");
 const colSelect = document.getElementById("cols");
 const zoom_in = document.getElementById("zoom_in");
 const zoom_out = document.getElementById("zoom_out");
+
+const offsetLeft = document.getElementById("offsetLeft");
+const offsetRight = document.getElementById("offsetRight");
+const offsetUp = document.getElementById("offsetUp");
+const offsetDown = document.getElementById("offsetDown");
+let offset = new Vector2(0,0);
+
 let isDark = false;
 
 let drawing = false;
@@ -159,6 +166,8 @@ const tilePalette = [
     new Sprite("tiles/floor.png"),
     new Sprite("tiles/wall.png"),
     new Sprite("tiles/grass.png"),
+
+    // Path
     new Sprite("tiles/pathCenter.png"),
     new Sprite("tiles/pathNorth.png"),
     new Sprite("tiles/pathSouth.png"),
@@ -174,7 +183,22 @@ const tilePalette = [
     new Sprite("tiles/pathSouthEastInner.png"),
     new Sprite("tiles/pathSouthWestInner.png"),
     new Sprite("tiles/pathNorthSouth.png"),
-    new Sprite("tiles/pathEastWest.png"),
+    new Sprite("tiles/pathEastWest.png"), // Index 19
+
+    // Cliff
+    new Sprite("tiles/cliff.png"),
+    new Sprite("tiles/cliffNorth.png"),
+    new Sprite("tiles/cliffSouth.png"),
+    new Sprite("tiles/cliffEast.png"),
+    new Sprite("tiles/cliffWest.png"),
+	new Sprite("tiles/cliffNorthEast.png"),
+	new Sprite("tiles/cliffNorthWest.png"),
+    new Sprite("tiles/cliffSouthEast.png"),
+    new Sprite("tiles/cliffSouthWest.png"),
+    new Sprite("tiles/cliffNorthEastInner.png"),
+	new Sprite("tiles/cliffNorthWestInner.png"),
+    new Sprite("tiles/cliffSouthEastInner.png"),
+    new Sprite("tiles/cliffSouthWestInner.png"),
 ];
 
 const colliderPalette = [
@@ -227,6 +251,42 @@ const tilesForEditor = [
              1, 0, 1, 
              0, 1,-1]), 
         new TileRule(tilePalette[17], [
+             0, 1, 0,
+             1, 0, 1, 
+            -1, 1, 0]), 
+    ]),
+    new Tile("Cliff", [
+        new TileRule(tilePalette[20]), 
+		
+        // Single side
+        new TileRule(tilePalette[21], [0, -1, 0, 0, 0, 0, 0, 1, 0]), 
+        new TileRule(tilePalette[22], [0, 1, 0, 0, 0, 0, 0, -1, 0]), 
+        new TileRule(tilePalette[23], [0, 0, 0, 1, 0, -1, 0, 0, 0]), 
+        new TileRule(tilePalette[24], [0, 0, 0, -1, 0, 1, 0, 0, 0]), 
+		
+        // Corners
+		new TileRule(tilePalette[25], [0, -1, 0, 1, 0, -1, 0, 1, 0]), 
+        new TileRule(tilePalette[26], [0, -1, 0, -1, 0, 1, 0, 1, 0]), 
+        new TileRule(tilePalette[27], [0, 1, 0, 1, 0, -1, 0, -1, 0]), 
+        new TileRule(tilePalette[28], [0, 1, 0, -1, 0, 1, 0, -1, 0]), 
+		
+        // Center
+        new TileRule(tilePalette[20], [0, 1, 0, 1, 0, 1, 0, 1, 0]),
+    
+        // Inner Corners
+        new TileRule(tilePalette[29], [
+             0, 1,-1,
+             1, 0, 1,
+             0, 1, 0]), 
+        new TileRule(tilePalette[30], [
+            -1, 1, 0, 
+             1, 0, 1, 
+             0, 1, 0]), 
+        new TileRule(tilePalette[31], [
+             0, 1, 0, 
+             1, 0, 1, 
+             0, 1,-1]), 
+        new TileRule(tilePalette[32], [
              0, 1, 0,
              1, 0, 1, 
             -1, 1, 0]), 
@@ -300,6 +360,10 @@ collider_decrease.addEventListener("click", () => {
     colliderWidth -= 0.25;
 });
 
+offsetLeft.addEventListener("click", () => {offset.x--;});
+offsetRight.addEventListener("click", () => {offset.x++;});
+offsetUp.addEventListener("click", () => {offset.y--;});
+offsetDown.addEventListener("click", () => {offset.y++;});
 
 
 class TextInput {
@@ -454,8 +518,10 @@ function sendMessage(msg) {
             console.log(cTile);
             if (cTile <= 3) {
                 drawnMap.set(y, x, cTile);
-            } else {
+            } else if (cTile <= 19) {
                 drawnMap.set(y, x, 4);
+            } else {
+                drawnMap.set(y, x, 5);
             }
         }
     }
@@ -470,7 +536,7 @@ function addTile(pos) {
         let x = Math.floor((pos.x / activeCamera.zoom) / tileSize);
         let y = Math.floor((pos.y / activeCamera.zoom) / tileSize);
 
-        drawnMap.set(x, y, selectedTileIndex);
+        drawnMap.set(x+offset.x, y+offset.y, selectedTileIndex);
         
         log.textContent = "";
         for (let j = 0; j < rows; j++) {

@@ -14,6 +14,8 @@ const backgroundTiles = [
     new Sprite("tiles/floor.png"),
     new Sprite("tiles/wall.png"),
     new Sprite("tiles/grass.png"),
+
+    // Path
     new Sprite("tiles/pathCenter.png"),
     new Sprite("tiles/pathNorth.png"),
     new Sprite("tiles/pathSouth.png"),
@@ -30,12 +32,29 @@ const backgroundTiles = [
     new Sprite("tiles/pathSouthWestInner.png"),
     new Sprite("tiles/pathNorthSouth.png"),
     new Sprite("tiles/pathEastWest.png"),
+
+    // Cliff
+    new Sprite("tiles/cliff.png"),
+    new Sprite("tiles/cliffNorth.png"),
+    new Sprite("tiles/cliffSouth.png"),
+    new Sprite("tiles/cliffEast.png"),
+    new Sprite("tiles/cliffWest.png"),
+	new Sprite("tiles/cliffNorthEast.png"),
+	new Sprite("tiles/cliffNorthWest.png"),
+    new Sprite("tiles/cliffSouthEast.png"),
+    new Sprite("tiles/cliffSouthWest.png"),
+    new Sprite("tiles/cliffNorthEastInner.png"),
+	new Sprite("tiles/cliffNorthWestInner.png"),
+    new Sprite("tiles/cliffSouthEastInner.png"),
+    new Sprite("tiles/cliffSouthWestInner.png"),
 ];
+
+let abyssCollection = [];
 
 // const board = new Board(100, 100);
 
 const backgroundMap = new TileMap(new Vector2(0,0), backgroundTiles, 64, 32, 32, [
-    11,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,13,5,16,7,7,7,7,7,7,7,7,7,7,7,14,4,4,4,4,16,7,7,7,7,7,7,7,7,7,7,7,14,6,5,6,3,3,3,3,3,3,3,3,3,3,3,10,14,4,16,7,12,3,3,3,3,3,1,3,3,3,3,3,5,6,5,6,3,3,3,3,3,3,3,3,3,9,3,3,5,16,12,3,3,3,3,3,3,3,3,3,3,1,3,3,5,6,5,6,3,3,3,3,3,3,3,3,3,3,3,11,15,6,3,3,9,3,3,3,3,3,3,1,3,3,3,3,5,6,5,6,1,3,3,3,3,3,3,3,3,3,3,5,4,6,3,3,3,3,3,3,3,3,3,1,1,1,3,3,5,6,10,12,1,1,3,3,3,3,3,3,3,3,3,5,4,6,3,3,3,3,3,3,3,3,3,1,1,1,1,3,5,6,2,2,2,1,3,3,3,3,3,3,3,3,3,10,14,6,3,3,3,3,3,3,3,3,1,1,1,1,1,3,5,6,2,2,2,1,3,3,3,3,3,3,3,3,3,3,5,17,13,3,3,3,3,3,3,3,1,1,1,3,1,3,5,6,1,1,1,1,3,3,3,3,3,3,3,3,3,3,10,14,6,3,3,3,3,3,3,3,1,1,1,1,1,3,5,6,1,1,1,1,3,3,3,3,3,3,3,3,3,3,3,5,6,3,3,3,3,3,3,3,1,3,1,1,3,3,5,6,1,1,1,3,3,3,3,3,3,3,3,11,8,8,8,15,17,8,8,8,13,3,3,3,3,3,1,3,3,3,5,6,2,2,2,3,3,3,3,3,3,3,3,5,16,7,7,14,16,7,7,14,6,3,3,3,1,3,3,3,1,3,5,6,2,2,2,1,3,3,3,3,3,3,3,5,6,3,3,5,6,3,3,5,6,3,3,3,3,3,1,3,3,3,5,6,2,2,2,1,3,3,3,3,3,3,3,5,6,3,2,1,1,2,3,5,6,3,3,3,3,3,3,3,3,3,5,6,2,2,2,3,3,3,3,3,3,3,3,5,17,8,1,1,1,1,8,15,6,3,3,3,3,3,3,3,3,3,5,6,5,6,1,3,3,3,3,3,3,3,3,5,16,7,1,1,1,1,7,14,6,2,3,2,3,2,3,2,3,2,5,6,5,6,3,3,3,3,3,3,3,3,3,5,6,3,2,1,1,2,3,5,6,3,3,3,3,3,3,3,3,3,5,6,5,6,3,3,3,3,3,3,3,3,3,5,6,3,3,5,6,3,3,5,6,3,3,3,3,3,3,3,3,3,5,6,5,6,3,3,3,3,3,3,3,3,3,5,17,8,8,15,17,8,8,15,17,13,3,3,3,3,3,3,3,3,5,6,5,6,3,3,11,19,19,19,13,3,3,10,7,7,7,7,7,7,7,14,4,6,3,3,3,3,3,3,3,3,5,6,5,6,3,11,12,1,1,1,10,13,3,3,3,3,3,3,2,3,3,10,14,17,13,3,3,3,3,3,3,3,5,6,5,6,3,18,1,11,19,13,1,18,3,3,3,3,3,3,3,3,3,3,10,14,17,8,8,13,3,3,3,3,5,6,5,6,3,18,1,18,2,18,1,18,3,3,3,3,3,3,2,3,3,3,3,10,7,14,4,17,8,13,3,3,5,6,5,6,3,18,1,10,19,12,1,18,3,3,3,3,3,3,3,3,3,3,3,3,3,5,4,4,4,6,3,3,5,6,5,6,3,10,13,1,1,1,11,12,3,3,3,3,3,3,2,3,3,3,3,3,3,10,14,4,4,6,3,3,5,6,5,6,3,3,10,19,19,19,12,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,10,14,4,17,8,8,15,6,5,6,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,3,3,3,3,3,3,3,3,10,14,4,4,4,4,6,5,6,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,5,16,7,14,4,6,5,6,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,3,3,3,3,3,3,3,11,8,15,6,3,5,4,6,5,17,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,15,4,4,17,8,15,4,6,10,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,12
+    20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,31,23,23,23,29,20,20,20,20,20,20,20,20,20,20,20,31,23,29,20,20,20,20,31,23,29,20,20,31,23,23,23,27,3,3,3,25,23,29,20,20,20,20,20,20,20,20,31,27,3,25,23,29,20,20,22,3,21,31,23,27,11,19,19,19,13,3,3,3,1,25,23,23,29,20,20,20,20,31,27,11,8,13,3,25,29,20,32,24,31,27,11,8,12,3,3,3,18,3,3,3,3,3,3,1,25,29,20,20,20,22,3,10,7,12,3,3,21,20,20,31,27,11,15,6,3,3,11,8,12,3,3,3,3,1,3,3,3,21,20,20,20,22,1,3,3,3,3,3,21,20,31,27,3,5,4,6,3,3,5,6,3,3,3,3,3,1,1,1,3,21,20,20,20,22,1,1,3,3,3,26,30,20,22,3,3,5,4,6,3,3,5,12,3,3,3,3,3,1,1,1,1,25,29,20,31,27,2,1,3,3,3,21,20,20,22,3,3,10,14,6,3,11,6,3,3,3,3,3,1,1,1,1,1,3,21,20,20,2,2,1,3,3,3,21,20,31,27,3,3,3,5,17,8,16,12,3,3,3,3,3,1,1,1,3,1,3,21,20,20,2,1,1,3,3,3,21,31,27,3,3,3,3,5,4,16,12,3,3,3,3,3,3,1,1,1,1,1,3,25,29,20,2,1,1,3,3,3,25,27,3,3,3,11,8,15,4,6,3,11,13,3,3,3,3,1,3,1,1,3,3,3,21,20,2,1,3,3,3,3,3,3,3,3,11,15,4,4,4,17,8,15,17,13,3,3,3,3,3,1,3,3,3,3,21,20,2,2,3,3,3,3,3,3,3,3,5,16,7,7,14,16,7,7,14,6,3,3,3,1,3,3,3,1,3,3,21,20,2,2,1,3,3,3,3,3,3,11,15,6,3,3,10,12,3,3,5,17,13,3,3,3,3,1,3,3,3,3,21,20,2,2,1,3,3,3,3,3,3,5,4,6,3,2,1,1,2,3,5,4,6,3,3,3,3,3,3,3,3,3,21,20,2,2,3,3,3,3,3,3,11,15,4,17,13,1,1,1,1,11,15,4,6,3,3,3,3,3,3,3,3,3,21,32,28,1,3,3,3,3,3,3,10,14,4,16,12,1,1,1,1,10,14,16,12,3,3,3,3,3,3,3,3,3,21,20,22,3,3,3,3,3,3,3,3,5,4,6,3,2,1,1,2,3,5,6,3,3,3,3,3,3,3,3,3,3,21,20,22,3,3,3,3,3,3,3,3,10,14,6,3,3,11,13,3,3,5,17,13,3,3,3,3,3,3,3,3,26,30,20,22,3,3,3,3,3,3,3,3,3,5,17,8,8,15,17,8,8,15,4,17,13,3,3,3,11,13,3,3,21,20,20,22,3,3,11,19,19,19,13,3,3,10,7,7,7,7,7,7,7,14,4,4,17,8,8,8,15,17,13,3,21,20,20,22,3,11,12,1,1,1,10,13,3,3,3,3,3,3,3,3,3,10,14,4,4,4,4,4,4,4,6,3,21,20,20,22,3,18,1,11,19,13,1,18,3,3,3,3,3,3,3,3,3,3,10,14,4,4,4,4,4,4,6,3,21,20,20,32,28,18,1,18,2,18,1,18,3,3,3,3,3,3,3,3,3,3,3,10,14,4,4,4,4,4,6,3,21,20,20,20,22,18,1,10,19,12,1,18,3,3,3,3,26,24,24,28,3,3,3,3,5,4,16,7,14,4,6,3,21,20,20,20,22,10,13,1,1,1,11,12,3,3,3,3,21,20,20,22,3,3,3,3,10,14,6,3,5,4,17,13,21,20,20,20,22,3,10,19,19,19,12,3,3,3,3,26,30,20,20,32,28,3,3,3,3,5,6,3,5,4,16,12,21,20,20,20,32,28,3,3,3,3,3,3,3,3,26,30,20,20,20,20,32,28,3,3,3,5,17,8,15,4,6,26,30,20,20,20,20,22,3,3,3,3,3,3,3,3,21,20,20,20,20,20,20,32,28,3,3,10,14,4,4,16,12,21,20,20,20,20,20,32,28,3,3,3,26,24,24,24,30,20,20,20,20,20,20,20,32,24,28,3,10,7,7,12,26,30,20,20,20,20,20,20,32,24,24,24,30,20,20,20,20,20,20,20,20,20,20,20,20,20,32,24,24,24,24,24,30,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20
 ]);
 const SpeechBubbleSprite = new NineSlicedSprite("speechBubble.png"  , [16, 16, 16, 24]);
 
@@ -441,7 +460,7 @@ class Prop extends GameObject {
     center;
     centerProportion;
     ready = false;
-    collider;
+    colliders = [];
 
     /**
      * 
@@ -464,7 +483,6 @@ class Prop extends GameObject {
                 ((this.size.y * center.y) / this.sprite.height)
                 )
             this.ready = true;
-            console.log(this.scaler)
         }, 10);
     }
 
@@ -478,46 +496,86 @@ class Prop extends GameObject {
     }
 
     addCollider(relativePoints) {
-        this.collider = new StaticConvexCollider(this.pos, relativePoints);
+        this.colliders.push(new StaticConvexCollider(this.pos, relativePoints));
     }
 }
 
 class Abyss {
-    static bgImage;
-    static bgImageLoaded = false;
-    static bgPattern;
+    bgImage;
+    bgImageLoaded = false;
+    bgPattern;
 
-    static xOffset;
-    static moveScale;
+    xOffset;
+    yOffset;
 
-    static init() {
+    scrollSpeedX;
+    scrollSpeedY;
+
+    moveScale;
+
+    constructor (image, moveScale, scrollSpeedX, scrollSpeedY) {
+
         // Declare that the abyss isn't loaded yet
-        Abyss.bgImageLoaded = false;
+        this.bgImageLoaded = false;
 
         // Declare its starting offset and speed
-        Abyss.xOffset = 0;
-        Abyss.moveScale = 0.1;
+        this.xOffset = 0;
+        this.yOffset = 0;
+        this.scrollSpeedX = scrollSpeedX;
+        this.scrollSpeedY = scrollSpeedY;
+        this.moveScale = moveScale;
 
         // Prepare image and update flag once ready
-        Abyss.bgImage = new Image();
-        Abyss.bgImage.onload = function () {
+        let self = this;
+        this.bgImage = new Image();
+        this.bgImage.onload = function () {
 
             // Create pattern for filling rect when drawn
-            Abyss.bgPattern = ctx.createPattern(Abyss.bgImage, "repeat");
-            Abyss.bgImageLoaded = true;
+            self.bgPattern = ctx.createPattern(self.bgImage, "repeat");
+            self.bgImageLoaded = true;
         }
-        Abyss.bgImage.src = "./sprites/bg.png";
+        this.bgImage.src = image.src;
     }
 
-    static draw(delta) {
-        if (Abyss.bgImageLoaded) {
+    /*draw(delta) {
+        if (this.bgImageLoaded) {
             ctx.save();
-            let offsetx = activeCamera.pos.x * -Abyss.moveScale;
-            let offsety = activeCamera.pos.y * -Abyss.moveScale;
+
+            let offsetx = this.xOffset;
+            offsetx += activeCamera.pos.x * -this.moveScale;
+            offsetx += this.scrollSpeedX * delta;
+
+            let offsety = this.yOffset;
+            offsety += activeCamera.pos.y * -this.moveScale;
+            offsety += this.scrollSpeedY * delta;
+
             ctx.translate(offsetx, offsety);
 
-            ctx.fillStyle = Abyss.bgPattern;
-            ctx.fillRect(-offsetx, -offsety, gameCanvas.width - offsetx, gameCanvas.height - offsety)
+            this.xOffset = offsetx;
+            this.yOffset = offsety;
+
+            ctx.fillStyle = this.bgPattern;
+            ctx.fillRect(offsetx, offsety, gameCanvas.width * 2 - offsetx, gameCanvas.height * 2 - offsety)
+            ctx.restore();
+        }
+    }*/
+
+    draw(delta) {
+        if (this.bgImageLoaded) {
+            ctx.save();
+
+            let offsetx = this.xOffset;
+            offsetx += activeCamera.pos.x * -this.moveScale;
+            //offsetx += this.scrollSpeedX * Date.time;
+
+            let offsety = this.yOffset;
+            offsety += activeCamera.pos.y * -this.moveScale;
+            //offsety += this.scrollSpeedY * Date.time;
+
+            ctx.translate(offsetx, offsety);
+
+            ctx.fillStyle = this.bgPattern;
+            ctx.fillRect(-offsetx, -offsety, (gameCanvas.width * 2) - offsetx, (gameCanvas.height * 2) - offsety)
             ctx.restore();
         }
     }
@@ -574,12 +632,10 @@ document.addEventListener("readystatechange", (e) => {
             // Once each tile is sliced, add them to background tiles in a group
             // With multiple atlases, these groups might get swapped depending on which finishes first
             prom.then((out) => {
-                console.log(out);
                 out.forEach((i) => {
                     backgroundTiles.push(new Sprite(i));
                 })
                 backgroundMap.tiles = backgroundTiles;
-                console.log(`Tilemap: \n ${backgroundMap.tiles}`)
             });
         }
 
@@ -708,7 +764,17 @@ function connect() {
 }
 
 function startAnimating() {
-    Abyss.init();
+
+    let bg = new Image();
+    bg.onload = function () {
+        abyssCollection.push(new Abyss(bg, 0.1, 0, 0));
+        bg = new Image();
+        bg.onload = function () {
+            abyssCollection.push(new Abyss(bg, 0.5, 1, 0));
+        }
+        bg.src = "./sprites/bg2.png";
+    }
+    bg.src = "./sprites/bg.png";
 
     let smallCollider = [
         Vector2.up.mul(20), 
@@ -729,16 +795,103 @@ function startAnimating() {
     let pillar_2 = new Sprite("pillar_2.png");
     let pillar_3 = new Sprite("pillar_3.png");
     let pillar_4 = new Sprite("pillar_4.png");
-    new Prop(treeB, new Vector2(-800, -450), new Vector2(256, 420), new Vector2(300, 300)).addCollider(treeCollider);
-    new Prop(treeA, new Vector2(-400, -250), new Vector2(170, 420), new Vector2(300, 300)).addCollider(treeCollider);
+    new Prop(treeB, new Vector2(-750, -550), new Vector2(256, 420), new Vector2(300, 300)).addCollider(treeCollider);
+    new Prop(treeA, new Vector2(-400, -270), new Vector2(170, 420), new Vector2(300, 300)).addCollider(treeCollider);
     new Prop(treeB, new Vector2(50, -850), new Vector2(256, 420), new Vector2(500, 500)).addCollider([Vector2.up.mul(20), Vector2.left.mul(50), Vector2.down.mul(20), Vector2.right.mul(100)]);
     new Prop(treeA, new Vector2(-650, -820), new Vector2(170, 420), new Vector2(350, 350)).addCollider(treeCollider);
     new Prop(treeA, new Vector2(100, -450), new Vector2(170, 420), new Vector2(300, 300)).addCollider(treeCollider);
-    new Prop(treeA, new Vector2(775, 575), new Vector2(170, 420), new Vector2(300, 300)).addCollider(treeCollider);
+    new Prop(treeB, new Vector2(-850, 570), new Vector2(256, 420), new Vector2(300, 300)).addCollider(treeCollider);
+    new Prop(treeA, new Vector2(635, 575), new Vector2(170, 420), new Vector2(500, 500)).addCollider([Vector2.up.mul(20), Vector2.left.mul(50), Vector2.down.mul(20), Vector2.right.mul(100)]);
     new Prop(pillar_1, new Vector2(96, 96), new Vector2(256, 500), new Vector2(128, 105)).addCollider(smallCollider);
     new Prop(pillar_2, new Vector2(-96, -96), new Vector2(256, 500), new Vector2(128, 105)).addCollider(smallCollider);
     new Prop(pillar_3, new Vector2(96, -96), new Vector2(256, 500), new Vector2(128, 105)).addCollider(smallCollider);
     new Prop(pillar_4, new Vector2(-96, 96), new Vector2(256, 500), new Vector2(128, 105)).addCollider(smallCollider);
+
+    let border = new Prop(pillar_1, new Vector2(0, 0), new Vector2(0, 0), new Vector2(1, 1));
+    border.addCollider([
+        new Vector2(-325, -588),
+        new Vector2(-620, -570),
+        new Vector2(-616, -344),
+        new Vector2(-465, -345),
+        new Vector2(-330, -495),
+    ]);
+    border.addCollider([
+        new Vector2(-1020, -1024),
+        new Vector2(-1000, -930),
+        new Vector2(1000, -950),
+        new Vector2(1020, -1010),
+    ]);
+    border.addCollider([
+        new Vector2(40, -940),
+        new Vector2(930, -725),
+        new Vector2(870, -900),
+    ]);
+    border.addCollider([
+        new Vector2(930, -725),
+        new Vector2(835, -500),
+        new Vector2(900, 235),
+    ]);
+    border.addCollider([
+        new Vector2(860, -305),
+        new Vector2(530, -135),
+        new Vector2(525, 95),
+        new Vector2(890, 440),
+    ]);
+    border.addCollider([
+        new Vector2(890, 420),
+        new Vector2(840, 820),
+        new Vector2(930, 980),
+    ]);
+    border.addCollider([
+        new Vector2(930, 700),
+        new Vector2(400, 980),
+        new Vector2(920, 920),
+    ]);
+    border.addCollider([
+        new Vector2(720, 870),
+        new Vector2(150, 880),
+        new Vector2(100, 1020),
+    ]);
+    border.addCollider([
+        new Vector2(140, 950),
+        new Vector2(-390, 940),
+        new Vector2(-400, 1020),
+    ]);
+    border.addCollider([
+        new Vector2(-310, 950),
+        new Vector2(-900, 700),
+        new Vector2(-910, 960),
+    ]);
+    border.addCollider([
+        new Vector2(-980, 300),
+        new Vector2(-985, 900),
+        new Vector2(-800, 730),
+    ]);
+    border.addCollider([
+        new Vector2(-845, -120),
+        new Vector2(-985, -900),
+        new Vector2(-980, 320),
+    ]);
+    border.addCollider([
+        new Vector2(-845, -120),
+        new Vector2(-616, -344),
+        new Vector2(-980, -350),
+    ]);
+    border.addCollider([
+        new Vector2(-820, -600),
+        new Vector2(-616, -344),
+        new Vector2(-620, -570),
+    ]);
+    border.addCollider([
+        new Vector2(-780, -940),
+        new Vector2(-985, -900),
+        new Vector2(-850, -700),
+    ]);
+    border.addCollider([
+        new Vector2(-850, -700),
+        new Vector2(-930, -615),
+        new Vector2(-750, -580),
+    ]);
     
     startTime = Date.now(); 
     drawScreen();
@@ -750,7 +903,9 @@ function update() {
     ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
 
     // Draw the background abyss
-    Abyss.draw(1);
+    abyssCollection.forEach((i) => {
+        i.draw(1);
+    })
 
     // Draw the tiles
     backgroundMap.draw();
@@ -771,6 +926,22 @@ function update() {
         element.drawSpeechBubbles(gameCanvas);
         element.update((Date.now()-startTime)/fpms);
     });
+
+    // Collider rendering
+    /*ctx.save();
+    ctx.globalAlpha = 0.5;
+    ctx.fillStyle = "#FF00FF";
+    let o = 400;
+    StaticConvexCollider.colliders.forEach((i) => {
+        ctx.beginPath();
+        ctx.moveTo((i.points[0].x - activeCamera.pos.x) * activeCamera.zoom + o, (i.points[0].y - activeCamera.pos.y) * activeCamera.zoom + o);
+        for (let j = 1; j < i.points.length; j++) {
+            ctx.lineTo((i.points[j].x - activeCamera.pos.x) * activeCamera.zoom + o, (i.points[j].y - activeCamera.pos.y) * activeCamera.zoom + o);
+        }
+        ctx.closePath();
+        ctx.fill();
+    })
+    ctx.restore();*/
 
 }
 

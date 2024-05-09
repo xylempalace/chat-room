@@ -105,8 +105,21 @@ webSocket.onmessage = (event) => {
     } else if ("invalidName" in obj || obj.invalidName) {
         // Handles recieving username selction errors and verification
         if (obj.invalidName) {
-            
-            console.log("Username is invalid!");
+            console.log("Reason for invalid username: " + obj.usernameError); 
+
+            console.log("Username is invalid!"); 
+            if (obj.usernameError === "Username Taken"){
+                document.getElementById("usernameErrorMsg").innerHTML = "Username is taken!";
+                
+            }
+            else{
+                document.getElementById("usernameErrorMsg").innerHTML = "Username is profane or invalid!";
+            }
+            setTimeout(() => {
+                document.getElementById("usernameErrorMsg").innerHTML = ""
+            }
+            ,5000);
+
             receiveMessage(obj.usernameError);
             loginState = "username";
           //  const textBox = textInputs.find((element) => element.textInput.getAttribute("placeholder") == "Username");

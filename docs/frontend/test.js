@@ -132,12 +132,20 @@ webSocket.onmessage = (event) => {
     }
     if ("playerNum" in obj) {
         Resources.playerNum = obj.playerNum;
-        console.log(Resources.playerNum);
     }
     if ("startRoom" in obj) {
         for (var i = 0; i < gameProps.length; i++) {
             if (gameProps[i].drawMenu) {
                 gameProps[i].window.windowState = 3;
+            }
+        }
+    }
+    if ("gameMove" in obj) {
+        for (var i = 0; i < gameProps.length; i++) {
+            if (gameProps[i].drawMenu) {
+                gameProps[i].game.processIncoming(obj.gameMove);
+                gameProps[i].game.switchTurn();
+                console.log(Resources.order);
             }
         }
     }

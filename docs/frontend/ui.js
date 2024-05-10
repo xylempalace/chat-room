@@ -239,6 +239,7 @@ class Game {
     turn = 0;
     dimensions;
     buttons;
+    processMove;
 
     /**
      * Game object that handles playing a game
@@ -248,7 +249,7 @@ class Game {
      * @param {Board} board board of the game
      * @param dimensions 
      */
-    constructor(title, maxPlayers, minPlayers, board, dimensions, rules, buttons) {
+    constructor(title, maxPlayers, minPlayers, board, dimensions, rules, buttons, processMove) {
         this.title = title;
         this.maxPlayers = maxPlayers;
         this.minPlayers = minPlayers;
@@ -256,6 +257,7 @@ class Game {
         this.dimensions = dimensions;
         this.rules = rules;
         this.buttons = buttons;
+        this.processMove = processMove;
     }
 
     /**
@@ -281,6 +283,10 @@ class Game {
      */
     testWin() {
         return rules[0](this.board, this.players, this.turn);
+    }
+
+    processIncoming(move) {
+        this.processMove(move, this);
     }
 }
 
@@ -495,7 +501,7 @@ class UiGameMenu {
                             return nextState;
                         } else {
                             return windowState;
-                    }}, this.source.minPlayers, this.source.maxPlayers, this.source);
+                    }}, this.source.minPlayers, this.source.maxPlayers, this.source, i);
                 }
             }
 
@@ -563,7 +569,7 @@ class Button {
      * @param {Function} execute passed in function that determines what is done with the click
      * @returns returns output of the execute function
      */
-    processClick(position, execute, min, max, game) {
+    processClick(position, execute, min, max, game, index) {
         var input = document.getElementById("gameDiv");
         if (input !== null && this.windowState !== null) {
             input.remove();
@@ -571,7 +577,7 @@ class Button {
         var condition = position.x >= this.origin.x && position.y >= this.origin.y && position.x <= this.origin.x + this.width && position.y <= this.origin.y + this.height;
         
         if (condition && this.process !== null) {
-            this.process(min, max, this, game);
+            this.process(min, max, this, game, index);
         }
         return execute(condition, this.nextState, this.windowState);
     }

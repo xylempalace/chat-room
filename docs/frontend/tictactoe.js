@@ -60,16 +60,22 @@ function createTicTacToe() {
     var buttons = [];
     
     for (var i = 0; i < 9; i++) {
-        buttons.push(new Button(new Vector2(center.x + (-70 + (i % 3) * 70) * activeCamera.zoom, center.y + (-70 + Math.floor(i / 3) * 70) * activeCamera.zoom), 60, 60, "#7d7d7d", "", 30, 3, 3, null, (a, b, obj, game) => {
+        buttons.push(new Button(new Vector2(center.x + (-70 + (i % 3) * 70) * activeCamera.zoom, center.y + (-70 + Math.floor(i / 3) * 70) * activeCamera.zoom), 60, 60, "#7d7d7d", "", 30, 3, 3, null, (a, b, obj, game, index) => {
             if (Resources.order === game.turn) {
                 obj.text = (game.turn === 0 ? "X": "O");
                 game.switchTurn();
-                Resources.ws.send(JSON.stringify({
-                    
+                Resources.ws.send(JSON.stringify({  
+                    gameMove: [index, obj.text],
+                    id: userPlayer.username,
+                    roomID: Resources.currentRoomID
                 }));
             }
         }));
     }
 
-    return new Game("Tic Tac Toe", 2, 2, gameBoard, dimensions, [winCondition, moveCondition], buttons);
+    const processMove = (move, obj) => {
+        obj.buttons[move[0]].text = move[1];
+    }
+
+    return new Game("Tic Tac Toe", 2, 2, gameBoard, dimensions, [winCondition, moveCondition], buttons, processMove);
 }

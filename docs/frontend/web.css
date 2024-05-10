@@ -31,13 +31,13 @@ body{
 .chatInput{
     position: absolute; 
     width: 160px;
-    top: 94%;
-    left: .3%;
+    top: 95.8%;
+    left: -.2%;
     background-color: rgba(255, 255, 255,);
     border: 2px solid black;
     border-radius: 10px;
-    height: 5%;
-    width: 72%; 
+    height: 2.4em;
+    width: 73%; 
 }
 
 
@@ -153,10 +153,10 @@ input{
 
 .chatButton{
     position: absolute; 
-    left: 77.5%;
-    top: 94.5%;
+    left: 78%;
+    top: 96%;
     z-index: 1;
-    height:29px;
+    height:35px;
     transform: scale(1.1);
 }
 

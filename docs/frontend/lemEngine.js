@@ -13,10 +13,10 @@ const scriptStart = Date.now();
 let activeCamera;
 let cameraList = [];
 
-document.addEventListener("resize", (event) => {
+window.addEventListener("resize", (event) => {
+    gameCanvas.width  = document.getElementById('gameSpace').clientWidth*0.8;
+    gameCanvas.height = document.getElementById('gameSpace').clientHeight;
     cameraList.forEach((element) => {
-        gameCanvas.width  = document.getElementById('gameSpace').clientWidth*0.8;
-        gameCanvas.height = document.getElementById('gameSpace').clientHeight;
         element.resize();
     })
 });

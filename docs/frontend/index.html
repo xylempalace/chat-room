@@ -30,16 +30,16 @@
 
     <div style="width:100%; height: 100%;">
 
-        <div id = "chatBox" class="chatBox" >
+        <div id = "chatBox" class="chatBox shadow" >
            
             <div><p id="values" class="chatLog"></p> </div>
             <br /><br/>
             
-            <input placeholder="Chat..." type="text" minlength="1" maxlength="50" id="chatInput" class="chatInput" func="sendMessage">
-            
-            
-            <button class = "chatButton" id = "sendMessageButton" onclick="sendMessage(chatInput.value)">Enter</button>
-            
+            <div class="chatSend">
+                <input placeholder="Chat..." type="text" minlength="1" maxlength="50" id="chatInput" class="chatInput" func="sendMessage">
+                
+                <button class = "chatButton" id = "sendMessageButton" onclick="sendMessage(chatInput.value)">Enter</button>
+            </div>
         
         </div>
             

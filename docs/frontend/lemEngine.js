@@ -13,10 +13,11 @@ const scriptStart = Date.now();
 let activeCamera;
 let cameraList = [];
 
-document.addEventListener("resize", (event) => {
+window.addEventListener("resize", (event) => {
+    console.log("resize")
+    gameCanvas.width  = document.getElementById('gameSpace').clientWidth*0.8;
+    gameCanvas.height = document.getElementById('gameSpace').clientHeight;
     cameraList.forEach((element) => {
-        gameCanvas.width  = document.getElementById('gameSpace').clientWidth*0.8;
-        gameCanvas.height = document.getElementById('gameSpace').clientHeight;
         element.resize();
     })
 });
@@ -663,12 +664,9 @@ class Camera extends GameObject {
 function addCanvas() {
     var canvas = document.createElement('canvas');
     canvas.id = "gameCanvas";
+    canvas.className = "gameCanvas shadow";
     canvas.width  = document.getElementById('gameSpace').clientWidth*0.8;
     canvas.height = document.getElementById('gameSpace').clientHeight;
-    
-    canvas.style.zIndex = 8;
-    canvas.style.position = "absolute";
-    canvas.style.border = "0.5rem solid rgb(105, 100, 100)";
     
     canvas.addEventListener("mouseup", (e) => {
         canvasClick(canvas, e)

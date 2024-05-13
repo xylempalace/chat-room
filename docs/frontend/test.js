@@ -941,7 +941,7 @@ function update() {
     });
 
     // Collider rendering
-    /*ctx.save();
+   /* ctx.save();
     ctx.globalAlpha = 0.5;
     ctx.fillStyle = "#FF00FF";
     let o = 400;

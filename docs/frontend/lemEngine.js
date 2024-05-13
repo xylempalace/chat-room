@@ -14,7 +14,6 @@ let activeCamera;
 let cameraList = [];
 
 window.addEventListener("resize", (event) => {
-    console.log("resize")
     gameCanvas.width  = document.getElementById('gameSpace').clientWidth*0.8;
     gameCanvas.height = document.getElementById('gameSpace').clientHeight;
     cameraList.forEach((element) => {

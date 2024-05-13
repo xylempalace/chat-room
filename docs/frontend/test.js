@@ -91,10 +91,8 @@ webSocket.onmessage = (event) => {
             document.getElementById("container");
             
         } else {
-            console.log("hi");
             loginState = "usernameVerified";
             const textBox = textInputs.find((element) => element.textInput.getAttribute("placeholder") == "Username");
-            console.log("set user after uV");
             setUser(obj.usr, textBox);
         }
     }
@@ -267,7 +265,6 @@ class Player extends GameObject {
         this.setCosmetics(cosmetics);
     }
 
-//bookmark
     hasCosmeticEquipped(cosmeticName) {
         cosmeticName = "player/" + cosmeticName + ".png";
         for (let i = 0; i < this.cosmetics.length; i++) {
@@ -285,7 +282,14 @@ class Player extends GameObject {
     }
 
     addCosmetic(cosmeticName) {
-        if (this.cosmetics.includes(new PlayerCosmetic("player/" + cosmeticName + ".png", cosmeticName))) {
+
+        let type = 'default';
+        if (cosmeticName === "horns") {
+            type = 'head';
+            console.log("as")
+        }
+
+        if (this.cosmetics.includes(new PlayerCosmetic("player/" + cosmeticName + ".png", cosmeticName, type))) {
             console.log("You already have that equipped!");        
         }
         else {this.cosmetics.push(new PlayerCosmetic("player/" + cosmeticName + ".png", cosmeticName));
@@ -833,7 +837,7 @@ function serverUpdate() {
 function rgb(r, g, b){
     return ["rgb(",r,",",g,",",b,")"].join("");
 }
-    //bookmark
+
 function ToggleCosmetic(cosmeticName) {
     if (userPlayer.hasCosmeticEquipped(cosmeticName) >= 0) {
         userPlayer.removeCosmetic(cosmeticName);

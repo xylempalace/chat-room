@@ -375,12 +375,12 @@ sockserver.on('connection', (ws, req) => {
         }
       });
     } else if ("gameMove" in obj) {
-      console.log(obj.gameMove[0]);
       for (var i = 0; i < gameRooms[obj.roomID][0].length; i++) {
         sockserver.clients.forEach(client => {
-          if (clients[client.id] !== obj.id && client.id === gameRooms[obj.roomID][0][i]) {
+          if (client.id === gameRooms[obj.roomID][0][i]) {
             client.send(JSON.stringify({
-              gameMove: obj.gameMove
+              gameMove: obj.gameMove,
+              id: obj.id
             }));
           }
         });

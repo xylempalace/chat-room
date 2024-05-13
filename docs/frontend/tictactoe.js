@@ -5,10 +5,10 @@ function createTicTacToe() {
     }
 
     function moveCondition(inSpot, turn) {
-        return inSpot.value === "" && turn === Resources.order;
+        return inSpot.value === "" && Resources.order === turn;
     };
 
-    const winCondition = (gameBoard, players, turn) => {
+    const winCondition = (gameBoard, turn) => {
         const getWinner = arr => {
             if (arr.every(val => val.value === arr[0].value)) {
                 if (arr[0].value == "X") {
@@ -61,20 +61,32 @@ function createTicTacToe() {
     
     for (var i = 0; i < 9; i++) {
         buttons.push(new Button(new Vector2(center.x + (-70 + (i % 3) * 70) * activeCamera.zoom, center.y + (-70 + Math.floor(i / 3) * 70) * activeCamera.zoom), 60, 60, "#7d7d7d", "", 30, 3, 3, null, (a, b, obj, game, index) => {
-            if (Resources.order === game.turn) {
-                obj.text = (game.turn === 0 ? "X": "O");
-                game.switchTurn();
-                Resources.ws.send(JSON.stringify({  
-                    gameMove: [index, obj.text],
-                    id: userPlayer.username,
-                    roomID: Resources.currentRoomID
-                }));
+            if (game.testWin() === -1) { 
+                var pos = new Vector2(index % 3, Math.floor(index / 3));
+                game.gameBoard.setPos(pos, new Piece(game.turn === 0 ? "X": "O"), game.rules[1], game.turn);
+                if (game.gameBoard.get(pos).value !== "" && game.gameBoard.get(pos).value === (game.turn === 0 ? "X": "O")) {
+                    obj.text = game.gameBoard.get(pos).value;
+                    game.switchTurn(Resources.playerNum);
+                    Resources.ws.send(JSON.stringify({
+                        gameMove: [index, obj.text],
+                        id: userPlayer.username,
+                        roomID: Resources.currentRoomID
+                    }));
+                    console.log(game.testWin());
+                }
             }
         }));
     }
 
     const processMove = (move, obj) => {
+        obj.gameBoard.set(new Vector2(move[0] % 3, Math.floor(move[0] / 3)), new Piece(move[1]));
         obj.buttons[move[0]].text = move[1];
+        obj.switchTurn(Resources.playerNum);
+        console.log(obj.testWin());
+    }
+
+    const winText = () => {
+        
     }
 
     return new Game("Tic Tac Toe", 2, 2, gameBoard, dimensions, [winCondition, moveCondition], buttons, processMove);

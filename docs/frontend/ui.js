@@ -232,7 +232,6 @@ class Card {
 class Game {
     title;
     maxPlayers;
-    players;
     minPlayers;
     gameBoard;
     deck;
@@ -271,9 +270,9 @@ class Game {
     /**
      * Switches turn
      */
-    switchTurn() {
+    switchTurn(players) {
         this.turn++;
-        this.turn %= this.players;
+        this.turn %= players;
     }
 
     /**
@@ -282,7 +281,7 @@ class Game {
      * @returns whether or not a player has one
      */
     testWin() {
-        return rules[0](this.board, this.players, this.turn);
+        return this.rules[0](this.gameBoard, this.turn);
     }
 
     processIncoming(move) {

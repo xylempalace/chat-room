@@ -141,11 +141,11 @@ webSocket.onmessage = (event) => {
         }
     }
     if ("gameMove" in obj) {
-        for (var i = 0; i < gameProps.length; i++) {
-            if (gameProps[i].drawMenu) {
-                gameProps[i].game.processIncoming(obj.gameMove);
-                gameProps[i].game.switchTurn();
-                console.log(Resources.order);
+        if (obj.id !== userPlayer.username) {
+            for (var i = 0; i < gameProps.length; i++) {
+                if (gameProps[i].drawMenu) {
+                    gameProps[i].game.processIncoming(obj.gameMove, gameProps[i].game);
+                }
             }
         }
     }

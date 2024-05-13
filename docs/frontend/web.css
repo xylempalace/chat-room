@@ -49,6 +49,17 @@ body {
     background: #fcbcb8;
 }
 
+.yellow {
+    border: 0.5rem #FFD972 solid;
+    background: #ffe59e;
+}
+
+.bottomRightPanel {
+    display: flex;
+    flex-flow: row wrap;
+    z-index: 2;
+}
+
 /* username and chatbox thingies */
 .inputText {
     position: relative;

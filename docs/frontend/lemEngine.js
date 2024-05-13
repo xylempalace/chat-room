@@ -709,15 +709,11 @@ class Camera extends GameObject {
 
 function addCanvas() {
     var canvas = document.createElement('canvas');
-    
+
     canvas.id = "gameCanvas";
     canvas.className = "gameCanvas shadow";
     canvas.width  = document.getElementById('gameSpace').clientWidth*0.8;
     canvas.height = document.getElementById('gameSpace').clientHeight * 0.98;
-
-    canvas.style.zIndex = 8;
-    canvas.style.position = "absolute";
-    canvas.style.border = "0.5rem solid rgb(105, 100, 100)";
     
     canvas.addEventListener("mouseup", (e) => {
         canvasClick(canvas, e)
@@ -730,6 +726,7 @@ function addCanvas() {
     ctx = gameCanvas.getContext("2d");
     document.getElementById("gameSpace").appendChild(canvas);
 }
+
 
 function canvasClick(canvas, e) {
     let canvasRect = canvas.getBoundingClientRect();

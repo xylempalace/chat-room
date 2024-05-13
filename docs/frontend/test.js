@@ -712,23 +712,9 @@ document.addEventListener("readystatechange", (e) => {
             }
         });
 
-            const foundInputs = document.getElementById("usernameInput");
-        for (let i = 0; i < foundInputs.length; i++) {
-            let tI = new TextInput(
-               foundInputs[i],
-                foundInputs[i].getAttribute("placeholder"),
-                foundInputs[i].getAttribute("func"),
-                //foundInputs[i].getAttribute("hasButton"),
-                //foundInputs[i].getAttribute("reqConnection"),
-               foundInputs[i].getAttribute("minLength"),
-               foundInputs[i].getAttribute("maxLength")
-            );
-            textInputs.push(tI);
-        }
-         document.getElementById("usernameInput").value = ""
+        document.getElementById("usernameInput").value = ""
         let chatInput = TextInput.findInputByID("chatInput");
     
-      // chatInput.setDisabled(true);
         addCanvas();
         drawText(100, 100, "Connecting...");
     }

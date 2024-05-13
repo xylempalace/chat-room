@@ -12,7 +12,7 @@
    <div class = "container" id = "container">
 
         <h1>Welcome to Lexicomm!</h1>
-        <input placeholder="Username" class="inputText" minlength="3" maxlength="20" id="usernameInput">
+        <input placeholder="Username, 4 chars minimum" class="inputText" minlength="3" maxlength="20" id="usernameInput">
     
         <br /><br/>
             <a href = # class = "button" id="loginButton" onclick="setUser(usernameInput.value,usernameInput)">Enter</a> 
@@ -25,8 +25,6 @@
         </div>
 
     </div>
-
-    <button type="button" class="darkModeButton" onclick="ToggleDarkMode()"> Toggle Dark Mode </button>
 
     <div style="width:100%; height: 100%;">
 
@@ -45,13 +43,21 @@
             
         <div id = "rightPanel" style= "height: 100%; width:auto; margin-left: 261px; margin-right: 15%;">
             <div id = "gameSpace" style= "height: 80%; width:auto;"></div>
-            <br><br>
+            <br>
             <div id = "bottomRightPanel" style="width: 100%;">
-                <div id="cosmetics" class="yellow shadow" style="height: 100%;"></div>
-                <div id="links" class="yellow shadow" style="height: 100%;"></div>
+                <div id="cosmetics" class="yellow shadow" style="height: 100%; width: 20%;">
+                    <form style="overflow-y: scroll;">
+                        <input type="checkbox" id="Fedora" class="settingsCSS" onclick="ToggleCosmetic('fedora')"> <label for="Fedora">Fedora</label><br>
+                        <input type="checkbox" id="Flower" class="settingsCSS" onclick="ToggleCosmetic('flower')"> <label for="Flower">Flower</label><br>
+                        <input type="checkbox" id="Big_Glasses" class="settingsCSS" onclick="ToggleCosmetic('big_glasses')"> <label for="Big_Glasses">Big Glasses</label><br>
+                        <input type="checkbox" id="Lil_Glasses" class="settingsCSS" onclick="ToggleCosmetic('lil_glasses')"> <label for="Lil_Glasses">Little Glasses</label><br>
+                        <input type="checkbox" id="Horns" class="settingsCSS" onclick="ToggleCosmetic('horns')"> <label for="Horns">Horns</label><br>
+                        <input type="checkbox" id="Tail" class="settingsCSS" onclick="ToggleCosmetic('tail')"> <label for="Tail">Tail</label><br>
+                    </form>
+                </div>
+                <!--<div id="links" class="yellow shadow" style="height: 100%; width: 20%;"></div>-->
             </div>
         </div>
-
     </div>
     
     <script src="imageManipulator.js"></script>

@@ -124,6 +124,7 @@ class Vector2 {
 class GameObject {
     pos;
     drawPos;
+
     id;
     collider;
     static objs = [];
@@ -157,7 +158,6 @@ class GameObject {
 class Sprite {
     id;
     image;
-    centeredOffset;
 
     /**
      * Create a new sprite object
@@ -192,16 +192,23 @@ class Sprite {
             ctx.drawImage(this.image, pos.x, pos.y, width, height);
         }
     }
-
+    
+    
     /**
      * 
      * @param {Vector2} pos 
      * @param {Number} size 
      */
     draw (pos, size) {
+        // checking if image is image
         if (this.image.width !== 0) {
             ctx.drawImage(this.image, pos.x, pos.y, size, size);
         }
+    }
+    
+    
+    drawCentered(pos, width, height) {
+        ctx.drawImage(this.image, (pos.x - width/2), (pos.y - height/2), width, height);
     }
 
     get width () {
@@ -216,26 +223,58 @@ class Sprite {
 class NineSlicedSprite extends Sprite {
     sliceCoords = [];
     segments = [];
-    
-    constructor (image, sc) {
+
+    constructor (image) {
         super(image);
-        this.sliceCoords = sc
-        let w = this.image.width;
-        let h = this.image.height;
-        let r = this.image.width - sc[2];
-        let b = this.image.height - sc[3];
+
+        const realWidth = this.image.width;
+        const realHeight = this.image.height;
+
+        // setting the height and witdh of each slice (each slice should be 1/9th of the image)
+        this.sliceWidth = realWidth / 3;
+        this.sliceHeight = realHeight / 3;
         this.segments = [
-            [0    , 0    , sc[0], sc[1]], [sc[0], 0    , r   , sc[1]], [r    , 0    , w    , sc[1]], 
-            [0    , sc[1], sc[0], b    ], [sc[0], sc[1], r   , b    ], [r    , sc[1], w    , b    ],
-            [0    , b    , sc[0], h    ], [sc[0], b    , r   , h    ], [r    , b    , w    , h    ],
+            // slice: [posX, posY, width, height]
+
+            // [1] [2] [3]
+            // [4] [5] [6]
+            // [7] [8] [9]
+
+            // Drawing the slices in the "top row" from left to right (slices 1, 2 and 3) 
+            [0, 0, this.sliceWidth, this.sliceHeight],           [this.sliceWidth, 0, this.sliceWidth, this.sliceHeight],           [realWidth - this.sliceWidth, 0, this.sliceWidth, this.sliceHeight],
+
+            // Drawing the slices in the "middle row" from left to right (slices 4, 5 and 6)
+            [0, this.sliceHeight, this.sliceWidth, this.sliceHeight], [this.sliceWidth, this.sliceHeight, this.sliceWidth, this.sliceHeight], [realWidth - this.sliceWidth, this.sliceHeight, this.sliceWidth, this.sliceHeight], 
+
+            // Drawing the slices in the "bottom row" from left to right (slices 7, 8 and 9)
+            [0, realHeight - this.sliceHeight, this.sliceWidth, this.sliceHeight], [this.sliceWidth, realHeight - this.sliceHeight, this.sliceWidth, this.sliceHeight], [realWidth - this.sliceWidth, realHeight - this.sliceHeight, this.sliceWidth, this.sliceHeight]
+            
         ];
     }
+
+    // slices: [slice1, slice2, slice3, sliceN...]
+    // slice: [posX, posY, width, height]
+    getSlicePosX(index) {
+        return this.segments[index][0];
+    }
+
+    getSlicePosY(index) {
+        return this.segments[index][1];
+    }
+
+    getSliceWidth(index) {
+        return this.segments[index][2];
+    }
+
+    getSliceHeight(index) {
+        return this.segments[index][3];
+    }
     
-    draw (pos, size) {
-        let s = size / 3;
-        foreach ((element) => {
-            ctx.drawImage(this.image, element[0], element[1], element[2], element[3], pos.x + element[0], pos.y + element[1], s * element[2], s * element[3]);
-        })
+    draw(pos, size) {
+        for (let i = 0; i < this.segments.length; i++) {
+            ctx.drawImage(this.image, ...this.segments[i], this.getSlicePosX(i) + pos.x, this.getSlicePosY(i) + pos.y, this.getSliceWidth(i), this.getSliceHeight(i));
+        }
+    
     }
 }
 
@@ -256,7 +295,7 @@ class TileMap {
         this.map = map;
     }
 
-    draw () {
+    draw() {
         let offsetPos = new Vector2(
             this.pos.x - this.rows * this.tileSize / 2,
             this.pos.y - this.cols * this.tileSize / 2
@@ -268,7 +307,7 @@ class TileMap {
                     this.tiles[this.map[(i*this.rows) + k]].draw(new Vector2(
                         offsetPos.x + (i * this.tileSize),
                         offsetPos.y + (k * this.tileSize)).screenPos,
-                        (this.tileSize + 1)* activeCamera.zoom
+                        (this.tileSize + 1)* activeCamera.zoom, (this.tileSize + 1)* activeCamera.zoom
                     )
                 }
             }
@@ -662,10 +701,11 @@ class Camera extends GameObject {
 
 function addCanvas() {
     var canvas = document.createElement('canvas');
+
     canvas.id = "gameCanvas";
     canvas.className = "gameCanvas shadow";
     canvas.width  = document.getElementById('gameSpace').clientWidth*0.8;
-    canvas.height = document.getElementById('gameSpace').clientHeight;
+    canvas.height = document.getElementById('gameSpace').clientHeight * 0.98;
     
     canvas.addEventListener("mouseup", (e) => {
         canvasClick(canvas, e)
@@ -678,6 +718,7 @@ function addCanvas() {
     ctx = gameCanvas.getContext("2d");
     document.getElementById("gameSpace").appendChild(canvas);
 }
+
 
 function canvasClick(canvas, e) {
     let canvasRect = canvas.getBoundingClientRect();

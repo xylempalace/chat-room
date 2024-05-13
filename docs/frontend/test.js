@@ -56,7 +56,6 @@ let abyssCollection = [];
 const backgroundMap = new TileMap(new Vector2(0,0), backgroundTiles, 64, 32, 32, [
     20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,31,23,23,23,29,20,20,20,20,20,20,20,20,20,20,20,31,23,29,20,20,20,20,31,23,29,20,20,31,23,23,23,27,3,3,3,25,23,29,20,20,20,20,20,20,20,20,31,27,3,25,23,29,20,20,22,3,21,31,23,27,11,19,19,19,13,3,3,3,1,25,23,23,29,20,20,20,20,31,27,11,8,13,3,25,29,20,32,24,31,27,11,8,12,3,3,3,18,3,3,3,3,3,3,1,25,29,20,20,20,22,3,10,7,12,3,3,21,20,20,31,27,11,15,6,3,3,11,8,12,3,3,3,3,1,3,3,3,21,20,20,20,22,1,3,3,3,3,3,21,20,31,27,3,5,4,6,3,3,5,6,3,3,3,3,3,1,1,1,3,21,20,20,20,22,1,1,3,3,3,26,30,20,22,3,3,5,4,6,3,3,5,12,3,3,3,3,3,1,1,1,1,25,29,20,31,27,2,1,3,3,3,21,20,20,22,3,3,10,14,6,3,11,6,3,3,3,3,3,1,1,1,1,1,3,21,20,20,2,2,1,3,3,3,21,20,31,27,3,3,3,5,17,8,16,12,3,3,3,3,3,1,1,1,3,1,3,21,20,20,2,1,1,3,3,3,21,31,27,3,3,3,3,5,4,16,12,3,3,3,3,3,3,1,1,1,1,1,3,25,29,20,2,1,1,3,3,3,25,27,3,3,3,11,8,15,4,6,3,11,13,3,3,3,3,1,3,1,1,3,3,3,21,20,2,1,3,3,3,3,3,3,3,3,11,15,4,4,4,17,8,15,17,13,3,3,3,3,3,1,3,3,3,3,21,20,2,2,3,3,3,3,3,3,3,3,5,16,7,7,14,16,7,7,14,6,3,3,3,1,3,3,3,1,3,3,21,20,2,2,1,3,3,3,3,3,3,11,15,6,3,3,10,12,3,3,5,17,13,3,3,3,3,1,3,3,3,3,21,20,2,2,1,3,3,3,3,3,3,5,4,6,3,2,1,1,2,3,5,4,6,3,3,3,3,3,3,3,3,3,21,20,2,2,3,3,3,3,3,3,11,15,4,17,13,1,1,1,1,11,15,4,6,3,3,3,3,3,3,3,3,3,21,32,28,1,3,3,3,3,3,3,10,14,4,16,12,1,1,1,1,10,14,16,12,3,3,3,3,3,3,3,3,3,21,20,22,3,3,3,3,3,3,3,3,5,4,6,3,2,1,1,2,3,5,6,3,3,3,3,3,3,3,3,3,3,21,20,22,3,3,3,3,3,3,3,3,10,14,6,3,3,11,13,3,3,5,17,13,3,3,3,3,3,3,3,3,26,30,20,22,3,3,3,3,3,3,3,3,3,5,17,8,8,15,17,8,8,15,4,17,13,3,3,3,11,13,3,3,21,20,20,22,3,3,11,19,19,19,13,3,3,10,7,7,7,7,7,7,7,14,4,4,17,8,8,8,15,17,13,3,21,20,20,22,3,11,12,1,1,1,10,13,3,3,3,3,3,3,3,3,3,10,14,4,4,4,4,4,4,4,6,3,21,20,20,22,3,18,1,11,19,13,1,18,3,3,3,3,3,3,3,3,3,3,10,14,4,4,4,4,4,4,6,3,21,20,20,32,28,18,1,18,2,18,1,18,3,3,3,3,3,3,3,3,3,3,3,10,14,4,4,4,4,4,6,3,21,20,20,20,22,18,1,10,19,12,1,18,3,3,3,3,26,24,24,28,3,3,3,3,5,4,16,7,14,4,6,3,21,20,20,20,22,10,13,1,1,1,11,12,3,3,3,3,21,20,20,22,3,3,3,3,10,14,6,3,5,4,17,13,21,20,20,20,22,3,10,19,19,19,12,3,3,3,3,26,30,20,20,32,28,3,3,3,3,5,6,3,5,4,16,12,21,20,20,20,32,28,3,3,3,3,3,3,3,3,26,30,20,20,20,20,32,28,3,3,3,5,17,8,15,4,6,26,30,20,20,20,20,22,3,3,3,3,3,3,3,3,21,20,20,20,20,20,20,32,28,3,3,10,14,4,4,16,12,21,20,20,20,20,20,32,28,3,3,3,26,24,24,24,30,20,20,20,20,20,20,20,32,24,28,3,10,7,7,12,26,30,20,20,20,20,20,20,32,24,24,24,30,20,20,20,20,20,20,20,20,20,20,20,20,20,32,24,24,24,24,24,30,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20
 ]);
-const SpeechBubbleSprite = new NineSlicedSprite("speechBubble.png"  , [16, 16, 16, 24]);
 
 // WebSocket Stuff
 const webSocket = new WebSocket('ws://localhost:3000/');
@@ -127,17 +126,14 @@ webSocket.onmessage = (event) => {
             document.getElementById("container");
             
         } else {
-            console.log("hi");
             loginState = "usernameVerified";
             const textBox = textInputs.find((element) => element.textInput.getAttribute("placeholder") == "Username");
-            console.log("set user after uV");
             setUser(obj.usr, textBox);
         }
     }
 };
 
 webSocket.addEventListener("open", () => {
-    console.log("We are connected");
 });
 
 class TextInput {
@@ -270,6 +266,15 @@ class PlayerCosmetic {
             this.flippedSprite.draw(drawPos, size);
         }
     }
+
+    getSpritePath() {
+        let finalString = this.sprite.image.src;
+        let pos = finalString.search("/player/");
+
+        finalString = finalString.substr(pos + 1);
+
+        return finalString;
+    }
 }
 
 class Player extends GameObject {
@@ -291,11 +296,45 @@ class Player extends GameObject {
         super ("PLAYER-"+username, pos);
         this.username = username;
         this.color = color;
-        this.cosmetics = cosmetics;
+        this.setCosmetics(cosmetics);
+    }
+
+    hasCosmeticEquipped(cosmeticName) {
+        cosmeticName = "player/" + cosmeticName + ".png";
+        for (let i = 0; i < this.cosmetics.length; i++) {
+            if (this.cosmetics[i].getSpritePath() === cosmeticName) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     setCosmetics(cosmeticArr) {
-        this.cosmetics = cosmeticArr;
+        cosmeticArr.forEach((i) => {
+            this.cosmetics.push(i);
+        })
+    }
+
+    addCosmetic(cosmeticName) {
+
+        let type = 'default';
+        if (cosmeticName == 'horns') {
+            type = 'head';
+        }
+
+        if (this.cosmetics.includes(new PlayerCosmetic("player/" + cosmeticName + ".png", cosmeticName, type))) {
+            console.log("You already have that equipped!");        
+        } else {
+            this.cosmetics.push(new PlayerCosmetic("player/" + cosmeticName + ".png", cosmeticName, type));
+        }
+    }
+
+    removeCosmetic(cosmeticName) {
+        let i = this.hasCosmeticEquipped(cosmeticName);
+        if (i >= 0) {
+            cosmeticName = "player/" + cosmeticName + ".png";
+            this.cosmetics.splice(i, 2);
+        }
     }
     
     warpTo(pos) {
@@ -353,7 +392,7 @@ class Player extends GameObject {
     drawSpeechBubbles() {
         if (!this.expired) {
             var curBubble;
-            let vertOffset = (this.constructor.playerSizeY * 1.1 * activeCamera.zoom);
+            let vertOffset = (this.constructor.playerSizeY * 1.3 * activeCamera.zoom);
             
             for (let i = 0; i < this.speechBubbles.length; i++) {
                 
@@ -369,7 +408,6 @@ class Player extends GameObject {
                     vertOffset += (curBubble.height);           
                     
                     curBubble.drawBubble(bubbleCenterX, bubbleCenterY);
-
                 }
             }
         }
@@ -416,7 +454,7 @@ class SpeechBubble {
 
     constructor (message) {
         this.spawnTime = Date.now();
-        this.deathTime = this.spawnTime+this.constructor.lifeTime;
+        this.deathTime = this.spawnTime + this.constructor.lifeTime;
 
         // Checks if textbox is too long for one line, and, if so, breaks up into multiple lines
         if (ctx.measureText(message) < this.constructor.maxWidth) {
@@ -452,15 +490,25 @@ class SpeechBubble {
 
     // Draws the current bubble object at the given coordinates
     drawBubble(posX, posY) {
+        
+
+        const SpeechBubbleSprite2 = new Sprite("speechBubbleOther.png");
+
         var prevAlign = ctx.textAlign;
         var prevFont = ctx.font;
         ctx.textAlign = 'center';
         ctx.font = this.constructor.font;
     
+        let initOffset = (this.constructor.fontHeight * (this.message.length + 1) * 0.5)
+        
         for (let i = 0; i < this.message.length; i++) {
-            //SpeechBubbleSprite.draw(new Vector2(posX, posY), 50)
-            ctx.fillText(this.message[i], posX, posY-(this.constructor.fontHeight*(this.message.length-(1+i))));
+            ctx.fillText(this.message[i], posX, (posY - (this.constructor.fontHeight * (this.message.length - i))) + initOffset);
         }
+
+        SpeechBubbleSprite2.drawCentered(new Vector2(posX, posY), this.constructor.maxWidth, (this.message.length * this.constructor.fontHeight) * 1.5 + 10);
+        
+        let testNineSlice = new NineSlicedSprite("SpeechBubble.png")
+        testNineSlice.draw(new Vector2(posX, posY), 200);
 
         ctx.textAlign = prevAlign;
         ctx.font = prevFont;
@@ -662,23 +710,9 @@ document.addEventListener("readystatechange", (e) => {
             }
         });
 
-            const foundInputs = document.getElementById("usernameInput");
-        for (let i = 0; i < foundInputs.length; i++) {
-            let tI = new TextInput(
-               foundInputs[i],
-                foundInputs[i].getAttribute("placeholder"),
-                foundInputs[i].getAttribute("func"),
-                //foundInputs[i].getAttribute("hasButton"),
-                //foundInputs[i].getAttribute("reqConnection"),
-               foundInputs[i].getAttribute("minLength"),
-               foundInputs[i].getAttribute("maxLength")
-            );
-            textInputs.push(tI);
-        }
-         document.getElementById("usernameInput").value = ""
+        document.getElementById("usernameInput").value = ""
         let chatInput = TextInput.findInputByID("chatInput");
     
-      // chatInput.setDisabled(true);
         addCanvas();
         drawText(100, 100, "Connecting...");
     }
@@ -910,6 +944,8 @@ function startAnimating() {
     drawScreen();
 }
 
+
+
 function update() {
     activeCamera.follow(userPlayer.pos);
 
@@ -937,7 +973,7 @@ function update() {
     // Render the other players's speech bubbles
     otherPlayers.forEach((element) => {
         element.drawSpeechBubbles(gameCanvas);
-        element.update((Date.now()-startTime)/fpms);
+        element.update((Date.now()-startTime) / fpms);
     });
 
     // Collider rendering
@@ -976,29 +1012,16 @@ function serverUpdate() {
 function rgb(r, g, b){
     return ["rgb(",r,",",g,",",b,")"].join("");
 }
-    
-function ToggleDarkMode() {
 
-    const chatBoxReference = document.getElementById("chatBox");
-    if (!isDark) {
-        /* enables dark mode flag */
-        isDark = !isDark;
-
-        /* changes color of webpage's background */
-        document.body.style.background = rgb(54, 54, 54);
-
+function ToggleCosmetic(cosmeticName) {
+    if (userPlayer.hasCosmeticEquipped(cosmeticName) >= 0) {
+        userPlayer.removeCosmetic(cosmeticName);
     }
-
     else {
-        /* changes color of webpage's background */
-        document.body.style.background = "white";
-
-        /* changes color of the chatbox itself */
-        chatBoxReference.style.background = "lightgrey";
-
-        /* disables off dark mode */
-        isDark = !isDark;
+        userPlayer.addCosmetic(cosmeticName);
     }
+
+
 }
 
 function onClick(event, canvasPos) {

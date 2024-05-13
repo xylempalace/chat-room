@@ -84,9 +84,15 @@ body {
     width: max-content;
 }
 
-.darkModeButton {
-    position: absolute; 
-    
+.toggleCosmeticsButton {
+    cursor: pointer;
+
+    width: 30px; height: 30px;
+
+    margin: 4px;
+
+    padding: 10px ;
+
     bottom: 0; right: 0;
 }
 
@@ -144,6 +150,7 @@ text-align: center;
 input {
     border: 1px solid grey;  
 }
+
 .shadow {
     box-shadow: 5px 10px 10px #6f8f89;
 }
@@ -175,6 +182,11 @@ input {
     height:100%;
     border: 2px solid #736372;
     transform: scale(1.1);
+}
+
+.settingsCSS{
+    cursor: pointer;
+    size: 200%;
 }
 
 .loginButton {

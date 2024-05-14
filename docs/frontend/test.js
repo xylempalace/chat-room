@@ -134,6 +134,7 @@ webSocket.onmessage = (event) => {
 };
 
 webSocket.addEventListener("open", () => {
+    console.log("We are connected");
 });
 
 class TextInput {
@@ -300,6 +301,7 @@ class Player extends GameObject {
     }
 
     hasCosmeticEquipped(cosmeticName) {
+        
         cosmeticName = "player/" + cosmeticName + ".png";
         for (let i = 0; i < this.cosmetics.length; i++) {
             if (this.cosmetics[i].getSpritePath() === cosmeticName) {
@@ -307,6 +309,7 @@ class Player extends GameObject {
             }
         }
         return -1;
+        
     }
 
     setCosmetics(cosmeticArr) {
@@ -318,14 +321,18 @@ class Player extends GameObject {
     addCosmetic(cosmeticName) {
 
         let type = 'default';
-        if (cosmeticName == 'horns') {
-            type = 'head';
+        
+        if (this.cosmetics.includes(new PlayerCosmetic("player/" + cosmeticName + ".png", cosmeticName, type))) {
+            console.log("You already have that equipped!");       
+            return; 
         }
 
-        if (this.cosmetics.includes(new PlayerCosmetic("player/" + cosmeticName + ".png", cosmeticName, type))) {
-            console.log("You already have that equipped!");        
-        } else {
-            this.cosmetics.push(new PlayerCosmetic("player/" + cosmeticName + ".png", cosmeticName, type));
+        else {            
+            if (cosmeticName === "horns") {
+                type = 'head';
+                console.log("as")
+            }
+            this.cosmetics.push(new PlayerCosmetic("player/" + cosmeticName + ".png", cosmeticName));
         }
     }
 
@@ -333,7 +340,7 @@ class Player extends GameObject {
         let i = this.hasCosmeticEquipped(cosmeticName);
         if (i >= 0) {
             cosmeticName = "player/" + cosmeticName + ".png";
-            this.cosmetics.splice(i, 2);
+            this.cosmetics.splice(i);
         }
     }
     
@@ -1017,11 +1024,10 @@ function ToggleCosmetic(cosmeticName) {
     if (userPlayer.hasCosmeticEquipped(cosmeticName) >= 0) {
         userPlayer.removeCosmetic(cosmeticName);
     }
+
     else {
         userPlayer.addCosmetic(cosmeticName);
     }
-
-
 }
 
 function onClick(event, canvasPos) {

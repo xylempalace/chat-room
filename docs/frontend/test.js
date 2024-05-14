@@ -538,13 +538,23 @@ class Prop extends GameObject {
         this.drawOffset = Vector2.zero;
 
         //this.center = center;
-        setTimeout(() => {
+        if (this.sprite.image.naturalHeight != 0) {
             this.scaler = new Vector2(
                 ((this.size.x * center.x) / this.sprite.width), 
                 ((this.size.y * center.y) / this.sprite.height)
                 )
             this.ready = true;
-        }, 10);
+            console.log(this.scaler)
+        } else {
+            let self = this;
+            this.sprite.image.addEventListener("load", () => {
+                self.scaler = new Vector2(
+                    ((self.size.x * center.x) / self.sprite.image.width), 
+                    ((self.size.y * center.y) / self.sprite.image.height)
+                    )
+                self.ready = true;
+            });
+        }
     }
 
     draw() {

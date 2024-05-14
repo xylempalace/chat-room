@@ -339,7 +339,7 @@ class Player extends GameObject {
         let i = this.hasCosmeticEquipped(cosmeticName);
         if (i >= 0) {
             cosmeticName = "player/" + cosmeticName + ".png";
-            this.cosmetics.splice(i);
+            this.cosmetics.splice(i, 1);
         }
     }
     

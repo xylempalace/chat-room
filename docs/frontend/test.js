@@ -321,18 +321,17 @@ class Player extends GameObject {
     addCosmetic(cosmeticName) {
 
         let type = 'default';
-        
+
         if (this.cosmetics.includes(new PlayerCosmetic("player/" + cosmeticName + ".png", cosmeticName, type))) {
             console.log("You already have that equipped!");       
             return; 
         }
 
         else {            
-            if (cosmeticName === "horns") {
+            if (cosmeticName === "horns" || cosmeticName == 'fedora') {
                 type = 'head';
-                console.log("as")
             }
-            this.cosmetics.push(new PlayerCosmetic("player/" + cosmeticName + ".png", cosmeticName));
+            this.cosmetics.push(new PlayerCosmetic("player/" + cosmeticName + ".png", cosmeticName, type));
         }
     }
 

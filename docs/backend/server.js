@@ -132,14 +132,18 @@ sockserver.on('connection', (ws, req) => {
   ws.on('close', () => {
     // When the client disconnects it sends its username to other clients so they know to remove that player from their screen
     try {
-      console.log(`${clients[ws.id][0]}(${ws.id}) has disconnected!`);
-      sockserver.clients.forEach(client => {
-        client.send(JSON.stringify({
-          id: clients[ws.id][0],
-          expired: true
-        })); 
-      });
-      delete clients[ws.id];
+      if (clients[ws.id] !== undefined) {
+        console.log(`${clients[ws.id][0]}(${ws.id}) has disconnected!`);
+        sockserver.clients.forEach(client => {
+          client.send(JSON.stringify({
+            id: clients[ws.id][0],
+            expired: true
+          })); 
+        });
+        delete clients[ws.id];
+      } else {
+        console.log("Client without account disconnected");
+      }
     } catch (e) {
       console.log("Disconnect failed! Error:");
       console.log(e);

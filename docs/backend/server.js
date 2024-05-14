@@ -202,7 +202,7 @@ sockserver.on('connection', (ws, req) => {
 
       gameID = `${obj.newRoom == "public" ? "pub-" : "priv-"}${gameID}`;
       // Room created with its ID, then the id off the creator in a list as well as the min and max amt of players allowed in the room
-      gameRooms[gameID] = [[ws.id], obj.playersMin, obj.playersMax];
+      gameRooms[gameID] = [[ws.id], obj.playersMin, obj.playersMax, false];
       console.log(`New room created with game ID: ${gameID}`);
 
       // Notifies the client of the newly created room
@@ -256,7 +256,7 @@ sockserver.on('connection', (ws, req) => {
       if (obj.joinRoom === null) {
         for (const [key, value] of Object.entries(gameRooms)) {
           // Finds the first available public room to join
-          if (key.includes("pub-") && value[0].length < value[2]) {
+          if (key.includes("pub-") && value[0].length < value[2] && !value[3]) {
             value[0].push(ws.id);
             ws.send(JSON.stringify({
               joinRoom: key,
@@ -287,7 +287,7 @@ sockserver.on('connection', (ws, req) => {
         // Adds the player to the specified room if its public
         privacy = "pub-";
         var room = gameRooms[privacy + obj.joinRoom];
-        if (room[0].length < room[2]) {
+        if (room[0].length < room[2] && !room[3]) {
           room[0].push(ws.id)
           ws.send(JSON.stringify({
             joinRoom: privacy + obj.joinRoom,
@@ -311,7 +311,7 @@ sockserver.on('connection', (ws, req) => {
         // Adds the player to the specified room if its private
         privacy = "priv-";
         var room = gameRooms[privacy + obj.joinRoom];
-        if (room[0].length < room[2]) {
+        if (room[0].length < room[2] && !room[3]) {
           gameRooms[privacy + obj.joinRoom][0].push(ws.id)
           ws.send(JSON.stringify({
             joinRoom: privacy + obj.joinRoom,
@@ -374,6 +374,7 @@ sockserver.on('connection', (ws, req) => {
           }
         }
       });
+      gameRooms[obj.roomID][3] = true;
     } else if ("gameMove" in obj) {
       for (var i = 0; i < gameRooms[obj.roomID][0].length; i++) {
         sockserver.clients.forEach(client => {

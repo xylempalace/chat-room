@@ -441,23 +441,40 @@ class UiGameMenu {
                 roomID: Resources.currentRoomID
             }));
         }));
+
+        this.buttons.push(new Button(new Vector2(this.center.x, this.center.y + 50 * activeCamera.zoom), 180, 40, "#20ff00", "REMATCH", 30, 3, 3, () => this.source.testWin() !== -1, () => {
+            
+        }));
     }
 
     /**
      * Draws the game window to the screen
     */
    draw() {
-        ctx.save()
+        ctx.save();
+        ctx.textAlign = 'center';
         for (var i = 0 ; i < this.buttons.length; i++) {
            this.buttons[i].draw(this.windowState, this.source.minPlayers); 
         }
         if (this.windowState === 3) {    
-            for (var i = 0; i < this.source.buttons.length; i++) {
-                this.source.buttons[i].draw(this.windowState);
+            var win = this.source.testWin();
+            if (win !== -1) {
+                ctx.fillStyle = "#ffffff";
+                ctx.fillRect(this.origin.x + this.width / 2 - 75 * activeCamera.zoom, this.origin.y + (200 - 28) * activeCamera.zoom, 150 * activeCamera.zoom, 40 * activeCamera.zoom);
+                ctx.fillStyle = "black";
+                ctx.font = `${25 * activeCamera.zoom}px Arial`;
+                ctx.fillText((win === 2 ? "Tie" : (win === 0 ? "X wins" : "O wins")), this.origin.x + this.width / 2, this.origin.y + 200 * activeCamera.zoom);
+            } else {
+                for (var i = 0; i < this.source.buttons.length; i++) {
+                    this.source.buttons[i].draw(this.windowState);
+                }
             }
         }
-        ctx.textAlign = 'center';
         ctx.fillStyle = "black";
+        if (this.windowState === 1) {
+            ctx.font = `${25 * activeCamera.zoom}px Arial`;
+            ctx.fillText(Resources.currentRoomID.substring(Resources.currentRoomID.indexOf("-") + 1), this.origin.x + this.width / 2, this.origin.y + 100 * activeCamera.zoom);
+        }
         ctx.font = `${30 * activeCamera.zoom}px Arial`;
         ctx.fillText(this.title, this.origin.x + this.width / 2, this.origin.y + 50 * activeCamera.zoom);
         ctx.restore();

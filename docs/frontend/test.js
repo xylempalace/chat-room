@@ -318,7 +318,7 @@ class Player extends GameObject {
     addCosmetic(cosmeticName) {
 
         let type = 'default';
-        if (cosmeticName == 'horns') {
+        if (cosmeticName == 'horns' || cosmeticName == "fedora") {
             type = 'head';
         }
 

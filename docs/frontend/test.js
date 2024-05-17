@@ -58,7 +58,35 @@ const backgroundMap = new TileMap(new Vector2(0,0), backgroundTiles, 64, 32, 32,
 ]);
 
 // WebSocket Stuff
-const webSocket = new WebSocket('ws://localhost:3000/');
+let webSocket
+function webSocketInit(address) {
+    webSocket = new WebSocket(address);
+
+    // Attempt to reconnect the user if the websocket closes
+    webSocket.onclose = function() {
+        setTimeout(function(){ // Upon closing, attempt reconnection after 5 seconds
+            console.log("Reconnecting..."); 
+            webSocketInit(address);
+
+            let attemptReregister = function () {
+                setTimeout(function(){
+                    if (webSocket.readyState === 1) { // If websocket is successfully connected after 5 more seconds, register this client as a new player
+                        if (webSocket.readyState > 0) {
+                            console.log("Reconnected!");
+                            webSocket.send(JSON.stringify({
+                                id : userPlayer.username
+                            }));
+                        }
+                    } else if (webSocket.readyState == 0) {
+                        attemptReregister();
+                    }
+                }, 5000);
+            }
+
+        }, 5000);
+    }
+}
+webSocketInit('ws://localhost:3000/');
 
 ImageManipulator.init();
 
@@ -821,9 +849,12 @@ function setUser(usr) {
  * Starts the game
  */
 function connect() {
-    connected = true;
     serverUpdate();
-    startAnimating();
+
+    if (!connected) {
+        connected = true;
+        startAnimating();
+    }
 }
 
 function startAnimating() {
@@ -1014,15 +1045,21 @@ function update() {
  * Sends actively updated info to the server
  */
 function serverUpdate() {
-    setTimeout(() => {
-        serverUpdate();
-    }, 10);
-    webSocket.send(JSON.stringify({
-        id: userPlayer.username,
-        posX: userPlayer.pos.x,
-        posY: userPlayer.pos.y,
-        flipped: userPlayer.flipped
-    }));
+    if (webSocket.readyState < 2) {
+        setTimeout(() => {
+            serverUpdate();
+        }, 10);
+        webSocket.send(JSON.stringify({
+            id: userPlayer.username,
+            posX: userPlayer.pos.x,
+            posY: userPlayer.pos.y,
+            flipped: userPlayer.flipped
+        }));
+    } else {
+        setTimeout(() => {
+            serverUpdate();
+        }, 5000);
+    }
 }
 
 function rgb(r, g, b){

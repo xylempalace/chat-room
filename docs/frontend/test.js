@@ -17,6 +17,8 @@ const backgroundTiles = [
     new Sprite("tiles/floor.png"),
     new Sprite("tiles/wall.png"),
     new Sprite("tiles/grass.png"),
+
+    // Path
     new Sprite("tiles/pathCenter.png"),
     new Sprite("tiles/pathNorth.png"),
     new Sprite("tiles/pathSouth.png"),
@@ -33,19 +35,35 @@ const backgroundTiles = [
     new Sprite("tiles/pathSouthWestInner.png"),
     new Sprite("tiles/pathNorthSouth.png"),
     new Sprite("tiles/pathEastWest.png"),
+
+    // Cliff
+    new Sprite("tiles/cliff.png"),
+    new Sprite("tiles/cliffNorth.png"),
+    new Sprite("tiles/cliffSouth.png"),
+    new Sprite("tiles/cliffEast.png"),
+    new Sprite("tiles/cliffWest.png"),
+	new Sprite("tiles/cliffNorthEast.png"),
+	new Sprite("tiles/cliffNorthWest.png"),
+    new Sprite("tiles/cliffSouthEast.png"),
+    new Sprite("tiles/cliffSouthWest.png"),
+    new Sprite("tiles/cliffNorthEastInner.png"),
+	new Sprite("tiles/cliffNorthWestInner.png"),
+    new Sprite("tiles/cliffSouthEastInner.png"),
+    new Sprite("tiles/cliffSouthWestInner.png"),
 ];
 
 // GAMES
 gameProps = [];
 
 const backgroundMap = new TileMap(new Vector2(0,0), backgroundTiles, 64, 32, 32, [
-    11,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,13,5,16,7,7,7,7,7,7,7,7,7,7,7,14,4,4,4,4,16,7,7,7,7,7,7,7,7,7,7,7,14,6,5,6,3,3,3,3,3,3,3,3,3,3,3,10,14,4,16,7,12,3,3,3,3,3,1,3,3,3,3,3,5,6,5,6,3,3,3,3,3,3,3,3,3,9,3,3,5,16,12,3,3,3,3,3,3,3,3,3,3,1,3,3,5,6,5,6,3,3,3,3,3,3,3,3,3,3,3,11,15,6,3,3,9,3,3,3,3,3,3,1,3,3,3,3,5,6,5,6,1,3,3,3,3,3,3,3,3,3,3,5,4,6,3,3,3,3,3,3,3,3,3,1,1,1,3,3,5,6,10,12,1,1,3,3,3,3,3,3,3,3,3,5,4,6,3,3,3,3,3,3,3,3,3,1,1,1,1,3,5,6,2,2,2,1,3,3,3,3,3,3,3,3,3,10,14,6,3,3,3,3,3,3,3,3,1,1,1,1,1,3,5,6,2,2,2,1,3,3,3,3,3,3,3,3,3,3,5,17,13,3,3,3,3,3,3,3,1,1,1,3,1,3,5,6,1,1,1,1,3,3,3,3,3,3,3,3,3,3,10,14,6,3,3,3,3,3,3,3,1,1,1,1,1,3,5,6,1,1,1,1,3,3,3,3,3,3,3,3,3,3,3,5,6,3,3,3,3,3,3,3,1,3,1,1,3,3,5,6,1,1,1,3,3,3,3,3,3,3,3,11,8,8,8,15,17,8,8,8,13,3,3,3,3,3,1,3,3,3,5,6,2,2,2,3,3,3,3,3,3,3,3,5,16,7,7,14,16,7,7,14,6,3,3,3,1,3,3,3,1,3,5,6,2,2,2,1,3,3,3,3,3,3,3,5,6,3,3,5,6,3,3,5,6,3,3,3,3,3,1,3,3,3,5,6,2,2,2,1,3,3,3,3,3,3,3,5,6,3,2,1,1,2,3,5,6,3,3,3,3,3,3,3,3,3,5,6,2,2,2,3,3,3,3,3,3,3,3,5,17,8,1,1,1,1,8,15,6,3,3,3,3,3,3,3,3,3,5,6,5,6,1,3,3,3,3,3,3,3,3,5,16,7,1,1,1,1,7,14,6,2,3,2,3,2,3,2,3,2,5,6,5,6,3,3,3,3,3,3,3,3,3,5,6,3,2,1,1,2,3,5,6,3,3,3,3,3,3,3,3,3,5,6,5,6,3,3,3,3,3,3,3,3,3,5,6,3,3,5,6,3,3,5,6,3,3,3,3,3,3,3,3,3,5,6,5,6,3,3,3,3,3,3,3,3,3,5,17,8,8,15,17,8,8,15,17,13,3,3,3,3,3,3,3,3,5,6,5,6,3,3,11,19,19,19,13,3,3,10,7,7,7,7,7,7,7,14,4,6,3,3,3,3,3,3,3,3,5,6,5,6,3,11,12,1,1,1,10,13,3,3,3,3,3,3,2,3,3,10,14,17,13,3,3,3,3,3,3,3,5,6,5,6,3,18,1,11,19,13,1,18,3,3,3,3,3,3,3,3,3,3,10,14,17,8,8,13,3,3,3,3,5,6,5,6,3,18,1,18,2,18,1,18,3,3,3,3,3,3,2,3,3,3,3,10,7,14,4,17,8,13,3,3,5,6,5,6,3,18,1,10,19,12,1,18,3,3,3,3,3,3,3,3,3,3,3,3,3,5,4,4,4,6,3,3,5,6,5,6,3,10,13,1,1,1,11,12,3,3,3,3,3,3,2,3,3,3,3,3,3,10,14,4,4,6,3,3,5,6,5,6,3,3,10,19,19,19,12,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,10,14,4,17,8,8,15,6,5,6,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,3,3,3,3,3,3,3,3,10,14,4,4,4,4,6,5,6,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,5,16,7,14,4,6,5,6,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,3,3,3,3,3,3,3,11,8,15,6,3,5,4,6,5,17,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,15,4,4,17,8,15,4,6,10,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,12
+    20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,31,23,23,23,29,20,20,20,20,20,20,20,20,20,20,20,31,23,29,20,20,20,20,31,23,29,20,20,31,23,23,23,27,3,3,3,25,23,29,20,20,20,20,20,20,20,20,31,27,3,25,23,29,20,20,22,3,21,31,23,27,11,19,19,19,13,3,3,3,1,25,23,23,29,20,20,20,20,31,27,11,8,13,3,25,29,20,32,24,31,27,11,8,12,3,3,3,18,3,3,3,3,3,3,1,25,29,20,20,20,22,3,10,7,12,3,3,21,20,20,31,27,11,15,6,3,3,11,8,12,3,3,3,3,1,3,3,3,21,20,20,20,22,1,3,3,3,3,3,21,20,31,27,3,5,4,6,3,3,5,6,3,3,3,3,3,1,1,1,3,21,20,20,20,22,1,1,3,3,3,26,30,20,22,3,3,5,4,6,3,3,5,12,3,3,3,3,3,1,1,1,1,25,29,20,31,27,2,1,3,3,3,21,20,20,22,3,3,10,14,6,3,11,6,3,3,3,3,3,1,1,1,1,1,3,21,20,20,2,2,1,3,3,3,21,20,31,27,3,3,3,5,17,8,16,12,3,3,3,3,3,1,1,1,3,1,3,21,20,20,2,1,1,3,3,3,21,31,27,3,3,3,3,5,4,16,12,3,3,3,3,3,3,1,1,1,1,1,3,25,29,20,2,1,1,3,3,3,25,27,3,3,3,11,8,15,4,6,3,11,13,3,3,3,3,1,3,1,1,3,3,3,21,20,2,1,3,3,3,3,3,3,3,3,11,15,4,4,4,17,8,15,17,13,3,3,3,3,3,1,3,3,3,3,21,20,2,2,3,3,3,3,3,3,3,3,5,16,7,7,14,16,7,7,14,6,3,3,3,1,3,3,3,1,3,3,21,20,2,2,1,3,3,3,3,3,3,11,15,6,3,3,10,12,3,3,5,17,13,3,3,3,3,1,3,3,3,3,21,20,2,2,1,3,3,3,3,3,3,5,4,6,3,2,1,1,2,3,5,4,6,3,3,3,3,3,3,3,3,3,21,20,2,2,3,3,3,3,3,3,11,15,4,17,13,1,1,1,1,11,15,4,6,3,3,3,3,3,3,3,3,3,21,32,28,1,3,3,3,3,3,3,10,14,4,16,12,1,1,1,1,10,14,16,12,3,3,3,3,3,3,3,3,3,21,20,22,3,3,3,3,3,3,3,3,5,4,6,3,2,1,1,2,3,5,6,3,3,3,3,3,3,3,3,3,3,21,20,22,3,3,3,3,3,3,3,3,10,14,6,3,3,11,13,3,3,5,17,13,3,3,3,3,3,3,3,3,26,30,20,22,3,3,3,3,3,3,3,3,3,5,17,8,8,15,17,8,8,15,4,17,13,3,3,3,11,13,3,3,21,20,20,22,3,3,11,19,19,19,13,3,3,10,7,7,7,7,7,7,7,14,4,4,17,8,8,8,15,17,13,3,21,20,20,22,3,11,12,1,1,1,10,13,3,3,3,3,3,3,3,3,3,10,14,4,4,4,4,4,4,4,6,3,21,20,20,22,3,18,1,11,19,13,1,18,3,3,3,3,3,3,3,3,3,3,10,14,4,4,4,4,4,4,6,3,21,20,20,32,28,18,1,18,2,18,1,18,3,3,3,3,3,3,3,3,3,3,3,10,14,4,4,4,4,4,6,3,21,20,20,20,22,18,1,10,19,12,1,18,3,3,3,3,26,24,24,28,3,3,3,3,5,4,16,7,14,4,6,3,21,20,20,20,22,10,13,1,1,1,11,12,3,3,3,3,21,20,20,22,3,3,3,3,10,14,6,3,5,4,17,13,21,20,20,20,22,3,10,19,19,19,12,3,3,3,3,26,30,20,20,32,28,3,3,3,3,5,6,3,5,4,16,12,21,20,20,20,32,28,3,3,3,3,3,3,3,3,26,30,20,20,20,20,32,28,3,3,3,5,17,8,15,4,6,26,30,20,20,20,20,22,3,3,3,3,3,3,3,3,21,20,20,20,20,20,20,32,28,3,3,10,14,4,4,16,12,21,20,20,20,20,20,32,28,3,3,3,26,24,24,24,30,20,20,20,20,20,20,20,32,24,28,3,10,7,7,12,26,30,20,20,20,20,20,20,32,24,24,24,30,20,20,20,20,20,20,20,20,20,20,20,20,20,32,24,24,24,24,24,30,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20
 ]);
-const SpeechBubbleSprite = new NineSlicedSprite("speechBubble.png"  , [16, 16, 16, 24]);
 
 // WebSocket Stuff
 const webSocket = new WebSocket('ws://localhost:3000/');
 Resources.ws = webSocket;
+
+ImageManipulator.init();
 
 webSocket.onmessage = (event) => {
     var obj = JSON.parse(event.data);
@@ -79,15 +97,31 @@ webSocket.onmessage = (event) => {
         })
         if (p != null) {
             p.pos.x = obj.posX;
-            p.pos.y = obj.posY; 
+            p.pos.y = obj.posY;
+            p.flipped = obj.flipped;
         } else {
-            otherPlayers.push(new Player(obj.id, new Vector2(obj.posX, obj.posY), obj.id, "#FF0000"));
+            var newPlayer = new Player(obj.id, new Vector2(obj.posX, obj.posY), obj.id, "#FF0000");
+            newPlayer.flipped = obj.flipped;
+            otherPlayers.push(newPlayer);
         }
-    } else if ("invalidName" in obj) {
+    } else if ("invalidName" in obj || obj.invalidName) {
         // Handles recieving username selction errors and verification
         if (obj.invalidName) {
-            
-            console.log("Username is invalid!");
+            console.log("Reason for invalid username: " + obj.usernameError); 
+
+            console.log("Username is invalid!"); 
+            if (obj.usernameError === "Username Taken"){
+                document.getElementById("usernameErrorMsg").innerHTML = "Username is taken!";
+                
+            }
+            else{
+                document.getElementById("usernameErrorMsg").innerHTML = "Username is profane or invalid!";
+            }
+            setTimeout(() => {
+                document.getElementById("usernameErrorMsg").innerHTML = ""
+            }
+            ,5000);
+
             receiveMessage(obj.usernameError);
             loginState = "username";
           //  const textBox = textInputs.find((element) => element.textInput.getAttribute("placeholder") == "Username");
@@ -95,10 +129,8 @@ webSocket.onmessage = (event) => {
             document.getElementById("container");
             
         } else {
-            console.log("hi");
             loginState = "usernameVerified";
             const textBox = textInputs.find((element) => element.textInput.getAttribute("placeholder") == "Username");
-            console.log("set user after uV");
             setUser(obj.usr, textBox);
         }
     } else if ("joinRoom" in obj) {
@@ -231,23 +263,68 @@ class PlayerCosmetic {
     color;
     sprite;
     flippedSprite;
+    name;
+    type;
+
+    static defaultAnchor = new Vector2(0, 0);
+    static headAnchor = new Vector2(0.25, -0.25);
+
+    anchor;
 
     /**
      * 
      * @param {String} spritePath 
-     * @param {String} flippedSpritePath 
+     * @param {String} name Name of cosmetic
+     * @param {String} type 
      */
-    constructor (spritePath, flippedSpritePath) {
+    constructor (spritePath, name, type = 'default') {
         this.sprite = new Sprite(spritePath);
-        this.flippedSprite = new Sprite(flippedSpritePath)
+        this.flippedSprite = this.sprite;
+
+        switch (type) {
+            case 'default':
+                this.type = 'default';
+                this.anchor = PlayerCosmetic.defaultAnchor;
+                break;
+            case 'head':
+                this.type = 'head';
+                this.anchor = PlayerCosmetic.headAnchor;
+                break;
+
+            case 'body':
+                this.type = 'body';
+                this.anchor = PlayerCosmetic.defaultAnchor;
+                break;
+
+            default:
+                throw new Error(`Cosmetic type "${type}" is invalid`);
+                break;
+        }
+
+        this.sprite.image.onload = (e) => {
+            ImageManipulator.manip(this.sprite.image, ["flipX"]).then((out) => {
+                this.flippedSprite = new Sprite(out);
+            });
+        };
     }
 
     draw(pos, size, flipped = false) {
         if (!flipped) {
-            this.sprite.draw(pos, size);
+            let drawPos = new Vector2(pos.x + (size * this.anchor.x), pos.y + (size * this.anchor.y));
+            this.sprite.draw(drawPos, size);
         } else {
-            this.flippedSprite.draw(pos, size);
+            let drawPos = new Vector2(pos.x - (size * this.anchor.x), pos.y + (size * this.anchor.y));
+            this.flippedSprite.draw(drawPos, size);
         }
+    }
+
+    getSpritePath() {
+        let finalString = this.sprite.image.src;
+        let pos = finalString.search("/player/");
+
+        finalString = finalString.substr(pos + 1);
+
+        return finalString;
     }
 }
 
@@ -263,18 +340,57 @@ class Player extends GameObject {
     speechBubbles = [];
     color;
     cosmetics = [];
-    static baseCosmetics = [new PlayerCosmetic("player/base.png", "player/base_flipped.png"), new PlayerCosmetic("player/flower.png", "player/flower_flipped.png")];
+    static baseCosmetics = [new PlayerCosmetic("player/base.png", "base", 'body')];
     flipped = false;
 
     constructor(id, pos, username, color, cosmetics = Player.baseCosmetics) {
         super ("PLAYER-"+username, pos);
         this.username = username;
         this.color = color;
-        this.cosmetics = cosmetics;
+        this.setCosmetics(cosmetics);
+    }
+
+    hasCosmeticEquipped(cosmeticName) {
+        
+        cosmeticName = "player/" + cosmeticName + ".png";
+        for (let i = 0; i < this.cosmetics.length; i++) {
+            if (this.cosmetics[i].getSpritePath() === cosmeticName) {
+                return i;
+            }
+        }
+        return -1;
+        
     }
 
     setCosmetics(cosmeticArr) {
-        this.cosmetics = cosmeticArr;
+        cosmeticArr.forEach((i) => {
+            this.cosmetics.push(i);
+        })
+    }
+
+    addCosmetic(cosmeticName) {
+
+        let type = 'default';
+
+        if (this.cosmetics.includes(new PlayerCosmetic("player/" + cosmeticName + ".png", cosmeticName, type))) {
+            console.log("You already have that equipped!");       
+            return; 
+        }
+
+        else {            
+            if (cosmeticName === "horns" || cosmeticName == 'fedora') {
+                type = 'head';
+            }
+            this.cosmetics.push(new PlayerCosmetic("player/" + cosmeticName + ".png", cosmeticName, type));
+        }
+    }
+
+    removeCosmetic(cosmeticName) {
+        let i = this.hasCosmeticEquipped(cosmeticName);
+        if (i >= 0) {
+            cosmeticName = "player/" + cosmeticName + ".png";
+            this.cosmetics.splice(i, 1);
+        }
     }
     
     warpTo(pos) {
@@ -347,7 +463,7 @@ class Player extends GameObject {
     drawSpeechBubbles() {
         if (!this.expired) {
             var curBubble;
-            let vertOffset = (this.constructor.playerSizeY * 1.1 * activeCamera.zoom);
+            let vertOffset = (this.constructor.playerSizeY * 1.3 * activeCamera.zoom);
             
             for (let i = 0; i < this.speechBubbles.length; i++) {
                 
@@ -363,7 +479,6 @@ class Player extends GameObject {
                     vertOffset += (curBubble.height);           
                     
                     curBubble.drawBubble(bubbleCenterX, bubbleCenterY);
-
                 }
             }
         }
@@ -410,7 +525,7 @@ class SpeechBubble {
 
     constructor (message) {
         this.spawnTime = Date.now();
-        this.deathTime = this.spawnTime+this.constructor.lifeTime;
+        this.deathTime = this.spawnTime + this.constructor.lifeTime;
 
         // Checks if textbox is too long for one line, and, if so, breaks up into multiple lines
         if (ctx.measureText(message) < this.constructor.maxWidth) {
@@ -446,15 +561,25 @@ class SpeechBubble {
 
     // Draws the current bubble object at the given coordinates
     drawBubble(posX, posY) {
+        
+
+        const SpeechBubbleSprite2 = new Sprite("speechBubbleOther.png");
+
         var prevAlign = ctx.textAlign;
         var prevFont = ctx.font;
         ctx.textAlign = 'center';
         ctx.font = this.constructor.font;
     
+        let initOffset = (this.constructor.fontHeight * (this.message.length + 1) * 0.5)
+        
         for (let i = 0; i < this.message.length; i++) {
-            //SpeechBubbleSprite.draw(new Vector2(posX, posY), 50)
-            ctx.fillText(this.message[i], posX, posY-(this.constructor.fontHeight*(this.message.length-(1+i))));
+            ctx.fillText(this.message[i], posX, (posY - (this.constructor.fontHeight * (this.message.length - i))) + initOffset);
         }
+
+        SpeechBubbleSprite2.drawCentered(new Vector2(posX, posY), this.constructor.maxWidth, (this.message.length * this.constructor.fontHeight) * 1.5 + 10);
+        
+        let testNineSlice = new NineSlicedSprite("SpeechBubble.png")
+        testNineSlice.draw(new Vector2(posX, posY), 200);
 
         ctx.textAlign = prevAlign;
         ctx.font = prevFont;
@@ -462,48 +587,89 @@ class SpeechBubble {
 }
 
 class Abyss {
-    static bgImage;
-    static bgImageLoaded = false;
-    static bgPattern;
+    bgImage;
+    bgImageLoaded = false;
+    bgPattern;
 
-    static xOffset;
-    static moveScale;
+    xOffset;
+    yOffset;
 
-    static init() {
+    scrollSpeedX;
+    scrollSpeedY;
+
+    moveScale;
+
+    constructor (image, moveScale, scrollSpeedX, scrollSpeedY) {
+
         // Declare that the abyss isn't loaded yet
-        Abyss.bgImageLoaded = false;
+        this.bgImageLoaded = false;
 
         // Declare its starting offset and speed
-        Abyss.xOffset = 0;
-        Abyss.moveScale = 0.1;
+        this.xOffset = 0;
+        this.yOffset = 0;
+        this.scrollSpeedX = scrollSpeedX;
+        this.scrollSpeedY = scrollSpeedY;
+        this.moveScale = moveScale;
 
         // Prepare image and update flag once ready
-        Abyss.bgImage = new Image();
-        Abyss.bgImage.onload = function () {
+        let self = this;
+        this.bgImage = new Image();
+        this.bgImage.onload = function () {
 
             // Create pattern for filling rect when drawn
-            Abyss.bgPattern = ctx.createPattern(Abyss.bgImage, "repeat");
-            Abyss.bgImageLoaded = true;
+            self.bgPattern = ctx.createPattern(self.bgImage, "repeat");
+            self.bgImageLoaded = true;
         }
-        Abyss.bgImage.src = "./sprites/bg.png";
+        this.bgImage.src = image.src;
     }
 
-    static draw(delta) {
-        if (Abyss.bgImageLoaded) {
+    /*draw(delta) {
+        if (this.bgImageLoaded) {
             ctx.save();
-            let offsetx = activeCamera.pos.x * -Abyss.moveScale;
-            let offsety = activeCamera.pos.y * -Abyss.moveScale;
+
+            let offsetx = this.xOffset;
+            offsetx += activeCamera.pos.x * -this.moveScale;
+            offsetx += this.scrollSpeedX * delta;
+
+            let offsety = this.yOffset;
+            offsety += activeCamera.pos.y * -this.moveScale;
+            offsety += this.scrollSpeedY * delta;
+
             ctx.translate(offsetx, offsety);
 
-            ctx.fillStyle = Abyss.bgPattern;
-            ctx.fillRect(-offsetx, -offsety, gameCanvas.width - offsetx, gameCanvas.height - offsety)
+            this.xOffset = offsetx;
+            this.yOffset = offsety;
+
+            ctx.fillStyle = this.bgPattern;
+            ctx.fillRect(offsetx, offsety, gameCanvas.width * 2 - offsetx, gameCanvas.height * 2 - offsety)
+            ctx.restore();
+        }
+    }*/
+
+    draw(delta) {
+        if (this.bgImageLoaded) {
+            ctx.save();
+
+            let offsetx = this.xOffset;
+            offsetx += activeCamera.pos.x * -this.moveScale;
+            //offsetx += this.scrollSpeedX * Date.time;
+
+            let offsety = this.yOffset;
+            offsety += activeCamera.pos.y * -this.moveScale;
+            //offsety += this.scrollSpeedY * Date.time;
+
+            ctx.translate(offsetx, offsety);
+
+            ctx.fillStyle = this.bgPattern;
+            ctx.fillRect(-offsetx, -offsety, (gameCanvas.width * 2) - offsetx, (gameCanvas.height * 2) - offsety)
             ctx.restore();
         }
     }
 }
 
-//Called when the page is finished loading
-
+/**
+ * Called when the page is finished loading
+ */
 document.addEventListener("readystatechange", (e) => {
 
     
@@ -511,36 +677,77 @@ document.addEventListener("readystatechange", (e) => {
       //  setUser(document.getElementById("usernameInput"));
       const textInput = document.getElementById('usernameInput');
       const submitButton = document.getElementById('loginButton');
-      
-      textInput.addEventListener('keydown', function(event) {
-          if (event.key === 'Enter') {
-              submitButton.click();
-          }
-      });
 
-            const foundInputs = document.getElementById("usernameInput");
-        for (let i = 0; i < foundInputs.length; i++) {
-            let tI = new TextInput(
-               foundInputs[i],
-                foundInputs[i].getAttribute("placeholder"),
-                foundInputs[i].getAttribute("func"),
-                //foundInputs[i].getAttribute("hasButton"),
-                //foundInputs[i].getAttribute("reqConnection"),
-               foundInputs[i].getAttribute("minLength"),
-               foundInputs[i].getAttribute("maxLength")
-            );
-            textInputs.push(tI);
+        ImageManipulator.init();
+    
+        let sliceAtlas = function (base, tilesWide, tilesHigh) {
+            let prom = new Promise(outerResolve => {
+                let slice = function (x, y) {
+                    let params = [
+                        `canvasScale ${tileWidth} ${tileHeight}`,
+                        `translate ${-tileWidth * x} ${-tileHeight * y}`
+                    ]
+
+                    // This causes problems because the for loop does not wait for promises
+                    // eg, if x = 1 and y = 2 are used to set the tile, then by the time the correct index is set and references x and y again, x and y will have already changed for other loops
+                    // declaring an index value seperately does not fix it
+                    let index = (x * tilesWide) + y;
+                    ImageManipulator.manip(base, params).then((out) => {
+                        seperated[index] = out;
+                        if (seperated.length === tilesWide*tilesHigh) {
+                            //printMessage(index);
+                            outerResolve(seperated);
+                        }
+                    });
+                }
+
+                let tileWidth = base.width / tilesWide; // Calculate how wide each tile is
+                let tileHeight = base.height / tilesHigh; // Same, but for height
+
+                // Create an array to store each seperated tile
+                let seperated = [];
+                
+                for (let j = 0; j < tilesWide; j++) { // Go through each column
+                    for (let k = 0; k < tilesHigh; k++) { // Then each tile in that column
+                        //printMessage((j * tilesWide) + k)
+                        slice(j + 0, k + 0);
+                    }
+                }
+            })
+
+            // Once each tile is sliced, add them to background tiles in a group
+            // With multiple atlases, these groups might get swapped depending on which finishes first
+            prom.then((out) => {
+                out.forEach((i) => {
+                    backgroundTiles.push(new Sprite(i));
+                })
+                backgroundMap.tiles = backgroundTiles;
+            });
         }
-         document.getElementById("usernameInput").value = ""
+
+        let path = new Image();
+        path.src = '/sprites/tiles/pathAtlas.png';
+        sliceAtlas(path, 4, 4);
+      
+        textInput.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                submitButton.click();
+            }
+        });
+
+        document.getElementById("usernameInput").value = ""
         let chatInput = TextInput.findInputByID("chatInput");
     
-      // chatInput.setDisabled(true);
         addCanvas();
         drawText(100, 100, "Connecting...");
     }
 
 });
 
+/**
+ * Sends the string in the message box to the server
+ * @param {String} msg 
+ */
 function sendMessage(msg) {
     if (msg.length > 0) {
         document.getElementById("chatInput").value = ""; 
@@ -553,10 +760,18 @@ function sendMessage(msg) {
     }
 }
 
+/**
+ * Adds the given string to the chatlog
+ * @param {String} msg 
+ */
 function printMessage(msg) {
     log.textContent += msg+"\n";
 }
 
+/**
+ * Adds the given string to the chatlog
+ * @param {String} msg 
+ */
 function receiveMessage(msg) {
     log.textContent += msg+"\n";
 }
@@ -568,9 +783,10 @@ function updateUser(e) {
     }
 }
 
-
-
-
+/**
+ * Attempts to create a new user in accordance with the server, and, if successful, begins the game
+ * @param {String} usr 
+ */
 function setUser(usr) {
     
     console.log("setUser called");
@@ -592,19 +808,17 @@ function setUser(usr) {
             receiveMessage("Username set to "+userPlayer.username);
             cameraList.push(new Camera("playerCam", Vector2.zero, 0.01, [-1024, -1024, 1024, 1024]));
             activeCamera = cameraList[cameraList.length-1];
-            //textbox.setDisabled(true);
-            //console.log(findInputByID)
-          //  TextInput.findInputByID("chatInput").setDisabled(false);
-          document.getElementById('chatInput').addEventListener('keypress', function(e){
-            console.log("TESSTTTT");    
-            if(e.key==="Enter"){
-                console.log("inside ekey pressed");
-                document.getElementById('sendMessageButton').click(); 
+
+            document.getElementById('chatInput').addEventListener('keypress', function(e){
+                console.log("TESSTTTT");    
+                if(e.key==="Enter"){
+                    console.log("inside ekey pressed");
+                    document.getElementById('sendMessageButton').click(); 
+                    }
                 }
-        }
-        )
+            )
+
             connect();
-            startAnimating();
         }
 
         console.log("Final login state: " + loginState);
@@ -612,21 +826,27 @@ function setUser(usr) {
 
 }
 
+/**
+ * Starts the game
+ */
 function connect() {
-    
-    //otherPlayers.push(new Player("(0, 0)", new Vector2(0, 0), "(0, 0)", "#00FF00"));
-
-    let centerDist = 500;
-    otherPlayers.push(new Player("(0, " + centerDist + ")", new Vector2(0, centerDist), "(0, " + centerDist + ")", "#FF0000"));
-    otherPlayers.push(new Player("(0, -" + centerDist + ")", new Vector2(0, -centerDist), "(0, -" + centerDist + ")", "#FFFF00"));
-    otherPlayers.push(new Player("(" + centerDist + ", 0)", new Vector2(centerDist, 0), "(" + centerDist + ", 0)", "#0000FF"));
-    otherPlayers.push(new Player("(-" + centerDist + ", 0)", new Vector2(-centerDist, 0), "(-" + centerDist + ", 0)", "#00FFFF"));
     connected = true;
     serverUpdate();
+    startAnimating();
 }
 
 function startAnimating() {
-    Abyss.init();
+
+    let bg = new Image();
+    bg.onload = function () {
+        abyssCollection.push(new Abyss(bg, 0.1, 0, 0));
+        bg = new Image();
+        bg.onload = function () {
+            abyssCollection.push(new Abyss(bg, 0.5, 1, 0));
+        }
+        bg.src = "./sprites/bg2.png";
+    }
+    bg.src = "./sprites/bg.png";
 
     let smallCollider = [
         Vector2.up.mul(20), 
@@ -649,45 +869,138 @@ function startAnimating() {
     let pillar_4 = new Sprite("pillar_4.png");
     let tictactoeBoard = new Sprite("minigame/tictactoe/tictactoeBoardInteract.png");
     gameProps.push(new GameProp(tictactoeBoard, new Vector2(0, 0), new Vector2(32, 32), new Vector2(100, 100), 60, createTicTacToe()));
-    new Prop(treeB, new Vector2(-800, -450), new Vector2(256, 420), new Vector2(300, 300)).addCollider(treeCollider);
-    new Prop(treeA, new Vector2(-400, -250), new Vector2(170, 420), new Vector2(300, 300)).addCollider(treeCollider);
+    new Prop(treeB, new Vector2(-750, -550), new Vector2(256, 420), new Vector2(300, 300)).addCollider(treeCollider);
+    new Prop(treeA, new Vector2(-400, -270), new Vector2(170, 420), new Vector2(300, 300)).addCollider(treeCollider);
     new Prop(treeB, new Vector2(50, -850), new Vector2(256, 420), new Vector2(500, 500)).addCollider([Vector2.up.mul(20), Vector2.left.mul(50), Vector2.down.mul(20), Vector2.right.mul(100)]);
     new Prop(treeA, new Vector2(-650, -820), new Vector2(170, 420), new Vector2(350, 350)).addCollider(treeCollider);
     new Prop(treeA, new Vector2(100, -450), new Vector2(170, 420), new Vector2(300, 300)).addCollider(treeCollider);
-    new Prop(treeA, new Vector2(775, 575), new Vector2(170, 420), new Vector2(300, 300)).addCollider(treeCollider);
+    new Prop(treeB, new Vector2(-850, 570), new Vector2(256, 420), new Vector2(300, 300)).addCollider(treeCollider);
+    new Prop(treeA, new Vector2(635, 575), new Vector2(170, 420), new Vector2(500, 500)).addCollider([Vector2.up.mul(20), Vector2.left.mul(50), Vector2.down.mul(20), Vector2.right.mul(100)]);
     new Prop(pillar_1, new Vector2(96, 96), new Vector2(256, 500), new Vector2(128, 105)).addCollider(smallCollider);
+    new Prop(pillar_2, new Vector2(-96, -96), new Vector2(256, 500), new Vector2(128, 105)).addCollider(smallCollider);
+    new Prop(pillar_3, new Vector2(96, -96), new Vector2(256, 500), new Vector2(128, 105)).addCollider(smallCollider);
+    new Prop(pillar_4, new Vector2(-96, 96), new Vector2(256, 500), new Vector2(128, 105)).addCollider(smallCollider);
+
+    let border = new Prop(pillar_1, new Vector2(0, 0), new Vector2(0, 0), new Vector2(1, 1));
+    border.addCollider([
+        new Vector2(-325, -588),
+        new Vector2(-620, -570),
+        new Vector2(-616, -344),
+        new Vector2(-465, -345),
+        new Vector2(-330, -495),
+    ]);
+    border.addCollider([
+        new Vector2(-1020, -1024),
+        new Vector2(-1000, -930),
+        new Vector2(1000, -950),
+        new Vector2(1020, -1010),
+    ]);
+    border.addCollider([
+        new Vector2(40, -940),
+        new Vector2(930, -725),
+        new Vector2(870, -900),
+    ]);
+    border.addCollider([
+        new Vector2(930, -725),
+        new Vector2(835, -500),
+        new Vector2(900, 235),
+    ]);
+    border.addCollider([
+        new Vector2(860, -305),
+        new Vector2(530, -135),
+        new Vector2(525, 95),
+        new Vector2(890, 440),
+    ]);
+    border.addCollider([
+        new Vector2(890, 420),
+        new Vector2(840, 820),
+        new Vector2(930, 980),
+    ]);
+    border.addCollider([
+        new Vector2(930, 700),
+        new Vector2(400, 980),
+        new Vector2(920, 920),
+    ]);
+    border.addCollider([
+        new Vector2(720, 870),
+        new Vector2(150, 880),
+        new Vector2(100, 1020),
+    ]);
+    border.addCollider([
+        new Vector2(140, 950),
+        new Vector2(-390, 940),
+        new Vector2(-400, 1020),
+    ]);
+    border.addCollider([
+        new Vector2(-310, 950),
+        new Vector2(-900, 700),
+        new Vector2(-910, 960),
+    ]);
+    border.addCollider([
+        new Vector2(-980, 300),
+        new Vector2(-985, 900),
+        new Vector2(-800, 730),
+    ]);
+    border.addCollider([
+        new Vector2(-845, -120),
+        new Vector2(-985, -900),
+        new Vector2(-980, 320),
+    ]);
+    border.addCollider([
+        new Vector2(-845, -120),
+        new Vector2(-616, -344),
+        new Vector2(-980, -350),
+    ]);
+    border.addCollider([
+        new Vector2(-820, -600),
+        new Vector2(-616, -344),
+        new Vector2(-620, -570),
+    ]);
+    border.addCollider([
+        new Vector2(-780, -940),
+        new Vector2(-985, -900),
+        new Vector2(-850, -700),
+    ]);
+    border.addCollider([
+        new Vector2(-850, -700),
+        new Vector2(-930, -615),
+        new Vector2(-750, -580),
+    ]);
     
     startTime = Date.now(); 
     drawScreen();
 }
+
+
 
 function update() {
     activeCamera.follow(userPlayer.pos);
 
     ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
 
-    Abyss.draw(1);
-    //ctx.save();
-    //ctx.fillStyle = Abyss.bgPattern;
-    //ctx.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
-    //ctx.restore();
+    // Draw the background abyss
+    abyssCollection.forEach((i) => {
+        i.draw(1);
+    })
 
+    // Draw the tiles
     backgroundMap.draw();
 
+    // Draw the game objects
     GameObject.objs.sort(GameObject.sortVertically);
     GameObject.objs.forEach((element) => {
         
         element.draw();
     })
     
-    //userPlayer.drawPlayer(gameCanvas);
+    // Render the client's speech bubbles
     userPlayer.drawSpeechBubbles(gameCanvas);
     userPlayer.update((Date.now()-startTime) / fpms);
     
+    // Render the other players's speech bubbles
     otherPlayers.forEach((element) => {
-        //element.drawPlayer(gameCanvas);
         element.drawSpeechBubbles(gameCanvas);
-        element.update((Date.now()-startTime)/fpms);
+        element.update((Date.now()-startTime) / fpms);
     });
 
     for (var i = 0; i < gameProps.length; i++) {
@@ -697,46 +1010,57 @@ function update() {
         }
     }
 
-    //let treeSprite = new Sprite("tree.png");
-    //treeSprite.draw(new Vector2(-256, -256).screenPos, 400);
+    for (var i = 0; i < gameProps.length; i++) {
+        gameProps[i].interactPrompt(userPlayer.pos);
+        if (gameProps[i].drawMenu) {
+            gameProps[i].window.draw();
+        }
+    }
+
+    // Collider rendering
+   /* ctx.save();
+    ctx.globalAlpha = 0.5;
+    ctx.fillStyle = "#FF00FF";
+    let o = 400;
+    StaticConvexCollider.colliders.forEach((i) => {
+        ctx.beginPath();
+        ctx.moveTo((i.points[0].x - activeCamera.pos.x) * activeCamera.zoom + o, (i.points[0].y - activeCamera.pos.y) * activeCamera.zoom + o);
+        for (let j = 1; j < i.points.length; j++) {
+            ctx.lineTo((i.points[j].x - activeCamera.pos.x) * activeCamera.zoom + o, (i.points[j].y - activeCamera.pos.y) * activeCamera.zoom + o);
+        }
+        ctx.closePath();
+        ctx.fill();
+    })
+    ctx.restore();*/
+
 }
 
+/**
+ * Sends actively updated info to the server
+ */
 function serverUpdate() {
     setTimeout(() => {
         serverUpdate();
-    }, 20);
+    }, 10);
     webSocket.send(JSON.stringify({
         id: userPlayer.username,
         posX: userPlayer.pos.x,
-        posY: userPlayer.pos.y
+        posY: userPlayer.pos.y,
+        flipped: userPlayer.flipped
     }));
 }
 
 function rgb(r, g, b){
     return ["rgb(",r,",",g,",",b,")"].join("");
 }
-    
-function ToggleDarkMode() {
 
-    const chatBoxReference = document.getElementById("chatBox");
-    if (!isDark) {
-        /* enables dark mode flag */
-        isDark = !isDark;
-
-        /* changes color of webpage's background */
-        document.body.style.background = rgb(54, 54, 54);
-
+function ToggleCosmetic(cosmeticName) {
+    if (userPlayer.hasCosmeticEquipped(cosmeticName) >= 0) {
+        userPlayer.removeCosmetic(cosmeticName);
     }
 
     else {
-        /* changes color of webpage's background */
-        document.body.style.background = "white";
-
-        /* changes color of the chatbox itself */
-        chatBoxReference.style.background = "lightgrey";
-
-        /* disables off dark mode */
-        isDark = !isDark;
+        userPlayer.addCosmetic(cosmeticName);
     }
 }
 
@@ -773,6 +1097,3 @@ function onClick(event, canvasPos) {
         }
     }
 }
-
-
-

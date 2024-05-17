@@ -2,14 +2,27 @@
 const textInputs = [];
 const log = document.getElementById("values");
 const tileSelect = document.getElementById("selectTile");
+const colliderSelect = document.getElementById("colliderSelect");
+const collider_increase = document.getElementById("collider_increase");
+const collider_decrease = document.getElementById("collider_decrease");
 const rowSelect = document.getElementById("rows");
 const colSelect = document.getElementById("cols");
 const zoom_in = document.getElementById("zoom_in");
 const zoom_out = document.getElementById("zoom_out");
+
+const offsetLeft = document.getElementById("offsetLeft");
+const offsetRight = document.getElementById("offsetRight");
+const offsetUp = document.getElementById("offsetUp");
+const offsetDown = document.getElementById("offsetDown");
+let offset = new Vector2(0,0);
+
 let isDark = false;
 
 let drawing = false;
 let mousePos = new Vector2(0,0);
+
+let colliderWidth = 0.5;
+let colliderHeight = 0.5;
 
 class Tile {
     tileRules = [];
@@ -71,12 +84,90 @@ class TileRule {
     }
 }
 
+class ColliderType {
+
+    relativePoints;
+    name;
+
+    constructor (name, relativePoints) {
+        this.relativePoints = relativePoints
+        this.name = name;
+    };
+
+    /**
+     * Turns this collider into a string
+     * @returns A string representing the contents of a list of each point's position that makes up this collider type
+     */
+    format (w, h) {
+        let output = "";
+
+        let stringify = function (v) {
+            `[${v.x * w}, ${v.y * h}]`
+        }
+
+        // Add all but the final point
+        for (let i = 0; i < this.relativePoints - 1; i++) {
+            output += stringify(this.relativePoints[i]) + `, `;
+        }
+
+        output += `${this.relativePoints[stringify(this.relativePoints.length-1)]}`;
+        return output;
+    }
+
+    getPoints(w = 1, h = w) {
+        let output = [];
+
+        this.relativePoints.forEach((i) => {
+            output.push(new Vector2(i.x * w, i.y * h))
+        })
+
+        return output;
+    }
+} // The creator of 1984, jorjor well
+
+class LevelCollider {
+    x;
+    y;
+    shape;
+    w;
+    h;
+    collider;
+
+    static allColliders = [];
+
+    /**
+     * 
+     * @param {Number} x 
+     * @param {Number} y 
+     * @param {ColliderType} shape 
+     * @param {Number} w 
+     * @param {Number} h 
+     */
+    constructor (x, y, shape, w = 1, h = 1) {
+        this.x = x;
+        this.y = y;
+        this.shape = shape;
+        this.w = w;
+        this.h = h;
+        
+        this.collider = new StaticConvexCollider(new Vector2(x, y), shape.relativePoints)
+
+        LevelCollider.allColliders.push(this);
+    }
+
+    format () {
+        return `[${this.x}, ${this.y}, [${this.shape.format(this.w, this.h)}]]`;
+    }
+}
+
 //Tilemap
 const tilePalette = [
     null,
     new Sprite("tiles/floor.png"),
     new Sprite("tiles/wall.png"),
     new Sprite("tiles/grass.png"),
+
+    // Path
     new Sprite("tiles/pathCenter.png"),
     new Sprite("tiles/pathNorth.png"),
     new Sprite("tiles/pathSouth.png"),
@@ -92,8 +183,33 @@ const tilePalette = [
     new Sprite("tiles/pathSouthEastInner.png"),
     new Sprite("tiles/pathSouthWestInner.png"),
     new Sprite("tiles/pathNorthSouth.png"),
-    new Sprite("tiles/pathEastWest.png"),
+    new Sprite("tiles/pathEastWest.png"), // Index 19
+
+    // Cliff
+    new Sprite("tiles/cliff.png"),
+    new Sprite("tiles/cliffNorth.png"),
+    new Sprite("tiles/cliffSouth.png"),
+    new Sprite("tiles/cliffEast.png"),
+    new Sprite("tiles/cliffWest.png"),
+	new Sprite("tiles/cliffNorthEast.png"),
+	new Sprite("tiles/cliffNorthWest.png"),
+    new Sprite("tiles/cliffSouthEast.png"),
+    new Sprite("tiles/cliffSouthWest.png"),
+    new Sprite("tiles/cliffNorthEastInner.png"),
+	new Sprite("tiles/cliffNorthWestInner.png"),
+    new Sprite("tiles/cliffSouthEastInner.png"),
+    new Sprite("tiles/cliffSouthWestInner.png"),
 ];
+
+const colliderPalette = [
+    new ColliderType("Box", [new Vector2(-1, -1), new Vector2(-1, 1), new Vector2(1, 1), new Vector2(1, -1)]),
+    new ColliderType("Top-Right Triangle",    [new Vector2(-1, -1), new Vector2(-1, 1), new Vector2(1, 1)]),
+    new ColliderType("Top-Left Triangle",     [new Vector2(-1, 1), new Vector2(1, 1), new Vector2(1, -1)]),
+    new ColliderType("Bottom-Left Triangle",  [new Vector2(-1, -1), new Vector2(1, 1), new Vector2(1, -1)]),
+    new ColliderType("Bottom-Right Triangle", [new Vector2(-1, -1), new Vector2(-1, 1), new Vector2(1, -1)]),
+]
+
+const colliders = [];
 
 const tilesForEditor = [
     null,
@@ -139,10 +255,49 @@ const tilesForEditor = [
              1, 0, 1, 
             -1, 1, 0]), 
     ]),
+    new Tile("Cliff", [
+        new TileRule(tilePalette[20]), 
+		
+        // Single side
+        new TileRule(tilePalette[21], [0, -1, 0, 0, 0, 0, 0, 1, 0]), 
+        new TileRule(tilePalette[22], [0, 1, 0, 0, 0, 0, 0, -1, 0]), 
+        new TileRule(tilePalette[23], [0, 0, 0, 1, 0, -1, 0, 0, 0]), 
+        new TileRule(tilePalette[24], [0, 0, 0, -1, 0, 1, 0, 0, 0]), 
+		
+        // Corners
+		new TileRule(tilePalette[25], [0, -1, 0, 1, 0, -1, 0, 1, 0]), 
+        new TileRule(tilePalette[26], [0, -1, 0, -1, 0, 1, 0, 1, 0]), 
+        new TileRule(tilePalette[27], [0, 1, 0, 1, 0, -1, 0, -1, 0]), 
+        new TileRule(tilePalette[28], [0, 1, 0, -1, 0, 1, 0, -1, 0]), 
+		
+        // Center
+        new TileRule(tilePalette[20], [0, 1, 0, 1, 0, 1, 0, 1, 0]),
+    
+        // Inner Corners
+        new TileRule(tilePalette[29], [
+             0, 1,-1,
+             1, 0, 1,
+             0, 1, 0]), 
+        new TileRule(tilePalette[30], [
+            -1, 1, 0, 
+             1, 0, 1, 
+             0, 1, 0]), 
+        new TileRule(tilePalette[31], [
+             0, 1, 0, 
+             1, 0, 1, 
+             0, 1,-1]), 
+        new TileRule(tilePalette[32], [
+             0, 1, 0,
+             1, 0, 1, 
+            -1, 1, 0]), 
+    ]),
 ]
 
 let selectedTileIndex = 0;
 let selectedTile = tilePalette[selectedTileIndex];
+
+let selectedColliderIndex = 0;
+let selectedCollider = tilePalette[selectedColliderIndex];
 
 let tileSize = 16;
 let rows = 8;
@@ -170,6 +325,11 @@ tileSelect.addEventListener("input", () => {
     selectedTile = tilePalette[selectedTileIndex];
 });
 
+colliderSelect.addEventListener("input", () => {
+    selectedColliderIndex =  colliderSelect.selectedIndex - 2;
+    selectedCollider = tilePalette[selectedColliderIndex];
+});
+
 rowSelect.addEventListener("input", () => {
     rows = rowSelect.value;
     map.rows = rows;
@@ -190,6 +350,20 @@ zoom_out.addEventListener("click", () => {
     printMessage(activeCamera.zoom);
 });
 
+collider_increase.addEventListener("click", () => {
+    colliderHeight += 0.25;
+    colliderWidth += 0.25;
+});
+
+collider_decrease.addEventListener("click", () => {
+    colliderHeight -= 0.25;
+    colliderWidth -= 0.25;
+});
+
+offsetLeft.addEventListener("click", () => {offset.x--;});
+offsetRight.addEventListener("click", () => {offset.x++;});
+offsetUp.addEventListener("click", () => {offset.y--;});
+offsetDown.addEventListener("click", () => {offset.y++;});
 
 
 class TextInput {
@@ -271,16 +445,32 @@ document.addEventListener("readystatechange", (e) => {
             textInputs.push(tI);
         }
         
-        printMessage("a");
-        let opt = document.createElement("option");
+        let opt;
+
+        // Tile pallete selection
+        opt = document.createElement("option");
         opt.text = "None";
         tileSelect.add(opt);
         
         for (let i = 1; i < tilesForEditor.length; i++) {
             opt = document.createElement("option");
-            //opt.text = tilePalette[i].toString.substr(tilePalette[i].toString.lastIndexOf("/") + 1, tilePalette[i].toString.lastIndexOf("."));
             opt.text = tilesForEditor[i].name;
             tileSelect.add(opt);
+        }
+
+        // Collider options
+        opt = document.createElement("option");
+        opt.text = "None";
+        colliderSelect.add(opt);
+
+        opt = document.createElement("option");
+        opt.text = "Delete";
+        colliderSelect.add(opt);
+
+        for (let i = 0; i < colliderPalette.length; i++) {
+            opt = document.createElement("option");
+            opt.text = colliderPalette[i].name;
+            colliderSelect.add(opt);
         }
 
         addCanvas();
@@ -291,6 +481,7 @@ document.addEventListener("readystatechange", (e) => {
         
         gameCanvas.addEventListener("mousedown", (e) => {
             drawing = true;
+            addCollider(getMousePos());
         });
         startAnimating()
     }
@@ -327,8 +518,10 @@ function sendMessage(msg) {
             console.log(cTile);
             if (cTile <= 3) {
                 drawnMap.set(y, x, cTile);
-            } else {
+            } else if (cTile <= 19) {
                 drawnMap.set(y, x, 4);
+            } else {
+                drawnMap.set(y, x, 5);
             }
         }
     }
@@ -343,7 +536,7 @@ function addTile(pos) {
         let x = Math.floor((pos.x / activeCamera.zoom) / tileSize);
         let y = Math.floor((pos.y / activeCamera.zoom) / tileSize);
 
-        drawnMap.set(x, y, selectedTileIndex);
+        drawnMap.set(x+offset.x, y+offset.y, selectedTileIndex);
         
         log.textContent = "";
         for (let j = 0; j < rows; j++) {
@@ -360,11 +553,38 @@ function addTile(pos) {
     }
 }
 
+function addCollider(pos) {
+    let x = Math.floor((pos.x / activeCamera.zoom) / tileSize);
+    let y = Math.floor((pos.y / activeCamera.zoom) / tileSize);
+    let p = new Vector2(x, y);
+
+    // Check if the user has a tile selected
+    if (selectedColliderIndex > 0) {
+        // Delete tile if in delete mode
+        if (selectedColliderIndex == 1) {
+            let chosenCollider;
+            for (let i = LevelCollider.allColliders.length-1; i >= 0; i--) {
+                if (LevelCollider.allColliders[i].collider.isColliding(mousePos)) {
+                    chosenCollider = i;
+                    i = -1;
+                }
+            }
+
+            if (chosenCollider >= 0) {
+                LevelCollider.allColliders.splice(i, 1);
+            }
+        } else {
+            printMessage("a")
+            new LevelCollider(x, y, colliderPalette[selectedColliderIndex], colliderWidth, colliderHeight);
+        }
+    }
+}
+
 function updateMap () {
     m = []
     for (let x = 0; x < cols; x++) {
         for (let y = 0; y < rows; y++) {
-            if (drawnMap.get(x, y) == null) {
+            if (drawnMap.get(x, y) == null || drawnMap.get(x, y) == 0) {
                 m[(x * cols) + y] = null;
             } else {
                 m[(x * cols) + y] = tilePalette.indexOf(tilesForEditor[drawnMap.get(x, y)].findBestMatch([
@@ -386,23 +606,46 @@ function startAnimating() {
     drawScreen();
 }
 
-function update() {
-    {
-        ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+function getMousePos() {
+    let canvasRect = gameCanvas.getBoundingClientRect();
+    let c = new Vector2(
+        mousePos.x - canvasRect.left, 
+        mousePos.y - canvasRect.top
+    );
 
-        if (drawing) {
-            let canvasRect = gameCanvas.getBoundingClientRect();
-            let c = new Vector2(
-                mousePos.x - canvasRect.left, 
-                mousePos.y - canvasRect.top
+    return c;
+}
+
+function update() {
+    ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+
+    // Add tiles at the current mouse pos if we are currently drawing new tiles
+    if (drawing) {
+        let c = getMousePos();
+        addTile(c);
+    }
+
+    updateMap();
+    log.textContent = map.map;
+    map.draw();
+
+
+    if (selectedColliderIndex !== 0) {
+        ctx.save();
+        ctx.globalAlpha = 0.5;
+        LevelCollider.allColliders.forEach((i) => {
+            ctx.beginPath();
+            ctx.moveTo(
+                i.collider.points[i.collider.points.length - 1].x * activeCamera.zoom * tileSize, 
+                i.collider.points[i.collider.points.length - 1].y * activeCamera.zoom * tileSize
             );
 
-            addTile(c);
-        }
+            i.collider.points.forEach((k) => {
+                ctx.lineTo(k.x * activeCamera.zoom * tileSize, k.y * activeCamera.zoom * tileSize);
+            })
 
-        updateMap();
-        log.textContent = map.map;
-        map.draw();
-        
+            ctx.fill();
+        })
+        ctx.restore();
     }
 }

@@ -54,24 +54,46 @@ const files = {
   '/sprites/tiles/floor.png' : ['image/png', '../frontend/sprites/tiles/floor.png'],
   '/sprites/tiles/wall.png' : ['image/png', '../frontend/sprites/tiles/wall.png'],
   '/sprites/tiles/grass.png' : ['image/png', '../frontend/sprites/tiles/grass.png'],
-  '/sprites/tiles/pathCenter.png' : ['image/png', '../frontend/sprites/tiles/pathCenter.png'],
-  '/sprites/tiles/pathNorth.png' : ['image/png', '../frontend/sprites/tiles/pathNorth.png'],
-  '/sprites/tiles/pathSouth.png' : ['image/png', '../frontend/sprites/tiles/pathSouth.png'],
-  '/sprites/tiles/pathEast.png' : ['image/png', '../frontend/sprites/tiles/pathEast.png'],
-  '/sprites/tiles/pathWest.png' : ['image/png', '../frontend/sprites/tiles/pathWest.png'],
-  '/sprites/tiles/pathNone.png' : ['image/png', '../frontend/sprites/tiles/pathNone.png'],
-  '/sprites/tiles/pathNorthEast.png' : ['image/png', '../frontend/sprites/tiles/pathNorthEast.png'],
-  '/sprites/tiles/pathNorthWest.png' : ['image/png', '../frontend/sprites/tiles/pathNorthWest.png'],
-  '/sprites/tiles/pathSouthEast.png' : ['image/png', '../frontend/sprites/tiles/pathSouthEast.png'],
-  '/sprites/tiles/pathSouthWest.png' : ['image/png', '../frontend/sprites/tiles/pathSouthWest.png'],
-  '/sprites/tiles/pathNorthEastInner.png' : ['image/png', '../frontend/sprites/tiles/pathNorthEastInner.png'],
-  '/sprites/tiles/pathNorthWestInner.png' : ['image/png', '../frontend/sprites/tiles/pathNorthWestInner.png'],
-  '/sprites/tiles/pathSouthEastInner.png' : ['image/png', '../frontend/sprites/tiles/pathSouthEastInner.png'],
-  '/sprites/tiles/pathSouthWestInner.png' : ['image/png', '../frontend/sprites/tiles/pathSouthWestInner.png'],
-  '/sprites/tiles/pathEastWest.png' : ['image/png', '../frontend/sprites/tiles/pathEastWest.png'],
-  '/sprites/tiles/pathNorthSouth.png' : ['image/png', '../frontend/sprites/tiles/pathNorthSouth.png'],
+
+  // Path
+    '/sprites/tiles/pathCenter.png' : ['image/png', '../frontend/sprites/tiles/pathCenter.png'],
+    '/sprites/tiles/pathNorth.png' : ['image/png', '../frontend/sprites/tiles/pathNorth.png'],
+    '/sprites/tiles/pathSouth.png' : ['image/png', '../frontend/sprites/tiles/pathSouth.png'],
+    '/sprites/tiles/pathEast.png' : ['image/png', '../frontend/sprites/tiles/pathEast.png'],
+    '/sprites/tiles/pathWest.png' : ['image/png', '../frontend/sprites/tiles/pathWest.png'],
+    '/sprites/tiles/pathNone.png' : ['image/png', '../frontend/sprites/tiles/pathNone.png'],
+    '/sprites/tiles/pathNorthEast.png' : ['image/png', '../frontend/sprites/tiles/pathNorthEast.png'],
+    '/sprites/tiles/pathNorthWest.png' : ['image/png', '../frontend/sprites/tiles/pathNorthWest.png'],
+    '/sprites/tiles/pathSouthEast.png' : ['image/png', '../frontend/sprites/tiles/pathSouthEast.png'],
+    '/sprites/tiles/pathSouthWest.png' : ['image/png', '../frontend/sprites/tiles/pathSouthWest.png'],
+    '/sprites/tiles/pathNorthEastInner.png' : ['image/png', '../frontend/sprites/tiles/pathNorthEastInner.png'],
+    '/sprites/tiles/pathNorthWestInner.png' : ['image/png', '../frontend/sprites/tiles/pathNorthWestInner.png'],
+    '/sprites/tiles/pathSouthEastInner.png' : ['image/png', '../frontend/sprites/tiles/pathSouthEastInner.png'],
+    '/sprites/tiles/pathSouthWestInner.png' : ['image/png', '../frontend/sprites/tiles/pathSouthWestInner.png'],
+    '/sprites/tiles/pathEastWest.png' : ['image/png', '../frontend/sprites/tiles/pathEastWest.png'],
+    '/sprites/tiles/pathNorthSouth.png' : ['image/png', '../frontend/sprites/tiles/pathNorthSouth.png'],
+    '/sprites/tiles/pathAtlas.png' : ['image/png', '../frontend/sprites/tiles/pathAtlas.png'],
+
+  // Cliff
+    '/sprites/tiles/cliff.png' : ['image/png', '../frontend/sprites/tiles/cliff.png'],
+    '/sprites/tiles/cliffNorth.png' : ['image/png', '../frontend/sprites/tiles/cliffNorth.png'],
+    '/sprites/tiles/cliffSouth.png' : ['image/png', '../frontend/sprites/tiles/cliffSouth.png'],
+    '/sprites/tiles/cliffEast.png' : ['image/png', '../frontend/sprites/tiles/cliffEast.png'],
+    '/sprites/tiles/cliffWest.png' : ['image/png', '../frontend/sprites/tiles/cliffWest.png'],
+    '/sprites/tiles/cliffNone.png' : ['image/png', '../frontend/sprites/tiles/cliffNone.png'],
+    '/sprites/tiles/cliffNorthEast.png' : ['image/png', '../frontend/sprites/tiles/cliffNorthEast.png'],
+    '/sprites/tiles/cliffNorthWest.png' : ['image/png', '../frontend/sprites/tiles/cliffNorthWest.png'],
+    '/sprites/tiles/cliffSouthEast.png' : ['image/png', '../frontend/sprites/tiles/cliffSouthEast.png'],
+    '/sprites/tiles/cliffSouthWest.png' : ['image/png', '../frontend/sprites/tiles/cliffSouthWest.png'],
+    '/sprites/tiles/cliffNorthEastInner.png' : ['image/png', '../frontend/sprites/tiles/cliffNorthEastInner.png'],
+    '/sprites/tiles/cliffNorthWestInner.png' : ['image/png', '../frontend/sprites/tiles/cliffNorthWestInner.png'],
+    '/sprites/tiles/cliffSouthEastInner.png' : ['image/png', '../frontend/sprites/tiles/cliffSouthEastInner.png'],
+    '/sprites/tiles/cliffSouthWestInner.png' : ['image/png', '../frontend/sprites/tiles/cliffSouthWestInner.png'],
+
   '/sprites/speechBubble.png' : ['image/png', '../frontend/sprites/speechBubble.png'],
-  '/sprites/bg.png' : ['image/png', '../frontend/sprites/bg.png'],
+  '/sprites/speechBubbleOther.png' : ['image/png', '../frontend/sprites/speechBubbleOther.png'],
+  '/sprites/bg.png' : ['image/png', '../frontend/sprites/bg_sky.png'],
+  '/sprites/bg2.png' : ['image/png', '../frontend/sprites/bg_sky2.png'],
 
   // Props
   '/sprites/tree.png' : ['image/png', '../frontend/sprites/tree.png'],
@@ -84,9 +106,13 @@ const files = {
 
   //Player
   '/sprites/player/base.png' : ['image/png', '../frontend/sprites/player/base.png'],
-  '/sprites/player/base_flipped.png' : ['image/png', '../frontend/sprites/player/base_flipped.png'],
+  '/sprites/player/fedora.png' : ['image/png', '../frontend/sprites/player/fedora.png'],
   '/sprites/player/flower.png' : ['image/png', '../frontend/sprites/player/flower.png'],
-  '/sprites/player/flower_flipped.png' : ['image/png', '../frontend/sprites/player/flower_flipped.png'],
+  '/sprites/player/big_glasses.png' : ['image/png', '../frontend/sprites/player/big_glasses.png'],
+  '/sprites/player/horns.png' : ['image/png', '../frontend/sprites/player/horns.png'],
+  '/sprites/player/tail.png' : ['image/png', '../frontend/sprites/player/tail.png'],
+  '/sprites/player/lil_glasses.png' : ['image/png', '../frontend/sprites/player/lil_glasses.png'],
+
 };
 
 var clients = {};
@@ -111,14 +137,18 @@ sockserver.on('connection', (ws, req) => {
   ws.on('close', () => {
     // When the client disconnects it sends its username to other clients so they know to remove that player from their screen
     try {
-      console.log(`${clients[ws.id][0]}(${ws.id}) has disconnected!`);
-      sockserver.clients.forEach(client => {
-        client.send(JSON.stringify({
-          id: clients[ws.id][0],
-          expired: true
-        })); 
-      });
-      delete clients[ws.id];
+      if (clients[ws.id] !== undefined) {
+        console.log(`${clients[ws.id][0]}(${ws.id}) has disconnected!`);
+        sockserver.clients.forEach(client => {
+          client.send(JSON.stringify({
+            id: clients[ws.id][0],
+            expired: true
+          })); 
+        });
+        delete clients[ws.id];
+      } else {
+        console.log("Client without account disconnected");
+      }
       var del;
       for (const [key, value] of Object.entries(gameRooms)) {
         for (var i = 0; i < value[0].length; i++) {
@@ -168,13 +198,14 @@ sockserver.on('connection', (ws, req) => {
         client.send(JSON.stringify({
           id: obj.id,
           posX: obj.posX,
-          posY: obj.posY
+          posY: obj.posY,
+          flipped: obj.flipped
         }));
       });
     } else if ("msg" in obj) {
       // When a message is sent this code distributes that message to other clients
       sockserver.clients.forEach(client => {
-        if (distance(clients[client.id][1], clients[ws.id][1], clients[client.id][2], clients[ws.id][2]) < 800) {
+        if (distance(clients[client.id][1], clients[ws.id][1], clients[client.id][2], clients[ws.id][2]) < 700) {
           const matches = matcher.getAllMatches(obj.msg);
           var newmsg = (censor.applyTo(obj.msg, matches));
           obj.msg = newmsg; 
@@ -391,8 +422,11 @@ sockserver.on('connection', (ws, req) => {
       var validName = true;
 
       // Checks if the username is taken and if so tells the client to select a different username
+      console.log(clients);
       for (const [key, value] of Object.entries(clients)) {
+        
         if (obj.id == value[0]) {
+          console.log("Duplicate username detected");
           validName = false;
           ws.send(JSON.stringify({
             invalidName: true,

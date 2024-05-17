@@ -52,6 +52,8 @@ const backgroundTiles = [
     new Sprite("tiles/cliffSouthWestInner.png"),
 ];
 
+let abyssCollection = [];
+
 // GAMES
 gameProps = [];
 
@@ -179,6 +181,15 @@ webSocket.onmessage = (event) => {
                     gameProps[i].game.processIncoming(obj.gameMove, gameProps[i].game);
                 }
             }
+        }
+    }
+    if ("rematch" in obj) {
+        if (Resources.rematch.length !== Resources.playerNum) {
+            Resources.rematch = [];
+            for (var i = 0; i < Resources.playerNum; i++) {
+                Resources.rematch.push(false);
+            }
+            Resources.rematch[obj.rematch];
         }
     }
 };
@@ -867,8 +878,10 @@ function startAnimating() {
     let pillar_2 = new Sprite("pillar_2.png");
     let pillar_3 = new Sprite("pillar_3.png");
     let pillar_4 = new Sprite("pillar_4.png");
+
     let tictactoeBoard = new Sprite("minigame/tictactoe/tictactoeBoardInteract.png");
     gameProps.push(new GameProp(tictactoeBoard, new Vector2(0, 0), new Vector2(32, 32), new Vector2(100, 100), 60, createTicTacToe()));
+
     new Prop(treeB, new Vector2(-750, -550), new Vector2(256, 420), new Vector2(300, 300)).addCollider(treeCollider);
     new Prop(treeA, new Vector2(-400, -270), new Vector2(170, 420), new Vector2(300, 300)).addCollider(treeCollider);
     new Prop(treeB, new Vector2(50, -850), new Vector2(256, 420), new Vector2(500, 500)).addCollider([Vector2.up.mul(20), Vector2.left.mul(50), Vector2.down.mul(20), Vector2.right.mul(100)]);

@@ -5,6 +5,7 @@ class Resources {
     static owner = false;
     static playerNum;
     static order;
+    static rematch = [];
 }
 
 class Board {
@@ -443,7 +444,9 @@ class UiGameMenu {
         }));
 
         this.buttons.push(new Button(new Vector2(this.center.x, this.center.y + 50 * activeCamera.zoom), 180, 40, "#20ff00", "REMATCH", 30, 3, 3, () => this.source.testWin() !== -1, () => {
-            
+            Resources.ws.send(JSON.stringify({
+                rematch: order
+            }));
         }));
     }
 

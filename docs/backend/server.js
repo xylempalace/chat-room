@@ -417,6 +417,16 @@ sockserver.on('connection', (ws, req) => {
           }
         });
       }
+    } else if ("rematch" in obj) {
+      for (var i = 0; i < gameRooms[obj.roomID][0].length; i++) {
+        sockserver.clients.forEach(client => {
+          if (client.id === gameRooms[obj.roomID][0][i]) {
+            client.send(JSON.stringify({
+              rematch: obj.rematch
+            }));
+          }
+        });
+      }
     } else if ("id" in obj) {
       // When a client selects a username
       var validName = true;

@@ -240,6 +240,8 @@ class Game {
     dimensions;
     buttons;
     processMove;
+    display;
+    winDisplay;
 
     /**
      * Game object that handles playing a game
@@ -247,9 +249,14 @@ class Game {
      * @param {number} maxPlayers max players allowed
      * @param {number} minPlayers min players allowed
      * @param {Board} board board of the game
-     * @param dimensions 
+     * @param {Vector2} dimensions the size of the window popup
+     * @param rules an array of all the rules used to run the game win condition should be first one
+     * @param buttons an array of all the buttons used for the player to play
+     * @param processMove the code that processes the info sent from the server about the opponent's move
+     * @param display the code on how to display the ui the player interacts with
+     * @param winDisplay the display that shows who won
      */
-    constructor(title, maxPlayers, minPlayers, board, dimensions, rules, buttons, processMove) {
+    constructor(title, maxPlayers, minPlayers, board, dimensions, rules, buttons, processMove, display, winDisplay) {
         this.title = title;
         this.maxPlayers = maxPlayers;
         this.minPlayers = minPlayers;
@@ -258,6 +265,8 @@ class Game {
         this.rules = rules;
         this.buttons = buttons;
         this.processMove = processMove;
+        this.display = display;
+        this.winDisplay = winDisplay;
     }
 
     /**
@@ -462,15 +471,9 @@ class UiGameMenu {
         if (this.windowState === 3) {    
             var win = this.source.testWin();
             if (win !== -1) {
-                ctx.fillStyle = "#ffffff";
-                ctx.fillRect(this.origin.x + this.width / 2 - 75 * activeCamera.zoom, this.origin.y + (200 - 28) * activeCamera.zoom, 150 * activeCamera.zoom, 40 * activeCamera.zoom);
-                ctx.fillStyle = "black";
-                ctx.font = `${25 * activeCamera.zoom}px Arial`;
-                ctx.fillText((win === 2 ? "Tie" : (win === 0 ? "X wins" : "O wins")), this.origin.x + this.width / 2, this.origin.y + 200 * activeCamera.zoom);
+                this.source.winDisplay(win, this.origin, this.width);
             } else {
-                for (var i = 0; i < this.source.buttons.length; i++) {
-                    this.source.buttons[i].draw(this.windowState);
-                }
+                this.source.display(this.windowState, this.source   );
             }
         }
         ctx.fillStyle = "black";

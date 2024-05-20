@@ -85,9 +85,19 @@ function createTicTacToe() {
         console.log(obj.testWin());
     }
 
-    const winText = () => {
-        
+    const renderButtons = (windowState, game) => {
+        for (var i = 0 ; i < game.buttons.length; i++) {
+            game.buttons[i].draw(windowState, game.minPlayers); 
+         }
     }
 
-    return new Game("Tic Tac Toe", 2, 2, gameBoard, dimensions, [winCondition, moveCondition], buttons, processMove);
+    const winText = (win, origin, width) => {
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(origin.x + width / 2 - 75 * activeCamera.zoom, origin.y + (200 - 28) * activeCamera.zoom, 150 * activeCamera.zoom, 40 * activeCamera.zoom);
+        ctx.fillStyle = "black";
+        ctx.font = `${25 * activeCamera.zoom}px Arial`;
+        ctx.fillText((win === 2 ? "Tie" : (win === 0 ? "X wins" : "O wins")), origin.x + width / 2, origin.y + 200 * activeCamera.zoom);   
+    }
+
+    return new Game("Tic Tac Toe", 2, 2, gameBoard, dimensions, [winCondition, moveCondition], buttons, processMove, renderButtons, winText);
 }

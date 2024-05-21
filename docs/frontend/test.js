@@ -96,11 +96,12 @@ webSocket.onmessage = (event) => {
             p.pos.x = obj.posX;
             p.pos.y = obj.posY;
             p.flipped = obj.flipped;
+            p.cosmetics = obj.cosmetics;
         } else {
             var newPlayer = new Player(obj.id, new Vector2(obj.posX, obj.posY), obj.id, "#FF0000");
             newPlayer.flipped = obj.flipped;
             otherPlayers.push(newPlayer);
-        }
+        } 
     } else if ("invalidName" in obj || obj.invalidName) {
         // Handles recieving username selction errors and verification
         if (obj.invalidName) {
@@ -276,6 +277,12 @@ class PlayerCosmetic {
 
         return finalString;
     }
+
+    getSpriteName() {
+        let finalString = this.getSpritePath();
+        finalString = finalString.substring(finalString.search("r/") + 2, finalString.length - 4);
+        return finalString;
+    }
 }
 
 class Player extends GameObject {
@@ -290,6 +297,7 @@ class Player extends GameObject {
     speechBubbles = [];
     color;
     cosmetics = [];
+    cosmeticsButWithNamesInsteadOfCosmetics = [];
     static baseCosmetics = [new PlayerCosmetic("player/base.png", "base", 'body')];
     flipped = false;
 
@@ -319,6 +327,7 @@ class Player extends GameObject {
     }
 
     addCosmetic(cosmeticName) {
+        
 
         let type = 'default';
 
@@ -333,6 +342,12 @@ class Player extends GameObject {
             }
             this.cosmetics.push(new PlayerCosmetic("player/" + cosmeticName + ".png", cosmeticName, type));
         }
+
+        let awesomestringtoprint = "";
+        for(let i = 0; i < this.cosmetics.length; i++) {
+            awesomestringtoprint += this.cosmetics[i].getSpriteName();
+        }
+        console.log(awesomestringtoprint);
     }
 
     removeCosmetic(cosmeticName) {
@@ -1021,7 +1036,8 @@ function serverUpdate() {
         id: userPlayer.username,
         posX: userPlayer.pos.x,
         posY: userPlayer.pos.y,
-        flipped: userPlayer.flipped
+        flipped: userPlayer.flipped,
+        cosmetics: userPlayer.cosmetics
     }));
 }
 

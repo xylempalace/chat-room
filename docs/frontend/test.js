@@ -202,6 +202,11 @@ webSocket.onmessage = (event) => {
         if (rematch) {
             Resources.order++;
             Resources.order %= Resources.playerNum;
+            for (var i = 0; i < gameProps.length; i++) {
+                if (gameProps[i].drawMenu) {
+                    gameProps[i].window.source = Resources.createGame[gameProps[i].window.title]();
+                }
+            }
         }
     }
 };

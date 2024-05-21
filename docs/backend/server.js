@@ -86,6 +86,7 @@ const files = {
     '/sprites/tiles/cliffNorthWestInner.png' : ['image/png', '../frontend/sprites/tiles/cliffNorthWestInner.png'],
     '/sprites/tiles/cliffSouthEastInner.png' : ['image/png', '../frontend/sprites/tiles/cliffSouthEastInner.png'],
     '/sprites/tiles/cliffSouthWestInner.png' : ['image/png', '../frontend/sprites/tiles/cliffSouthWestInner.png'],
+    '/sprites/tiles/cliffNorthWestSouthEastInner.png' : ['image/png', '../frontend/sprites/tiles/cliffNorthWestSouthEastInner.png'],
 
   '/sprites/speechBubble.png' : ['image/png', '../frontend/sprites/speechBubble.png'],
   '/sprites/speechBubbleOther.png' : ['image/png', '../frontend/sprites/speechBubbleOther.png'],

@@ -48,6 +48,7 @@ const files = {
   '/lemEngine.js' : ['text/javascript', '../frontend/lemEngine.js'],
   '/ui.js' : ['text/javascript', '../frontend/ui.js'],
   '/tictactoe.js' : ['text/javascript', '../frontend/tictactoe.js'],
+  '/connect4.js' : ['text/javascript', '../frontend/connect4.js'],
   '/imageManipulator.js' : ['text/javascript', '../tools/imageTools/imageManipulator.js'],
 
   // Tiles
@@ -99,6 +100,7 @@ const files = {
   '/sprites/tree.png' : ['image/png', '../frontend/sprites/tree.png'],
   '/sprites/tree2.png' : ['image/png', '../frontend/sprites/tree2.png'],
   '/sprites/minigame/tictactoe/tictactoeBoardInteract.png' : ['image/png', '../frontend/sprites/minigame/tictactoe/tictactoeBoardInteract.png'],
+  '/sprites/minigame/connect4/connect4BoardInteract.png' : ['image/png', '../frontend/sprites/minigame/connect4/connect4BoardInteract.png'],
   '/sprites/pillar_1.png' : ['image/png', '../frontend/sprites/pillar_1.png'],
   '/sprites/pillar_2.png' : ['image/png', '../frontend/sprites/pillar_2.png'],
   '/sprites/pillar_3.png' : ['image/png', '../frontend/sprites/pillar_3.png'],

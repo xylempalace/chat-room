@@ -257,6 +257,14 @@ sockserver.on('connection', (ws, req) => {
         if (gameRooms[obj.leaveRoom][0].length <= 0) {
           // Deletes room if its empty
           delete gameRooms[obj.leaveRoom];
+        } else if (gameRooms[obj.leaveRoom][3]) {
+          for (var i = 0; i < gameRooms[obj.leaveRoom][0].length; i++) {
+            if (client.id === gameRooms[obj.leaveRoom][0][i]) {
+              client.send(JSON.stringify({
+                kick: true
+              }));
+            }
+          }
         } else {
           // Changes the owner of the room if the owner was the player who left
           sockserver.clients.forEach(client => {

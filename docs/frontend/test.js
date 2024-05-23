@@ -213,6 +213,9 @@ webSocket.onmessage = (event) => {
             }
         }
     }
+    if ("kick" in obj) {
+        
+    }
 };
 
 webSocket.addEventListener("open", () => {
@@ -901,11 +904,11 @@ function startAnimating() {
     let pillar_4 = new Sprite("pillar_4.png");
 
     let tictactoeBoard = new Sprite("minigame/tictactoe/tictactoeBoardInteract.png");
-    //gameProps.push(new GameProp(tictactoeBoard, new Vector2(0, 0), new Vector2(32, 32), new Vector2(100, 100), 60, createTicTacToe()));
+    gameProps.push(new GameProp(tictactoeBoard, new Vector2(0, 0), new Vector2(32, 32), new Vector2(100, 100), 60, createTicTacToe()));
 
     let connect4Board = new Sprite("minigame/connect4/connect4BoardInteract.png"); 
     
-    gameProps.push(new GameProp(connect4Board, new Vector2(10, 10), new Vector2(400, 500), new Vector2(100,100), 60, createConnect4()));
+    //gameProps.push(new GameProp(connect4Board, new Vector2(10, 10), new Vector2(400, 500), new Vector2(100,100), 60, createConnect4()));
     
     
     new Prop(treeB, new Vector2(-750, -550), new Vector2(256, 420), new Vector2(300, 300)).addCollider(treeCollider);

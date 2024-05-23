@@ -536,14 +536,16 @@ class UiGameMenu {
                 }
             }
 
-            for (var i = 0; i < this.source.buttons.length; i++) {
-                if (this.source.buttons[i].windowState === this.windowState && (this.source.buttons[i].extraCondition === null || this.source.buttons[i].extraCondition(this.source.minPlayers))) {
-                    var nextState = this.source.buttons[i].processClick(position, (condition, nextState, windowState) => {
-                        if (condition) {
-                            return nextState;
-                        } else {
-                            return windowState;
-                    }}, this.source.minPlayers, this.source.maxPlayers, this.source, i);
+            if (this.source.buttons !== null) {
+                for (var i = 0; i < this.source.buttons.length; i++) {
+                    if (this.source.buttons[i].windowState === this.windowState && (this.source.buttons[i].extraCondition === null || this.source.buttons[i].extraCondition(this.source.minPlayers))) {
+                        var nextState = this.source.buttons[i].processClick(position, (condition, nextState, windowState) => {
+                            if (condition) {
+                                return nextState;
+                            } else {
+                                return windowState;
+                        }}, this.source.minPlayers, this.source.maxPlayers, this.source, i);
+                    }
                 }
             }
 

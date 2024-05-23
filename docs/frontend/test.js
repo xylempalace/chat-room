@@ -177,15 +177,17 @@ webSocket.onmessage = (event) => {
         }
     }
     if ("gameMove" in obj) {
+        console.log(Resources.currentRoomID);
         if (obj.id !== userPlayer.username) {
             for (var i = 0; i < gameProps.length; i++) {
                 if (gameProps[i].drawMenu) {
-                    gameProps[i].game.processIncoming(obj.gameMove, gameProps[i].game);
+                    gameProps[i].window.source.processIncoming(obj.gameMove, gameProps[i].window.source);
                 }
             }
         }
     }
     if ("rematch" in obj) {
+        console.log(Resources.currentRoomID);
         if (Resources.rematch.length !== Resources.playerNum) {
             Resources.rematch = [];
             for (var i = 0; i < Resources.playerNum; i++) {
@@ -203,6 +205,7 @@ webSocket.onmessage = (event) => {
         if (rematch) {
             Resources.order++;
             Resources.order %= Resources.playerNum;
+            Resources.rematch = [];
             for (var i = 0; i < gameProps.length; i++) {
                 if (gameProps[i].drawMenu) {
                     gameProps[i].window.source = Resources.createGame[gameProps[i].window.title]();
@@ -898,7 +901,7 @@ function startAnimating() {
     let pillar_4 = new Sprite("pillar_4.png");
 
     let tictactoeBoard = new Sprite("minigame/tictactoe/tictactoeBoardInteract.png");
-   // gameProps.push(new GameProp(tictactoeBoard, new Vector2(0, 0), new Vector2(32, 32), new Vector2(100, 100), 60, createTicTacToe()));
+    //gameProps.push(new GameProp(tictactoeBoard, new Vector2(0, 0), new Vector2(32, 32), new Vector2(100, 100), 60, createTicTacToe()));
 
     let connect4Board = new Sprite("minigame/connect4/connect4BoardInteract.png"); 
     

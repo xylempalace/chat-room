@@ -90,6 +90,7 @@ const files = {
     '/sprites/tiles/cliffNorthWestInner.png' : ['image/png', '../frontend/sprites/tiles/cliffNorthWestInner.png'],
     '/sprites/tiles/cliffSouthEastInner.png' : ['image/png', '../frontend/sprites/tiles/cliffSouthEastInner.png'],
     '/sprites/tiles/cliffSouthWestInner.png' : ['image/png', '../frontend/sprites/tiles/cliffSouthWestInner.png'],
+    '/sprites/tiles/cliffNorthWestSouthEastInner.png' : ['image/png', '../frontend/sprites/tiles/cliffNorthWestSouthEastInner.png'],
 
   '/sprites/speechBubble.png' : ['image/png', '../frontend/sprites/speechBubble.png'],
   '/sprites/speechBubbleOther.png' : ['image/png', '../frontend/sprites/speechBubbleOther.png'],
@@ -193,20 +194,22 @@ sockserver.on('connection', (ws, req) => {
   
     if ("posX" in obj) {
       // This code handles recieving and distributing positional data from one client to the others
-      clients[ws.id][1] = obj.posX;
-      clients[ws.id][2] = obj.posY;
-      sockserver.clients.forEach(client => {
-        client.send(JSON.stringify({
-          id: obj.id,
-          posX: obj.posX,
-          posY: obj.posY,
-          flipped: obj.flipped
-        }));
-      });
+      if (clients[ws.id] !== undefined) {
+        clients[ws.id][1] = obj.posX;
+        clients[ws.id][2] = obj.posY;
+        sockserver.clients.forEach(client => {
+          client.send(JSON.stringify({
+            id: obj.id,
+            posX: obj.posX,
+            posY: obj.posY,
+            flipped: obj.flipped
+          }));
+        });
+      }
     } else if ("msg" in obj) {
       // When a message is sent this code distributes that message to other clients
       sockserver.clients.forEach(client => {
-        if (distance(clients[client.id][1], clients[ws.id][1], clients[client.id][2], clients[ws.id][2]) < 700) {
+        if (clients[ws.id] !== undefined && distance(clients[client.id][1], clients[ws.id][1], clients[client.id][2], clients[ws.id][2]) < 700) {
           const matches = matcher.getAllMatches(obj.msg);
           var newmsg = (censor.applyTo(obj.msg, matches));
           obj.msg = newmsg; 

@@ -199,6 +199,7 @@ const tilePalette = [
 	new Sprite("tiles/cliffNorthWestInner.png"),
     new Sprite("tiles/cliffSouthEastInner.png"),
     new Sprite("tiles/cliffSouthWestInner.png"),
+    new Sprite("tiles/cliffNorthWestSouthEastInner.png"),
 ];
 
 const colliderPalette = [
@@ -290,6 +291,10 @@ const tilesForEditor = [
              0, 1, 0,
              1, 0, 1, 
             -1, 1, 0]), 
+        new TileRule(tilePalette[33], [
+            -1, 1, 0, 
+             1, 0, 1, 
+             0, 1,-1]), 
     ]),
 ]
 

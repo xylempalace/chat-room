@@ -50,6 +50,7 @@ const backgroundTiles = [
 	new Sprite("tiles/cliffNorthWestInner.png"),
     new Sprite("tiles/cliffSouthEastInner.png"),
     new Sprite("tiles/cliffSouthWestInner.png"),
+    new Sprite("tiles/cliffNorthWestSouthEastInner.png"),
 ];
 
 let abyssCollection = [];
@@ -60,12 +61,44 @@ Resources.createGame["Tic Tac Toe"] = createTicTacToe;
 Resources.createGame["Connect Four"] = createTicTacToe;
 
 const backgroundMap = new TileMap(new Vector2(0,0), backgroundTiles, 64, 32, 32, [
-    20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,31,23,23,23,29,20,20,20,20,20,20,20,20,20,20,20,31,23,29,20,20,20,20,31,23,29,20,20,31,23,23,23,27,3,3,3,25,23,29,20,20,20,20,20,20,20,20,31,27,3,25,23,29,20,20,22,3,21,31,23,27,11,19,19,19,13,3,3,3,1,25,23,23,29,20,20,20,20,31,27,11,8,13,3,25,29,20,32,24,31,27,11,8,12,3,3,3,18,3,3,3,3,3,3,1,25,29,20,20,20,22,3,10,7,12,3,3,21,20,20,31,27,11,15,6,3,3,11,8,12,3,3,3,3,1,3,3,3,21,20,20,20,22,1,3,3,3,3,3,21,20,31,27,3,5,4,6,3,3,5,6,3,3,3,3,3,1,1,1,3,21,20,20,20,22,1,1,3,3,3,26,30,20,22,3,3,5,4,6,3,3,5,12,3,3,3,3,3,1,1,1,1,25,29,20,31,27,2,1,3,3,3,21,20,20,22,3,3,10,14,6,3,11,6,3,3,3,3,3,1,1,1,1,1,3,21,20,20,2,2,1,3,3,3,21,20,31,27,3,3,3,5,17,8,16,12,3,3,3,3,3,1,1,1,3,1,3,21,20,20,2,1,1,3,3,3,21,31,27,3,3,3,3,5,4,16,12,3,3,3,3,3,3,1,1,1,1,1,3,25,29,20,2,1,1,3,3,3,25,27,3,3,3,11,8,15,4,6,3,11,13,3,3,3,3,1,3,1,1,3,3,3,21,20,2,1,3,3,3,3,3,3,3,3,11,15,4,4,4,17,8,15,17,13,3,3,3,3,3,1,3,3,3,3,21,20,2,2,3,3,3,3,3,3,3,3,5,16,7,7,14,16,7,7,14,6,3,3,3,1,3,3,3,1,3,3,21,20,2,2,1,3,3,3,3,3,3,11,15,6,3,3,10,12,3,3,5,17,13,3,3,3,3,1,3,3,3,3,21,20,2,2,1,3,3,3,3,3,3,5,4,6,3,2,1,1,2,3,5,4,6,3,3,3,3,3,3,3,3,3,21,20,2,2,3,3,3,3,3,3,11,15,4,17,13,1,1,1,1,11,15,4,6,3,3,3,3,3,3,3,3,3,21,32,28,1,3,3,3,3,3,3,10,14,4,16,12,1,1,1,1,10,14,16,12,3,3,3,3,3,3,3,3,3,21,20,22,3,3,3,3,3,3,3,3,5,4,6,3,2,1,1,2,3,5,6,3,3,3,3,3,3,3,3,3,3,21,20,22,3,3,3,3,3,3,3,3,10,14,6,3,3,11,13,3,3,5,17,13,3,3,3,3,3,3,3,3,26,30,20,22,3,3,3,3,3,3,3,3,3,5,17,8,8,15,17,8,8,15,4,17,13,3,3,3,11,13,3,3,21,20,20,22,3,3,11,19,19,19,13,3,3,10,7,7,7,7,7,7,7,14,4,4,17,8,8,8,15,17,13,3,21,20,20,22,3,11,12,1,1,1,10,13,3,3,3,3,3,3,3,3,3,10,14,4,4,4,4,4,4,4,6,3,21,20,20,22,3,18,1,11,19,13,1,18,3,3,3,3,3,3,3,3,3,3,10,14,4,4,4,4,4,4,6,3,21,20,20,32,28,18,1,18,2,18,1,18,3,3,3,3,3,3,3,3,3,3,3,10,14,4,4,4,4,4,6,3,21,20,20,20,22,18,1,10,19,12,1,18,3,3,3,3,26,24,24,28,3,3,3,3,5,4,16,7,14,4,6,3,21,20,20,20,22,10,13,1,1,1,11,12,3,3,3,3,21,20,20,22,3,3,3,3,10,14,6,3,5,4,17,13,21,20,20,20,22,3,10,19,19,19,12,3,3,3,3,26,30,20,20,32,28,3,3,3,3,5,6,3,5,4,16,12,21,20,20,20,32,28,3,3,3,3,3,3,3,3,26,30,20,20,20,20,32,28,3,3,3,5,17,8,15,4,6,26,30,20,20,20,20,22,3,3,3,3,3,3,3,3,21,20,20,20,20,20,20,32,28,3,3,10,14,4,4,16,12,21,20,20,20,20,20,32,28,3,3,3,26,24,24,24,30,20,20,20,20,20,20,20,32,24,28,3,10,7,7,12,26,30,20,20,20,20,20,20,32,24,24,24,30,20,20,20,20,20,20,20,20,20,20,20,20,20,32,24,24,24,24,24,30,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20
+    20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,31,23,23,23,29,20,20,20,20,20,20,20,20,
+    20,20,20,31,23,29,20,20,20,20,31,23,29,20,20,31,23,23,23,27, 3, 3, 3,25,23,29,20,20,20,20,20,20,
+    20,20,31,27, 3,25,23,29,20,20,22, 3,21,31,23,27,11,19,19,19,13, 3, 3, 3, 1,25,23,23,29,20,20,20,
+    20,31,27,11, 8,13, 3,25,29,20,32,24,33,27,11, 8,12, 3, 3, 3,18, 3, 3, 3, 3, 3, 3, 1,25,29,20,20,
+    20,22, 3,10, 7,12, 3, 3,21,20,20,31,27,11,15, 6, 3, 3,11, 8,12, 3, 3, 3, 3, 1, 3, 3, 3,21,20,20,
+    20,22,1,3,3,3,3,3,21,20,31,27,3,5,4,6,3,3,5,6,3,3,3,3,3,1,1,1,3,21,20,20,20,22,1,1,3,3,3,26,30,20,22,3,3,5,4,6,3,3,5,12,3,3,3,3,3,1,1,1,1,25,29,20,31,27,2,1,3,3,3,21,20,20,22,3,3,10,14,6,3,11,6,3,3,3,3,3,1,1,1,1,1,3,21,20,20,2,2,1,3,3,3,21,20,31,27,3,3,3,5,17,8,16,12,3,3,3,3,3,1,1,1,3,1,3,21,20,20,2,1,1,3,3,3,21,31,27,3,3,3,3,5,4,16,12,3,3,3,3,3,3,1,1,1,1,1,3,25,29,20,2,1,1,3,3,3,25,27,3,3,3,11,8,15,4,6,3,11,13,3,3,3,3,1,3,1,1,3,3,3,21,20,2,1,3,3,3,3,3,3,3,3,11,15,4,4,4,17,8,15,17,13,3,3,3,3,3,1,3,3,3,3,21,20,2,2,3,3,3,3,3,3,3,3,5,16,7,7,14,16,7,7,14,6,3,3,3,1,3,3,3,1,3,3,21,20,2,2,1,3,3,3,3,3,3,11,15,6,3,3,10,12,3,3,5,17,13,3,3,3,3,1,3,3,3,3,21,20,2,2,1,3,3,3,3,3,3,5,4,6,3,2,1,1,2,3,5,4,6,3,3,3,3,3,3,3,3,3,21,20,2,2,3,3,3,3,3,3,11,15,4,17,13,1,1,1,1,11,15,4,6,3,3,3,3,3,3,3,3,3,21,32,28,1,3,3,3,3,3,3,10,14,4,16,12,1,1,1,1,10,14,16,12,3,3,3,3,3,3,3,3,3,21,20,22,3,3,3,3,3,3,3,3,5,4,6,3,2,1,1,2,3,5,6,3,3,3,3,3,3,3,3,3,3,21,20,22,3,3,3,3,3,3,3,3,10,14,6,3,3,11,13,3,3,5,17,13,3,3,3,3,3,3,3,3,26,30,20,22,3,3,3,3,3,3,3,3,3,5,17,8,8,15,17,8,8,15,4,17,13,3,3,3,11,13,3,3,21,20,20,22,3,3,11,19,19,19,13,3,3,10,7,7,7,7,7,7,7,14,4,4,17,8,8,8,15,17,13,3,21,20,20,22,3,11,12,1,1,1,10,13,3,3,3,3,3,3,3,3,3,10,14,4,4,4,4,4,4,4,6,3,21,20,20,22,3,18,1,11,19,13,1,18,3,3,3,3,3,3,3,3,3,3,10,14,4,4,4,4,4,4,6,3,21,20,20,32,28,18,1,18,2,18,1,18,3,3,3,3,3,3,3,3,3,3,3,10,14,4,4,4,4,4,6,3,21,20,20,20,22,18,1,10,19,12,1,18,3,3,3,3,26,24,24,28,3,3,3,3,5,4,16,7,14,4,6,3,21,20,20,20,22,10,13,1,1,1,11,12,3,3,3,3,21,20,20,22,3,3,3,3,10,14,6,3,5,4,17,13,21,20,20,20,22,3,10,19,19,19,12,3,3,3,3,26,30,20,20,32,28,3,3,3,3,5,6,3,5,4,16,12,21,20,20,20,32,28,3,3,3,3,3,3,3,3,26,30,20,20,20,20,32,28,3,3,3,5,17,8,15,4,6,26,30,20,20,20,20,22,3,3,3,3,3,3,3,3,21,20,20,20,20,20,20,32,28,3,3,10,14,4,4,16,12,21,20,20,20,20,20,32,28,3,3,3,26,24,24,24,30,20,20,20,20,20,20,20,32,24,28,3,10,7,7,12,26,30,20,20,20,20,20,20,32,24,24,24,30,20,20,20,20,20,20,20,20,20,20,20,20,20,32,24,24,24,24,24,30,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20
 ]);
 
 // WebSocket Stuff
-const webSocket = new WebSocket('ws://localhost:3000/');
-Resources.ws = webSocket;
+let webSocket
+function webSocketInit(address) {
+    webSocket = new WebSocket(address);
+
+    // Attempt to reconnect the user if the websocket closes
+    webSocket.onclose = function() {
+        setTimeout(function(){ // Upon closing, attempt reconnection after 5 seconds
+            console.log("Reconnecting..."); 
+            webSocketInit(address);
+
+            let attemptReregister = function () {
+                setTimeout(function(){
+                    if (webSocket.readyState === 1) { // If websocket is successfully connected after 5 more seconds, register this client as a new player
+                        if (webSocket.readyState > 0) {
+                            console.log("Reconnected!");
+                            webSocket.send(JSON.stringify({
+                                id : userPlayer.username
+                            }));
+                        }
+                    } else if (webSocket.readyState == 0) {
+                        attemptReregister();
+                    }
+                }, 5000);
+            }
+
+        }, 5000);
+    }
+}
+webSocketInit('ws://localhost:3000/');
 
 ImageManipulator.init();
 
@@ -658,29 +691,6 @@ class Abyss {
         this.bgImage.src = image.src;
     }
 
-    /*draw(delta) {
-        if (this.bgImageLoaded) {
-            ctx.save();
-
-            let offsetx = this.xOffset;
-            offsetx += activeCamera.pos.x * -this.moveScale;
-            offsetx += this.scrollSpeedX * delta;
-
-            let offsety = this.yOffset;
-            offsety += activeCamera.pos.y * -this.moveScale;
-            offsety += this.scrollSpeedY * delta;
-
-            ctx.translate(offsetx, offsety);
-
-            this.xOffset = offsetx;
-            this.yOffset = offsety;
-
-            ctx.fillStyle = this.bgPattern;
-            ctx.fillRect(offsetx, offsety, gameCanvas.width * 2 - offsetx, gameCanvas.height * 2 - offsety)
-            ctx.restore();
-        }
-    }*/
-
     draw(delta) {
         if (this.bgImageLoaded) {
             ctx.save();
@@ -811,6 +821,61 @@ function receiveMessage(msg) {
     log.textContent += msg+"\n";
 }
 
+/*function parseString(msg) {
+    let output = msg;
+    let j;
+    let i;
+    for (j = 0; j < msg.indexOf("*"); j++) {
+        curChar = msg.charAt(j);
+
+        // Ignore \* when searching for tags
+        //if (curChar == "\\" && msg.charAt(j+1) == "*") {continue;}
+
+        let indexOfSequence;
+        let closingIndex;
+
+        indexOfSequence = findSequence(msg.slice(j), "***");
+        if (indexOfSequence > 0) {
+            // Bold and italic
+            closingIndex = findSequence(msg.slice(j+3), "***");
+            if (closingIndex > 0) {
+
+            }
+            
+        } else {
+            indexOfSequence = findSequence(msg, "**");
+            if (indexOfSequence > 0) {
+                // Bold
+            } else {
+                indexOfSequence = findSequence(msg, "*");
+                if (indexOfSequence > 0) {
+                    // Italic
+                } else {
+                    continue;
+                }
+            }
+        }
+
+       // hi **hi**
+    }
+
+    for (i; i < msg.length; i++) {
+    }
+
+    return output;
+}
+
+function findSequence(str, sequence) {
+    for (let i = 0; i < str.length - sequence.length; i++) {
+        if (str.slice(i, i+sequence.length) == sequence) {
+            return i;
+        }
+    }
+
+    // Default to -1 if sequence wasn't found
+    return -1;
+}*/
+
 function updateUser(e) {
     if (e.key=="Enter") {
         console.log("enter key pressed");
@@ -865,9 +930,12 @@ function setUser(usr) {
  * Starts the game
  */
 function connect() {
-    connected = true;
     serverUpdate();
-    startAnimating();
+
+    if (!connected) {
+        connected = true;
+        startAnimating();
+    }
 }
 
 function startAnimating() {
@@ -1081,15 +1149,21 @@ function update() {
  * Sends actively updated info to the server
  */
 function serverUpdate() {
-    setTimeout(() => {
-        serverUpdate();
-    }, 10);
-    webSocket.send(JSON.stringify({
-        id: userPlayer.username,
-        posX: userPlayer.pos.x,
-        posY: userPlayer.pos.y,
-        flipped: userPlayer.flipped
-    }));
+    if (webSocket.readyState < 2) {
+        setTimeout(() => {
+            serverUpdate();
+        }, 10);
+        webSocket.send(JSON.stringify({
+            id: userPlayer.username,
+            posX: userPlayer.pos.x,
+            posY: userPlayer.pos.y,
+            flipped: userPlayer.flipped
+        }));
+    } else {
+        setTimeout(() => {
+            serverUpdate();
+        }, 5000);
+    }
 }
 
 function rgb(r, g, b){

@@ -455,27 +455,9 @@ class UiGameMenu {
 
         this.buttons.push(new Button(new Vector2(this.center.x, this.center.y + 50 * activeCamera.zoom), 180, 40, "#20ff00", "REMATCH", 30, 3, 3, () => this.source.testWin() !== -1 && (Resources.rematch.length !== Resources.playerNum || !Resources.rematch[Resources.order]), () => {
             Resources.ws.send(JSON.stringify({
-                rematch: order
+                rematch: Resources.order,
+                roomID: Resources.currentRoomID
             }));
-            if (Resources.rematch.length !== Resources.playerNum) {
-                Resources.rematch = [];
-                for (var i = 0; i < Resources.playerNum; i++) {
-                    Resources.rematch.push(false);
-                }
-            }
-            Resources.rematch[Resources.order] = true;
-            var rematch = true;
-            for (var i = 0; i < Resources.rematch.length; i++) {
-                if (!Resources.rematch[i]) {
-                    rematch = false;
-                    break;
-                }
-            }
-            if (rematch) {
-                Resources.order++;
-                Resources.order %= Resources.playerNum;
-                this.source = Resources.createGame[this.title]();
-            }
         }));
     }
 

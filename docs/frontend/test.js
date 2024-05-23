@@ -177,22 +177,44 @@ webSocket.onmessage = (event) => {
         }
     }
     if ("gameMove" in obj) {
+        console.log(Resources.currentRoomID);
         if (obj.id !== userPlayer.username) {
             for (var i = 0; i < gameProps.length; i++) {
                 if (gameProps[i].drawMenu) {
-                    gameProps[i].game.processIncoming(obj.gameMove, gameProps[i].game);
+                    gameProps[i].window.source.processIncoming(obj.gameMove, gameProps[i].window.source);
                 }
             }
         }
     }
     if ("rematch" in obj) {
+        console.log(Resources.currentRoomID);
         if (Resources.rematch.length !== Resources.playerNum) {
             Resources.rematch = [];
             for (var i = 0; i < Resources.playerNum; i++) {
                 Resources.rematch.push(false);
             }
-            Resources.rematch[obj.rematch];
         }
+        Resources.rematch[obj.rematch] = true;
+        var rematch = true;
+        for (var i = 0; i < Resources.rematch.length; i++) {
+            if (!Resources.rematch[i]) {
+                rematch = false;
+                break;
+            }
+        }
+        if (rematch) {
+            Resources.order++;
+            Resources.order %= Resources.playerNum;
+            Resources.rematch = [];
+            for (var i = 0; i < gameProps.length; i++) {
+                if (gameProps[i].drawMenu) {
+                    gameProps[i].window.source = Resources.createGame[gameProps[i].window.title]();
+                }
+            }
+        }
+    }
+    if ("kick" in obj) {
+        
     }
 };
 
@@ -882,11 +904,11 @@ function startAnimating() {
     let pillar_4 = new Sprite("pillar_4.png");
 
     let tictactoeBoard = new Sprite("minigame/tictactoe/tictactoeBoardInteract.png");
-   // gameProps.push(new GameProp(tictactoeBoard, new Vector2(0, 0), new Vector2(32, 32), new Vector2(100, 100), 60, createTicTacToe()));
+    gameProps.push(new GameProp(tictactoeBoard, new Vector2(0, 0), new Vector2(32, 32), new Vector2(100, 100), 60, createTicTacToe()));
 
     let connect4Board = new Sprite("minigame/connect4/connect4BoardInteract.png"); 
     
-    gameProps.push(new GameProp(connect4Board, new Vector2(10, 10), new Vector2(400, 500), new Vector2(40,30), 60, createConnect4()));
+    gameProps.push(new GameProp(connect4Board, new Vector2(10, 10), new Vector2(400, 500), new Vector2(100,100), 60, createConnect4()));
     
     
     new Prop(treeB, new Vector2(-750, -550), new Vector2(256, 420), new Vector2(300, 300)).addCollider(treeCollider);

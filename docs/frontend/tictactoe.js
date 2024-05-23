@@ -53,9 +53,6 @@ function createTicTacToe() {
 
     const canvas = document.getElementById("gameCanvas");
     var dimensions = new Vector2(800, 400);
-    var width = dimensions.x * activeCamera.zoom;
-    var height = dimensions.y * activeCamera.zoom;
-    var origin = new Vector2(canvas.width / 2 - width / 2, canvas.height / 2 - height / 2)
     var center = new Vector2(canvas.width / 2, canvas.height / 2);
     var buttons = [];
     
@@ -72,7 +69,6 @@ function createTicTacToe() {
                         id: userPlayer.username,
                         roomID: Resources.currentRoomID
                     }));
-                    console.log(game.testWin());
                 }
             }
         }));
@@ -82,7 +78,6 @@ function createTicTacToe() {
         obj.gameBoard.set(new Vector2(move[0] % 3, Math.floor(move[0] / 3)), new Piece(move[1]));
         obj.buttons[move[0]].text = move[1];
         obj.switchTurn(Resources.playerNum);
-        console.log(obj.testWin());
     }
 
     const renderButtons = (windowState, game) => {

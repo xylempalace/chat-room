@@ -257,11 +257,12 @@ class Game {
      * @param display the code on how to display the ui the player interacts with
      * @param winDisplay the display that shows who won
      */
-    constructor(title, maxPlayers, minPlayers, board, dimensions, rules, buttons, processMove, display, winDisplay) {
+    constructor(title, maxPlayers, minPlayers, board, deck, dimensions, rules, buttons, processMove, display, winDisplay) {
         this.title = title;
         this.maxPlayers = maxPlayers;
         this.minPlayers = minPlayers;
         this.gameBoard = board;
+        this.deck = deck;
         this.dimensions = dimensions;
         this.rules = rules;
         this.buttons = buttons;

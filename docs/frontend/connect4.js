@@ -57,6 +57,6 @@ for (var i = 0; i < 9; i++){
 
 
 
-return new Game("Connect Four", 2, 2, gameBoard, new Vector2(800, 400), [winCondition], null, null,displayBoard);
+return new Game("Connect Four", 2, 2, gameBoard, null, new Vector2(800, 400), [winCondition], null, null,displayBoard);
 
 }

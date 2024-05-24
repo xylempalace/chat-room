@@ -94,5 +94,5 @@ function createTicTacToe() {
         ctx.fillText((win === 2 ? "Tie" : (win === 0 ? "X wins" : "O wins")), origin.x + width / 2, origin.y + 200 * activeCamera.zoom);   
     }
 
-    return new Game("Tic Tac Toe", 2, 2, gameBoard, dimensions, [winCondition, moveCondition], buttons, processMove, renderButtons, winText);
+    return new Game("Tic Tac Toe", 2, 2, gameBoard, null, dimensions, [winCondition, moveCondition], buttons, processMove, renderButtons, winText);
 }

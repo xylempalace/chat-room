@@ -12,8 +12,11 @@ return inSpot.value === "" && Resources.order === turn;
 
 const winCondition = (gameBoard, turn) => {
 
-    return -1;
+    ;
 }
+
+
+
 
 const canvas = document.getElementById("gameCanvas");
     var dimensions = new Vector2(800, 400);
@@ -23,12 +26,11 @@ const canvas = document.getElementById("gameCanvas");
     var center = new Vector2(canvas.width / 2, canvas.height / 2);
     var buttons = [];
 
-for (var i = 0; i < 7; i++){
-   // buttons.push(new Button(new Vector2(center.x + (-70 + (i % 3) * 70) * activeCamera.zoom, center.y + (-70 + Math.floor(i / 3) * 70) * activeCamera.zoom), 60, 60, "#7d7d7d", "", 30, 3, 3, null, (a, b, obj, game, index) => {
-    buttons.push(new Button(new Vector2(center.x + (-170 + i* 90)*activeCamera.zoom, center.y + -220 * activeCamera.zoom)),90, 450, "#ffffff","",0,3,3,null,null);
-console.log("Button "+ i + "has been created");   
-}
-console.log(buttons);
+
+    for (var i = 0; i < 7; i++){
+        let b = new Button(new Vector2(center.x + (-150 + i* 50)*activeCamera.zoom, center.y + -220 * activeCamera.zoom),40, 450, "#FFB6C1","",0,3,3,null, null);
+        buttons.push(b);
+    } 
     const displayBoard = (windowState, game) => {
         for (var i = 0 ; i < game.buttons.length; i++) {
             console.log("Button " + i + "has been drawned");
@@ -59,7 +61,12 @@ console.log(buttons);
 
 
 
+const processMove = (move,obj) => {
+obj.gameBoard.getColumn()
 
+
+
+}
 
     const winText = (win,origin, width) => {
 
@@ -67,6 +74,6 @@ console.log(buttons);
     }
 
 
-return new Game("Connect Four", 2, 2, gameBoard, new Vector2(800, 400), [winCondition], buttons, null,displayBoard,winText);
+return new Game("Connect Four", 2, 2, gameBoard, new Vector2(800, 400), [winCondition], buttons, processMove,displayBoard,winText);
 
 }

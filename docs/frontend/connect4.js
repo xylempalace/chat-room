@@ -32,13 +32,17 @@ for (var i = 0; i < 9; i++){
         console.log("displayBoard called");
         ctx.fillStyle = "blue";
         ctx.beginPath();
-        ctx.fillRect(center.x -200 * activeCamera.zoom, center.y - 140 * activeCamera.zoom, 550,400);
-        ctx.fillStyle = "white";
-
+        ctx.fillRect(center.x -180 * activeCamera.zoom, center.y - 140 * activeCamera.zoom, 550,450);
         for(var x = 0; x < 7; x++){
             for( var y = 0; y < 6; y++){
-                if (game.gameBoard) {
+                if (gameBoard.get(new Vector2(x,y)).value == 0) {
+                    ctx.fillStyle = "white";
+                } else if(gameBoard.get(new Vector2(x,y)).value == 1) {
+                    ctx.fillStyle = "red";
+                }
 
+                else{
+                    ctx.fillStyle = "blue";
                 }
 
                 ctx.moveTo(center.x + (-300 + x * 100) * .5 * activeCamera.zoom, center.y + (-230 + y * 100) * activeCamera.zoom * .5);

@@ -903,8 +903,8 @@ function startAnimating() {
     let pillar_3 = new Sprite("pillar_3.png");
     let pillar_4 = new Sprite("pillar_4.png");
 
-    let tictactoeBoard = new Sprite("minigame/tictactoe/tictactoeBoardInteract.png");
-    gameProps.push(new GameProp(tictactoeBoard, new Vector2(0, 0), new Vector2(32, 32), new Vector2(100, 100), 60, createTicTacToe()));
+    // let tictactoeBoard = new Sprite("minigame/tictactoe/tictactoeBoardInteract.png");
+    // gameProps.push(new GameProp(tictactoeBoard, new Vector2(0, 0), new Vector2(32, 32), new Vector2(100, 100), 60, createTicTacToe()));
 
     let connect4Board = new Sprite("minigame/connect4/connect4BoardInteract.png"); 
     

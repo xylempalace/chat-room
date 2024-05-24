@@ -375,10 +375,15 @@ class UiGameMenu {
 
         // Button for joining any public room
         this.buttons.push(new Button(new Vector2(this.center.x - 130 * activeCamera.zoom, this.center.y), 220, 40, "#20ff00", "JOIN ANY", 30, 10, 2, null, () => {
-            Resources.ws.send(JSON.stringify({
+            //console.log(Resources);
+        
+          if(Resources.ws !== undefined){ 
+             Resources.ws.send(JSON.stringify({
                 joinRoom: null
             }));
-        }));
+        }}
+        ))
+
         // Button for joining a room by its id
         this.buttons.push(new Button(new Vector2(this.center.x + 130 * activeCamera.zoom, this.center.y), 240, 40, "#20ff00", "JOIN CODE", 30, 10, 11, null, () => {
             var gameDiv = document.createElement("div");
@@ -415,12 +420,14 @@ class UiGameMenu {
         this.buttons.push(new Button(new Vector2(this.center.x, this.center.y - 50 * activeCamera.zoom), 180, 40, "#ffb300", "PUBLIC", 30, 20, 21, null));
         // Room creation button
         this.buttons.push(new Button(new Vector2(this.center.x, this.center.y + 50 * activeCamera.zoom), 180, 40, "#20ff00", "CREATE", 30, 20, 2, null, (playersMin, playersMax) => {
+           
+           if(Resources.ws !== undefined){
             Resources.ws.send(JSON.stringify({
                 newRoom: "public",
                 playersMin: playersMin,
                 playersMax: playersMax
             }));
-        }));
+        }}));
         
         // Toggle for switching to public room
         this.buttons.push(new Button(new Vector2(this.center.x, this.center.y - 50 * activeCamera.zoom), 180, 40, "#00a2ff", "PRIVATE", 30, 21, 20, null));

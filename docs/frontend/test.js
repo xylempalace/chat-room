@@ -102,6 +102,8 @@ webSocketInit('ws://localhost:3000/');
 
 ImageManipulator.init();
 
+Resources.ws = webSocket;
+
 webSocket.onmessage = (event) => {
     var obj = JSON.parse(event.data);
     if ("expired" in obj) {

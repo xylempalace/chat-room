@@ -164,6 +164,16 @@ sockserver.on('connection', (ws, req) => {
       if (del !== null) {
         if (gameRooms[del][0].length <= 0) {
           delete gameRooms[del];
+        } else if (gameRooms[del][3]) {
+          sockserver.clients.forEach(client => {
+            for (var i = 0; i < gameRooms[del][0].length; i++) {
+              if (client.id === gameRooms[del][0][i]) {
+                client.send(JSON.stringify({
+                  kick: true
+                }));
+              }
+            }
+          });
         } else {
           sockserver.clients.forEach(client => {
             if (client.id === gameRooms[del][0][0]) {
@@ -261,13 +271,15 @@ sockserver.on('connection', (ws, req) => {
           // Deletes room if its empty
           delete gameRooms[obj.leaveRoom];
         } else if (gameRooms[obj.leaveRoom][3]) {
-          for (var i = 0; i < gameRooms[obj.leaveRoom][0].length; i++) {
-            if (client.id === gameRooms[obj.leaveRoom][0][i]) {
-              client.send(JSON.stringify({
-                kick: true
-              }));
+          sockserver.clients.forEach(client => {
+            for (var i = 0; i < gameRooms[obj.leaveRoom][0].length; i++) {
+              if (client.id === gameRooms[obj.leaveRoom][0][i]) {
+                client.send(JSON.stringify({
+                  kick: true
+                }));
+              }
             }
-          }
+          });
         } else {
           // Changes the owner of the room if the owner was the player who left
           sockserver.clients.forEach(client => {

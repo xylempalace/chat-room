@@ -249,7 +249,20 @@ webSocket.onmessage = (event) => {
         }
     }
     if ("kick" in obj) {
-        
+        for (var i = 0; i < gameProps.length; i++) {
+            gameProps[i].drawMenu = false;
+            freezePlayer = false;
+            var input = document.getElementById("gameDiv");
+            if (input !== null) {
+                input.remove();
+            }
+            if (Resources.currentRoomID !== null) {    
+                webSocket.send(JSON.stringify({
+                    leaveRoom: Resources.currentRoomID
+                }));
+                Resources.currentRoomID = null;
+            }
+        }
     }
 };
 
@@ -978,7 +991,7 @@ function startAnimating() {
 
     let connect4Board = new Sprite("minigame/connect4/connect4BoardInteract.png"); 
     
-    gameProps.push(new GameProp(connect4Board, new Vector2(10, 10), new Vector2(400, 500), new Vector2(100,100), 60, createConnect4()));
+    //gameProps.push(new GameProp(connect4Board, new Vector2(10, 10), new Vector2(400, 500), new Vector2(100,100), 60, createConnect4()));
     
     
     new Prop(treeB, new Vector2(-750, -550), new Vector2(256, 420), new Vector2(300, 300)).addCollider(treeCollider);
@@ -1186,21 +1199,21 @@ function onClick(event, canvasPos) {
     if (connected) {
         if (freezePlayer) {
             for (var i = 0; i < gameProps.length; i++) {
-                    if (gameProps[i].window.processClick(canvasPos)) {
-                        gameProps[i].drawMenu = false;
-                        freezePlayer = false;
-                        var input = document.getElementById("gameDiv");
-                        if (input !== null) {
-                            input.remove();
-                        }
-                        if (Resources.currentRoomID !== null) {    
-                            webSocket.send(JSON.stringify({
-                                leaveRoom: Resources.currentRoomID
-                            }));
-                            Resources.currentRoomID = null;
-                        }
+                if (gameProps[i].window.processClick(canvasPos)) {
+                    gameProps[i].drawMenu = false;
+                    freezePlayer = false;
+                    var input = document.getElementById("gameDiv");
+                    if (input !== null) {
+                        input.remove();
+                    }
+                    if (Resources.currentRoomID !== null) {    
+                        webSocket.send(JSON.stringify({
+                            leaveRoom: Resources.currentRoomID
+                        }));
+                        Resources.currentRoomID = null;
                     }
                 }
+            }
         } else {
             for (var i = 0; i < gameProps.length; i++) {
                 if (gameProps[i].interactPrompt(userPlayer.pos) && gameProps[i].button.processClick(canvasPos, (condition) => {return condition;})) {

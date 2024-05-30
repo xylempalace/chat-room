@@ -987,7 +987,8 @@ function startAnimating() {
     let pillar_4 = new Sprite("pillar_4.png");
 
     let tictactoeBoard = new Sprite("minigame/tictactoe/tictactoeBoardInteract.png");
-    gameProps.push(new GameProp(tictactoeBoard, new Vector2(480, -608), new Vector2(32, 32), new Vector2(64, 64), 60, createTicTacToe())).addCollider([Vector2.up.mul(20), Vector2.left.mul(50), Vector2.down.mul(20), Vector2.right.mul(100)]);
+    gameProps.push(new GameProp(tictactoeBoard, new Vector2(480, -608), new Vector2(32, 32), new Vector2(64, 64), 100, createTicTacToe()));
+    gameProps[gameProps.length - 1].addCollider([new Vector2(-60, -60), new Vector2(-58, 38), new Vector2(60, 40), new Vector2(58, -58)]);
 
     let connect4Board = new Sprite("minigame/connect4/connect4BoardInteract.png"); 
     
@@ -1143,7 +1144,7 @@ function update() {
     }
 
     // Collider rendering
-   /* ctx.save();
+    /*ctx.save();
     ctx.globalAlpha = 0.5;
     ctx.fillStyle = "#FF00FF";
     let o = 400;
@@ -1157,7 +1158,7 @@ function update() {
         ctx.fill();
     })
     ctx.restore();*/
-
+ 
 }
 
 /**

@@ -721,6 +721,62 @@ class Camera extends GameObject {
     }   
 }
 
+class Prop extends GameObject {
+    sprite;
+    size;
+    center;
+    centerProportion;
+    ready = false;
+    colliders = [];
+
+    /**
+     * 
+     * @param {Sprite} sprite Sprite object representing the image of this prop
+     * @param {Vector2} pos Position in the world to draw this prop, drawing from center
+     * @param {Vector2} center Center of the sprite, affecting z-sort position and where this is drawn from
+     * @param {Vector2} size How large to draw this prop
+     */
+    constructor (sprite, pos, center, size) {
+        super("PROP-"+sprite.image.src, pos);
+
+        this.sprite = sprite;
+        this.size = size;
+        this.drawOffset = Vector2.zero;
+
+        //this.center = center;
+        if (this.sprite.image.naturalHeight != 0) {
+            this.scaler = new Vector2(
+                ((this.size.x * center.x) / this.sprite.width), 
+                ((this.size.y * center.y) / this.sprite.height)
+                )
+            this.ready = true;
+            console.log(this.scaler)
+        } else {
+            let self = this;
+            this.sprite.image.addEventListener("load", () => {
+                self.scaler = new Vector2(
+                    ((self.size.x * center.x) / self.sprite.image.width), 
+                    ((self.size.y * center.y) / self.sprite.image.height)
+                    )
+                self.ready = true;
+            });
+        }
+    }
+
+    draw() {
+        if (this.ready) {
+            this.sprite.draw(new Vector2(
+                this.pos.x - (this.scaler.x), // Correct position offset from scaling
+                this.pos.y - (this.scaler.y)
+            ).screenPos, this.size.x * activeCamera.zoom, this.size.y * activeCamera.zoom);
+        }
+    }
+
+    addCollider(relativePoints) {
+        this.colliders.push(new StaticConvexCollider(this.pos, relativePoints));
+    }
+}
+
 function addCanvas() {
     var canvas = document.createElement('canvas');
     var tCanvas = document.createElement('canvas');
@@ -736,7 +792,7 @@ function addCanvas() {
     tCanvas.height = document.getElementById('gameSpace').clientHeight * 0.98;
     
     canvas.addEventListener("mouseup", (e) => {
-        canvasClick(canvas, e)
+        canvasClick(canvas, e);
     });
     
     cameraList.push(new Camera("default", Vector2.zero, 0.01, []));
@@ -782,12 +838,18 @@ function drawScreen() {
     
     update();
     
+    ctx.fillStyle = "#000000";
+    ctx.textAlign = "left";
     startTime = Date.now();
     var fpsDecimalPlaces = 1;
     var measuredFPS = ((startTime-beginTime))*(fpsDecimalPlaces*10);
     
     frameLength = Math.min(fpms-(Date.now()-beginTime),fpms);
 
+}
+
+function distance(x1, x2, y1, y2) {
+    return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
 }
 
 function update() {}

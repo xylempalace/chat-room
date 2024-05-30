@@ -7,8 +7,10 @@ let isDark = false;
 let connected = false;
 let loginState = "username";
 let userPlayer;
+Resources.player = userPlayer;
 let otherPlayers = [];
 let lastCameraPos = 0;
+let freezePlayer = false;
 
 //Tilemap
 const backgroundTiles = [
@@ -54,7 +56,10 @@ const backgroundTiles = [
 
 let abyssCollection = [];
 
-// const board = new Board(100, 100);
+// GAMES
+gameProps = [];
+Resources.createGame["Tic Tac Toe"] = createTicTacToe;
+Resources.createGame["Connect Four"] = createTicTacToe;
 
 const backgroundMap = new TileMap(new Vector2(0,0), backgroundTiles, 64, 32, 32, [
     20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,31,23,23,23,29,20,20,20,20,20,20,20,20,
@@ -97,6 +102,8 @@ function webSocketInit(address) {
 webSocketInit('ws://localhost:3000/');
 
 ImageManipulator.init();
+
+Resources.ws = webSocket;
 
 webSocket.onmessage = (event) => {
     var obj = JSON.parse(event.data);
@@ -165,6 +172,97 @@ webSocket.onmessage = (event) => {
             loginState = "usernameVerified";
             const textBox = textInputs.find((element) => element.textInput.getAttribute("placeholder") == "Username");
             setUser(obj.usr, textBox);
+        }
+    } else if ("joinRoom" in obj) {
+        var input = document.getElementById("gameDiv");
+        if (input !== null) {
+            input.remove();
+        }
+        if (obj.joinRoom === "error") {
+            for (var i = 0; i < gameProps.length; i++) {
+                if (gameProps[i].drawMenu) {
+                    gameProps[i].window.windowState = 10;
+                }
+            }
+            receiveMessage("No rooms available");
+            console.log("error");
+        } else {
+            Resources.currentRoomID = obj.joinRoom;
+            console.log(Resources.currentRoomID);
+            for (var i = 0; i < gameProps.length; i++) {
+                if (gameProps[i].drawMenu) {
+                    gameProps[i].window.windowState = 1;
+                }
+            }
+        }
+    }
+    if ("owner" in obj) {
+        Resources.owner = obj.owner;
+    }
+    if ("order" in obj) {
+        Resources.order = obj.order;
+    }
+    if ("playerNum" in obj) {
+        Resources.playerNum = obj.playerNum;
+    }
+    if ("startRoom" in obj) {
+        for (var i = 0; i < gameProps.length; i++) {
+            if (gameProps[i].drawMenu) {
+                gameProps[i].window.windowState = 3;
+            }
+        }
+    }
+    if ("gameMove" in obj) {
+        console.log(Resources.currentRoomID);
+        if (obj.id !== userPlayer.username) {
+            for (var i = 0; i < gameProps.length; i++) {
+                if (gameProps[i].drawMenu) {
+                    gameProps[i].window.source.processIncoming(obj.gameMove, gameProps[i].window.source);
+                }
+            }
+        }
+    }
+    if ("rematch" in obj) {
+        console.log(Resources.currentRoomID);
+        if (Resources.rematch.length !== Resources.playerNum) {
+            Resources.rematch = [];
+            for (var i = 0; i < Resources.playerNum; i++) {
+                Resources.rematch.push(false);
+            }
+        }
+        Resources.rematch[obj.rematch] = true;
+        var rematch = true;
+        for (var i = 0; i < Resources.rematch.length; i++) {
+            if (!Resources.rematch[i]) {
+                rematch = false;
+                break;
+            }
+        }
+        if (rematch) {
+            Resources.order++;
+            Resources.order %= Resources.playerNum;
+            Resources.rematch = [];
+            for (var i = 0; i < gameProps.length; i++) {
+                if (gameProps[i].drawMenu) {
+                    gameProps[i].window.source = Resources.createGame[gameProps[i].window.title]();
+                }
+            }
+        }
+    }
+    if ("kick" in obj) {
+        for (var i = 0; i < gameProps.length; i++) {
+            gameProps[i].drawMenu = false;
+            freezePlayer = false;
+            var input = document.getElementById("gameDiv");
+            if (input !== null) {
+                input.remove();
+            }
+            if (Resources.currentRoomID !== null) {    
+                webSocket.send(JSON.stringify({
+                    leaveRoom: Resources.currentRoomID
+                }));
+                Resources.currentRoomID = null;
+            }
         }
     }
 };
@@ -407,19 +505,34 @@ class Player extends GameObject {
             // Checks if current X position is further than your "destination"
             // Stops you if it is, keeps moving forward otherwise
             if (Math.abs(nextX-this.destination.x) > Math.abs(this.pos.x-this.destination.x)) {
-                this.velX = 0;
                 this.pos.x = this.destination.x;
+                this.stopX();
             } else {
                 this.pos.x = nextX;
             }
             
             if (Math.abs(nextY-this.destination.y) > Math.abs(this.pos.y-this.destination.y)) {
-                this.velY = 0;
                 this.pos.y = this.destination.y;
+                this.stopY();
             } else {
                 this.pos.y = nextY;
             }
         }
+    }
+
+    stopX() {
+        this.velX = 0;
+        this.destination.x = this.pos.x;
+    }
+
+    stopY() {
+        this.velY = 0;
+        this.destination.y = this.pos.y;
+    }
+
+    stop() {
+        this.stopX();
+        this.stopY();
     }
 
     sayMessage(message) {
@@ -554,62 +667,6 @@ class SpeechBubble {
 
         ctx.textAlign = prevAlign;
         ctx.font = prevFont;
-    }
-}
-
-class Prop extends GameObject {
-    sprite;
-    size;
-    center;
-    centerProportion;
-    ready = false;
-    colliders = [];
-
-    /**
-     * 
-     * @param {Sprite} sprite Sprite object representing the image of this prop
-     * @param {Vector2} pos Position in the world to draw this prop, drawing from center
-     * @param {Vector2} center Center of the sprite, affecting z-sort position and where this is drawn from
-     * @param {Vector2} size How large to draw this prop
-     */
-    constructor (sprite, pos, center, size) {
-        super("PROP-"+sprite.image.src, pos);
-
-        this.sprite = sprite;
-        this.size = size;
-        this.drawOffset = Vector2.zero;
-
-        //this.center = center;
-        if (this.sprite.image.naturalHeight != 0) {
-            this.scaler = new Vector2(
-                ((this.size.x * center.x) / this.sprite.width), 
-                ((this.size.y * center.y) / this.sprite.height)
-                )
-            this.ready = true;
-            console.log(this.scaler)
-        } else {
-            let self = this;
-            this.sprite.image.addEventListener("load", () => {
-                self.scaler = new Vector2(
-                    ((self.size.x * center.x) / self.sprite.image.width), 
-                    ((self.size.y * center.y) / self.sprite.image.height)
-                    )
-                self.ready = true;
-            });
-        }
-    }
-
-    draw() {
-        if (this.ready) {
-            this.sprite.draw(new Vector2(
-                this.pos.x - (this.scaler.x), // Correct position offset from scaling
-                this.pos.y - (this.scaler.y)
-            ).screenPos, this.size.x * activeCamera.zoom, this.size.y * activeCamera.zoom);
-        }
-    }
-
-    addCollider(relativePoints) {
-        this.colliders.push(new StaticConvexCollider(this.pos, relativePoints));
     }
 }
 
@@ -933,6 +990,16 @@ function startAnimating() {
     let pillar_2 = new Sprite("pillar_2.png");
     let pillar_3 = new Sprite("pillar_3.png");
     let pillar_4 = new Sprite("pillar_4.png");
+
+    let tictactoeBoard = new Sprite("minigame/tictactoe/tictactoeBoardInteract.png");
+    gameProps.push(new GameProp(tictactoeBoard, new Vector2(480, -608), new Vector2(32, 32), new Vector2(64, 64), 100, createTicTacToe()));
+    gameProps[gameProps.length - 1].addCollider([new Vector2(-60, -60), new Vector2(-58, 38), new Vector2(60, 40), new Vector2(58, -58)]);
+
+    let connect4Board = new Sprite("minigame/connect4/connect4BoardInteract.png"); 
+    
+    //gameProps.push(new GameProp(connect4Board, new Vector2(10, 10), new Vector2(400, 500), new Vector2(100,100), 60, createConnect4()));
+    
+    
     new Prop(treeB, new Vector2(-750, -550), new Vector2(256, 420), new Vector2(300, 300)).addCollider(treeCollider);
     new Prop(treeA, new Vector2(-400, -270), new Vector2(170, 420), new Vector2(300, 300)).addCollider(treeCollider);
     new Prop(treeB, new Vector2(50, -850), new Vector2(256, 420), new Vector2(500, 500)).addCollider([Vector2.up.mul(20), Vector2.left.mul(50), Vector2.down.mul(20), Vector2.right.mul(100)]);
@@ -1070,8 +1137,22 @@ function update() {
         element.update((Date.now()-startTime) / fpms);
     });
 
+    for (var i = 0; i < gameProps.length; i++) {
+        gameProps[i].interactPrompt(userPlayer.pos);
+        if (gameProps[i].drawMenu) {
+            gameProps[i].window.draw();
+        }
+    }
+
+    for (var i = 0; i < gameProps.length; i++) {
+        gameProps[i].interactPrompt(userPlayer.pos);
+        if (gameProps[i].drawMenu) {
+            gameProps[i].window.draw();
+        }
+    }
+
     // Collider rendering
-   /* ctx.save();
+    /*ctx.save();
     ctx.globalAlpha = 0.5;
     ctx.fillStyle = "#FF00FF";
     let o = 400;
@@ -1085,7 +1166,7 @@ function update() {
         ctx.fill();
     })
     ctx.restore();*/
-
+ 
 }
 
 /**
@@ -1125,6 +1206,34 @@ function ToggleCosmetic(cosmeticName) {
 
 function onClick(event, canvasPos) {
     if (connected) {
-        userPlayer.walkTo(canvasPos.screenToWorldPos());
+        if (freezePlayer) {
+            for (var i = 0; i < gameProps.length; i++) {
+                if (gameProps[i].window.processClick(canvasPos)) {
+                    gameProps[i].drawMenu = false;
+                    freezePlayer = false;
+                    var input = document.getElementById("gameDiv");
+                    if (input !== null) {
+                        input.remove();
+                    }
+                    if (Resources.currentRoomID !== null) {    
+                        webSocket.send(JSON.stringify({
+                            leaveRoom: Resources.currentRoomID
+                        }));
+                        Resources.currentRoomID = null;
+                    }
+                }
+            }
+        } else {
+            for (var i = 0; i < gameProps.length; i++) {
+                if (gameProps[i].interactPrompt(userPlayer.pos) && gameProps[i].button.processClick(canvasPos, (condition) => {return condition;})) {
+                    gameProps[i].drawMenu = true;
+                    gameProps[i].window.windowState = 0;
+                    freezePlayer = true;
+                    userPlayer.stop();
+                    return;
+                }
+            }
+            userPlayer.walkTo(canvasPos.screenToWorldPos());
+        }
     }
 }

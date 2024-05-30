@@ -184,6 +184,24 @@ input {
     transform: scale(1.1);
 }
 
+.joinCode {
+    position: relative;
+
+    width: 200px; height: 50px;
+
+    font-size: 3rem; text-align: center;
+    
+    z-index: 8;
+}
+
+.joinButton {
+    position: relative;
+
+    width: 53.7px; height:53.7px;
+
+    z-index: 8;
+}
+
 .settingsCSS{
     cursor: pointer;
     size: 200%;

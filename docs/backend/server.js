@@ -16,6 +16,9 @@ sockserver.getUniqueID = function () {
   }
   return s4() + s4() + '-' + s4();
 };
+sockserver.getUniqueRoomID = function () {
+  return Math.floor((1 + Math.random()) * 0x100000).toString(16).substring(1);
+};
 
 const port = 3000
 // Import path library
@@ -28,7 +31,6 @@ const {
 	englishRecommendedTransformers,
   asteriskCensorStrategy, 
 } = require('obscenity');
-
 const matcher = new RegExpMatcher({
 	...englishDataset.build(),
 	...englishRecommendedTransformers,
@@ -44,7 +46,9 @@ const files = {
   '/test.js' : ['text/javascript', '../frontend/test.js'],
   '/favicon.ico' : ['image/vnd.microsoft.icon', '../images/favicon.ico'],
   '/lemEngine.js' : ['text/javascript', '../frontend/lemEngine.js'],
-  '/games.js' : ['text/javascript', '../frontend/games.js'],
+  '/ui.js' : ['text/javascript', '../frontend/ui.js'],
+  '/tictactoe.js' : ['text/javascript', '../frontend/tictactoe.js'],
+  '/connect4.js' : ['text/javascript', '../frontend/connect4.js'],
   '/imageManipulator.js' : ['text/javascript', '../tools/imageTools/imageManipulator.js'],
 
   // Tiles
@@ -96,6 +100,8 @@ const files = {
   // Props
   '/sprites/tree.png' : ['image/png', '../frontend/sprites/tree.png'],
   '/sprites/tree2.png' : ['image/png', '../frontend/sprites/tree2.png'],
+  '/sprites/minigame/tictactoe/tictactoeBoardInteract.png' : ['image/png', '../frontend/sprites/minigame/tictactoe/tictactoeBoardInteract.png'],
+  '/sprites/minigame/connect4/connect4BoardInteract.png' : ['image/png', '../frontend/sprites/minigame/connect4/connect4BoardInteract.png'],
   '/sprites/pillar_1.png' : ['image/png', '../frontend/sprites/pillar_1.png'],
   '/sprites/pillar_2.png' : ['image/png', '../frontend/sprites/pillar_2.png'],
   '/sprites/pillar_3.png' : ['image/png', '../frontend/sprites/pillar_3.png'],
@@ -113,6 +119,7 @@ const files = {
 };
 
 var clients = {};
+var gameRooms = {};
 
 // Serves corresponding file upon request
 app.get('/*', (req, res) => {
@@ -144,6 +151,46 @@ sockserver.on('connection', (ws, req) => {
         delete clients[ws.id];
       } else {
         console.log("Client without account disconnected");
+      }
+      var del;
+      for (const [key, value] of Object.entries(gameRooms)) {
+        for (var i = 0; i < value[0].length; i++) {
+          if (value[0][i] === ws.id) {
+            value[0] = removeFromArray(value[0], i);
+            del = key;
+          }
+        }
+      }
+      if (del !== null) {
+        if (gameRooms[del][0].length <= 0) {
+          delete gameRooms[del];
+        } else if (gameRooms[del][3]) {
+          sockserver.clients.forEach(client => {
+            for (var i = 0; i < gameRooms[del][0].length; i++) {
+              if (client.id === gameRooms[del][0][i]) {
+                client.send(JSON.stringify({
+                  kick: true
+                }));
+              }
+            }
+          });
+        } else {
+          sockserver.clients.forEach(client => {
+            if (client.id === gameRooms[del][0][0]) {
+              client.send(JSON.stringify({
+                owner: true
+              }));
+            }
+            for (var i = 0; i < gameRooms[del][0].length; i++) {
+              if (client.id === gameRooms[del][0][i]) {
+                client.send(JSON.stringify({
+                  playerNum: gameRooms[del][0].length,
+                  order: i
+                }));
+              }
+            }
+          });
+        }
       }
     } catch (e) {
       console.log("Disconnect failed! Error:");
@@ -183,12 +230,224 @@ sockserver.on('connection', (ws, req) => {
           }));
         }
       });
+    } else if ("newRoom" in obj) {
+      // When a new game room is created
+      var gameID;
+      var cond;
+      while (cond !== true) {
+        // Creates a new room ID and checks if it already exists
+        cond = true;
+        gameID = `${sockserver.getUniqueRoomID()}`;
+        for (const [key, value] of Object.entries(gameRooms)) {
+          if (key.includes(gameID)) {
+            cond = false;
+          }
+        }
+      }
+
+      gameID = `${obj.newRoom == "public" ? "pub-" : "priv-"}${gameID}`;
+      // Room created with its ID, then the id off the creator in a list as well as the min and max amt of players allowed in the room
+      gameRooms[gameID] = [[ws.id], obj.playersMin, obj.playersMax, false];
+      console.log(`New room created with game ID: ${gameID}`);
+
+      // Notifies the client of the newly created room
+      ws.send(JSON.stringify({
+        joinRoom: gameID,
+        owner: true,
+        playerNum: gameRooms[gameID][0].length,
+        order: 0
+      }));
+    } else if ("leaveRoom" in obj) {  
+      // Handles leaving game rooms
+      try {
+        for (var i = 0; i < gameRooms[obj.leaveRoom][0].length; i++) {
+          // Finds which room the player is in and removes them
+          if (ws.id === gameRooms[obj.leaveRoom][0][i]) {
+            delete gameRooms[obj.leaveRoom][0].splice(i, 1);
+            break;
+          }
+        }
+        if (gameRooms[obj.leaveRoom][0].length <= 0) {
+          // Deletes room if its empty
+          delete gameRooms[obj.leaveRoom];
+        } else if (gameRooms[obj.leaveRoom][3]) {
+          sockserver.clients.forEach(client => {
+            for (var i = 0; i < gameRooms[obj.leaveRoom][0].length; i++) {
+              if (client.id === gameRooms[obj.leaveRoom][0][i]) {
+                client.send(JSON.stringify({
+                  kick: true
+                }));
+              }
+            }
+          });
+        } else {
+          // Changes the owner of the room if the owner was the player who left
+          sockserver.clients.forEach(client => {
+            if (client.id === gameRooms[obj.leaveRoom][0][0]) {
+              client.send(JSON.stringify({
+                owner: true
+              }));
+            }
+
+            // Updates all the players in the room of the new player count
+            for (var i = 0; i < gameRooms[obj.leaveRoom][0].length; i++) {
+              if (client.id === gameRooms[obj.leaveRoom][0][i]) {
+                client.send(JSON.stringify({
+                  playerNum: gameRooms[obj.leaveRoom][0].length,
+                  order: i
+                }));
+              }
+            }
+          });
+        }
+      } catch(err) {
+        console.log(err);
+      }
+    } else if ("joinRoom" in obj) {
+      // Handles players joining rooms
+      var privacy;
+      if (obj.joinRoom === null) {
+        for (const [key, value] of Object.entries(gameRooms)) {
+          // Finds the first available public room to join
+          if (key.includes("pub-") && value[0].length < value[2] && !value[3]) {
+            value[0].push(ws.id);
+            ws.send(JSON.stringify({
+              joinRoom: key,
+              owner: false
+            }));
+
+            // Updates the player count of all players in the room
+            for (var i = 0; i < value[0].length; i++) {
+              sockserver.clients.forEach(client => {
+                if (client.id === value[0][i]) {
+                  client.send(JSON.stringify({
+                    playerNum: value[0].length,
+                    order: i
+                  }));
+                }
+              });
+            }
+            return;
+          }
+        }
+
+        // Sends an error if the game is full
+        ws.send(JSON.stringify({
+          joinRoom: "error"
+        }));
+      } else if ("pub-" + obj.joinRoom in gameRooms) {
+        // Adds the player to the specified room if its public
+        privacy = "pub-";
+        var room = gameRooms[privacy + obj.joinRoom];
+        if (room[0].length < room[2] && !room[3]) {
+          room[0].push(ws.id)
+          ws.send(JSON.stringify({
+            joinRoom: privacy + obj.joinRoom,
+            owner: false
+          }));
+
+          // Updates the player count of all players in the room
+          for (var i = 0; i < room[0].length; i++) {
+            sockserver.clients.forEach(client => {
+              if (client.id === room[0][i]) {
+                client.send(JSON.stringify({
+                  playerNum: room[0].length,
+                  order: i
+                }));
+              }
+            });
+          }
+        }
+      } else if ("priv-" + obj.joinRoom in gameRooms) {
+        // Adds the player to the specified room if its private
+        privacy = "priv-";
+        var room = gameRooms[privacy + obj.joinRoom];
+        if (room[0].length < room[2] && !room[3]) {
+          gameRooms[privacy + obj.joinRoom][0].push(ws.id)
+          ws.send(JSON.stringify({
+            joinRoom: privacy + obj.joinRoom,
+            owner: false
+          }));
+
+          // Updates the player count of all players in the room
+          for (var i = 0; i < room[0].length; i++) {
+            sockserver.clients.forEach(client => {
+              if (client.id === room[0][i]) {
+                client.send(JSON.stringify({
+                  playerNum: room[0].length,
+                  order: i
+                }));
+              }
+            });
+          }
+        }
+      } else {
+        // Returns and error if no rooms were found
+        ws.send(JSON.stringify({
+          joinRoom: "error"
+        }));
+        return;
+      }
+    } else if ("updateRoom" in obj) {
+      // Updates the privacy of a game room
+      if (obj.updateRoom in gameRooms) {
+        // Finds the room and creates an edited ID
+        var newID = obj.new + obj.updateRoom.substring(obj.updateRoom.indexOf("-") + 1);
+
+        // Creates a new room with all the same data but with new ID
+        gameRooms[newID] = [gameRooms[obj.updateRoom][0], gameRooms[obj.updateRoom][1], gameRooms[obj.updateRoom][2]];
+        // Removes old room
+        delete gameRooms[obj.updateRoom];
+
+        // Updates all clients in the room of the change in privacy
+        for (var i = 0; i < gameRooms[newID][0].length; i++) {
+          sockserver.clients.forEach(client => {
+            if (client.id === gameRooms[newID][0][i]) {
+              client.send(JSON.stringify({
+                joinRoom: newID
+              }));
+            }
+          });
+        }
+      }
+    } else if ("startRoom" in obj) {
+      sockserver.clients.forEach(client => {
+        for (var i = 0; i < gameRooms[obj.roomID][0].length; i++) {
+          if (client.id === gameRooms[obj.roomID][0][i]) {
+            client.send(JSON.stringify({
+              startRoom: obj.roomID
+            }));
+          }
+        }
+      });
+      gameRooms[obj.roomID][3] = true;
+    } else if ("gameMove" in obj) {
+      console.log(obj.gameMove + " " + obj.roomID);
+      for (var i = 0; i < gameRooms[obj.roomID][0].length; i++) {
+        sockserver.clients.forEach(client => {
+          if (client.id === gameRooms[obj.roomID][0][i]) {
+            client.send(JSON.stringify({
+              gameMove: obj.gameMove,
+              id: obj.id
+            }));
+          }
+        });
+      }
+    } else if ("rematch" in obj) {
+      for (var i = 0; i < gameRooms[obj.roomID][0].length; i++) {
+        sockserver.clients.forEach(client => {
+          if (client.id === gameRooms[obj.roomID][0][i]) {
+            client.send(JSON.stringify({
+              rematch: obj.rematch
+            }));
+          }
+        });
+      }
     } else if ("id" in obj) {
       // When a client selects a username
       var validName = true;
 
       // Checks if the username is taken and if so tells the client to select a different username
-      console.log(clients);
       for (const [key, value] of Object.entries(clients)) {
         
         if (obj.id == value[0]) {
@@ -261,3 +520,10 @@ server.on('upgrade', (request, socket, head) => {
 });
 
 server.listen(port, () => console.log(`Listening on http://localhost:${port}`));
+
+
+function removeFromArray(arr, i) {
+  var halfBeforeTheUnwantedElement = arr.slice(0, i);
+  var halfAfterTheUnwantedElement = arr.splice(i + 1);
+  return halfBeforeTheUnwantedElement.concat(halfAfterTheUnwantedElement);
+}

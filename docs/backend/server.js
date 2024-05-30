@@ -132,14 +132,18 @@ sockserver.on('connection', (ws, req) => {
   ws.on('close', () => {
     // When the client disconnects it sends its username to other clients so they know to remove that player from their screen
     try {
-      console.log(`${clients[ws.id][0]}(${ws.id}) has disconnected!`);
-      sockserver.clients.forEach(client => {
-        client.send(JSON.stringify({
-          id: clients[ws.id][0],
-          expired: true
-        })); 
-      });
-      delete clients[ws.id];
+      if (clients[ws.id] !== undefined) {
+        console.log(`${clients[ws.id][0]}(${ws.id}) has disconnected!`);
+        sockserver.clients.forEach(client => {
+          client.send(JSON.stringify({
+            id: clients[ws.id][0],
+            expired: true
+          })); 
+        });
+        delete clients[ws.id];
+      } else {
+        console.log("Client without account disconnected");
+      }
     } catch (e) {
       console.log("Disconnect failed! Error:");
       console.log(e);
@@ -152,21 +156,23 @@ sockserver.on('connection', (ws, req) => {
   
     if ("posX" in obj) {
       // This code handles recieving and distributing positional data from one client to the others
-      clients[ws.id][1] = obj.posX;
-      clients[ws.id][2] = obj.posY;
-      sockserver.clients.forEach(client => {
-        client.send(JSON.stringify({
-          id: obj.id,
-          posX: obj.posX,
-          posY: obj.posY,
-          flipped: obj.flipped,
-          cosmetics: obj.cosmetics
-        }));
-      });
+      if (clients[ws.id] !== undefined) {
+        clients[ws.id][1] = obj.posX;
+        clients[ws.id][2] = obj.posY;
+        sockserver.clients.forEach(client => {
+          client.send(JSON.stringify({
+            id: obj.id,
+            posX: obj.posX,
+            posY: obj.posY,
+            flipped: obj.flipped,
+            cosmetics: obj.cosmetics
+          }));
+        });
+      }
     } else if ("msg" in obj) {
       // When a message is sent this code distributes that message to other clients
       sockserver.clients.forEach(client => {
-        if (distance(clients[client.id][1], clients[ws.id][1], clients[client.id][2], clients[ws.id][2]) < 700) {
+        if (clients[ws.id] !== undefined && distance(clients[client.id][1], clients[ws.id][1], clients[client.id][2], clients[ws.id][2]) < 700) {
           const matches = matcher.getAllMatches(obj.msg);
           var newmsg = (censor.applyTo(obj.msg, matches));
           obj.msg = newmsg; 

@@ -58,7 +58,35 @@ const backgroundMap = new TileMap(new Vector2(0,0), backgroundTiles, 64, 32, 32,
 ]);
 
 // WebSocket Stuff
-const webSocket = new WebSocket('ws://localhost:3000/');
+let webSocket
+function webSocketInit(address) {
+    webSocket = new WebSocket(address);
+
+    // Attempt to reconnect the user if the websocket closes
+    webSocket.onclose = function() {
+        setTimeout(function(){ // Upon closing, attempt reconnection after 5 seconds
+            console.log("Reconnecting..."); 
+            webSocketInit(address);
+
+            let attemptReregister = function () {
+                setTimeout(function(){
+                    if (webSocket.readyState === 1) { // If websocket is successfully connected after 5 more seconds, register this client as a new player
+                        if (webSocket.readyState > 0) {
+                            console.log("Reconnected!");
+                            webSocket.send(JSON.stringify({
+                                id : userPlayer.username
+                            }));
+                        }
+                    } else if (webSocket.readyState == 0) {
+                        attemptReregister();
+                    }
+                }, 5000);
+            }
+
+        }, 5000);
+    }
+}
+webSocketInit('ws://localhost:3000/');
 
 ImageManipulator.init();
 
@@ -96,10 +124,19 @@ webSocket.onmessage = (event) => {
             p.pos.x = obj.posX;
             p.pos.y = obj.posY;
             p.flipped = obj.flipped;
-            p.cosmetics = obj.cosmetics;
+            console.log(typeof p.cosmetics);
+            for (let i = 1; i < obj.cosmetics.length; i++) {
+                console.log(" adding: "+ obj.cosmetics[i]);
+                p.cosmetics.push(new PlayerCosmetic(obj.cosmetics[i] + ".png", obj.cosmetics[i], "default"));
+                console.log(p.cosmetics[i].getSpritePath());
+            }
+
         } else {
             var newPlayer = new Player(obj.id, new Vector2(obj.posX, obj.posY), obj.id, "#FF0000");
             newPlayer.flipped = obj.flipped;
+            for (let i = 1; i < obj.cosmetics.length; i++) {
+                p.cosmetics.push(new PlayerCosmetic(obj.cosmetics[i] + ".png", obj.cosmetics[i], "default"));
+            }
             otherPlayers.push(newPlayer);
         } 
     } else if ("invalidName" in obj || obj.invalidName) {
@@ -306,6 +343,7 @@ class Player extends GameObject {
         this.username = username;
         this.color = color;
         this.setCosmetics(cosmetics);
+        this.cosmeticsButWithNamesInsteadOfCosmetics.push("base");
     }
 
     hasCosmeticEquipped(cosmeticName) {
@@ -326,35 +364,55 @@ class Player extends GameObject {
         })
     }
 
-    addCosmetic(cosmeticName) {
-        
+    /**
+     * 
+     * @param {String} cosmeticName 
+     * 
+     */
+    addCosmetic(cosmeticName, cosmeticsList = false) {
 
         let type = 'default';
+       
+        if (cosmeticName === "horns" || cosmeticName == 'fedora') {
+            type = 'head';
+        }
+
+        if (cosmeticsList !== false) {
+            cosmeticsList.push(new PlayerCosmetic("player/" + cosmeticName + ".png", cosmeticName, type));
+            return;
+        }
 
         if (this.cosmetics.includes(new PlayerCosmetic("player/" + cosmeticName + ".png", cosmeticName, type))) {
             console.log("You already have that equipped!");       
-            return; 
         }
 
         else {            
-            if (cosmeticName === "horns" || cosmeticName == 'fedora') {
-                type = 'head';
-            }
             this.cosmetics.push(new PlayerCosmetic("player/" + cosmeticName + ".png", cosmeticName, type));
+            this.cosmeticsButWithNamesInsteadOfCosmetics.push(cosmeticName);
         }
-
-        let awesomestringtoprint = "";
-        for(let i = 0; i < this.cosmetics.length; i++) {
-            awesomestringtoprint += this.cosmetics[i].getSpriteName();
-        }
-        console.log(awesomestringtoprint);
     }
+
+    /*
+    addCosmetic(cosmeticName, cosmeticsList) {        
+
+        //awesomeList = cosmeticsList;
+        console.log(cosmeticsList);
+
+        let type = 'default';
+       
+        if (cosmeticName === "horns" || cosmeticName == 'fedora') {
+            type = 'head';
+        }
+        //cosmeticsList.push(new PlayerCosmetic("player/" + cosmeticName + ".png", cosmeticName, type));
+    }
+    */
 
     removeCosmetic(cosmeticName) {
         let i = this.hasCosmeticEquipped(cosmeticName);
         if (i >= 0) {
-            cosmeticName = "player/" + cosmeticName + ".png";
             this.cosmetics.splice(i, 1);
+            this.cosmeticsButWithNamesInsteadOfCosmetics.splice(i, 1);
+            return i;
         }
     }
     
@@ -836,9 +894,12 @@ function setUser(usr) {
  * Starts the game
  */
 function connect() {
-    connected = true;
     serverUpdate();
-    startAnimating();
+
+    if (!connected) {
+        connected = true;
+        startAnimating();
+    }
 }
 
 function startAnimating() {
@@ -1029,16 +1090,22 @@ function update() {
  * Sends actively updated info to the server
  */
 function serverUpdate() {
-    setTimeout(() => {
-        serverUpdate();
-    }, 10);
-    webSocket.send(JSON.stringify({
-        id: userPlayer.username,
-        posX: userPlayer.pos.x,
-        posY: userPlayer.pos.y,
-        flipped: userPlayer.flipped,
-        cosmetics: userPlayer.cosmetics
-    }));
+    if (webSocket.readyState < 2) {
+        setTimeout(() => {
+            serverUpdate();
+        }, 10);
+        webSocket.send(JSON.stringify({
+            id: userPlayer.username,
+            posX: userPlayer.pos.x,
+            posY: userPlayer.pos.y,
+            flipped: userPlayer.flipped,
+            cosmetics: userPlayer.cosmeticsButWithNamesInsteadOfCosmetics
+        }));
+    } else {
+        setTimeout(() => {
+            serverUpdate();
+        }, 5000);
+    }
 }
 
 function rgb(r, g, b){

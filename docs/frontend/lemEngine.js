@@ -1,6 +1,8 @@
 //Canvas references
 let gameCanvas;
 let ctx;
+let tileCanvas;
+let tctx;
 
 //FPS tracking and measurement, debug
 let startTime = 0;
@@ -16,6 +18,10 @@ let cameraList = [];
 window.addEventListener("resize", (event) => {
     gameCanvas.width  = document.getElementById('gameSpace').clientWidth;
     gameCanvas.height = document.getElementById('gameSpace').clientHeight;
+
+    tileCanvas.width  = document.getElementById('gameSpace').clientWidth;
+    tileCanvas.height = document.getElementById('gameSpace').clientHeight;
+
     cameraList.forEach((element) => {
         element.resize();
     })
@@ -188,21 +194,34 @@ class Sprite {
      * @param {Number} height 
      */
     draw (pos, width, height) {
-        if (this.image.width !== 0) {
-            ctx.drawImage(this.image, pos.x, pos.y, width, height);
-        }
+        console.log("Draw req: " + ctx);
+        this.drawContext(pos, width, height, ctx);
     }
     
     
     /**
      * 
      * @param {Vector2} pos 
-     * @param {Number} size 
+     * @param {Number} size
      */
     draw (pos, size) {
-        // checking if image is image
+        this.drawContext(pos, size, size, ctx);
+    }
+    
+    /**
+     * 
+     * @param {Vector2} pos 
+     * @param {Number} width 
+     * @param {Number} height 
+     * @param {CanvasRenderingContext2D} context 
+     */
+    drawContext(pos, width, height, context) {
         if (this.image.width !== 0) {
-            ctx.drawImage(this.image, pos.x, pos.y, size, size);
+            if (context !== ctx) {
+                tctx.drawImage(this.image, pos.x, pos.y, width, height);
+            } else {
+                ctx.drawImage(this.image, pos.x, pos.y, width, height);
+            }
         }
     }
     
@@ -295,7 +314,7 @@ class TileMap {
         this.map = map;
     }
 
-    draw() {
+    draw(context = tctx) {
         let offsetPos = new Vector2(
             this.pos.x - this.rows * this.tileSize / 2,
             this.pos.y - this.cols * this.tileSize / 2
@@ -303,12 +322,15 @@ class TileMap {
         
         for (let i = 0; i < this.cols; i++) {
             for (let k = 0; k < this.rows; k++) {
-                if (this.map[(i*this.rows) + k] != null && this.map[(i*this.rows) + k] != 0 && this.tiles[this.map[(i*this.rows) + k]] != null) { 
-                    this.tiles[this.map[(i*this.rows) + k]].draw(new Vector2(
-                        offsetPos.x + (i * this.tileSize),
-                        offsetPos.y + (k * this.tileSize)).screenPos,
-                        (this.tileSize + 1)* activeCamera.zoom, (this.tileSize + 1)* activeCamera.zoom
-                    )
+                let id = this.map[(i*this.rows) + k];
+                let t = this.tiles[id];
+                if (id != null && id != 0 && t != null) { 
+                    let tpos = new Vector2(offsetPos.x + (i * this.tileSize), offsetPos.y + (k * this.tileSize)).screenPos;
+                    if (!(tpos.x + this.tileSize < -2 * this.tileSize) && !(tpos.y + this.tileSize < -2 * this.tileSize) && (tpos.x - this.tileSize < activeCamera.width) && (tpos.y - this.tileSize < activeCamera.height))
+                    t.drawContext(tpos,
+                        (this.tileSize + 1)* activeCamera.zoom, (this.tileSize + 1)* activeCamera.zoom,
+                        (this.tileSize + 1)* activeCamera.zoom, (this.tileSize + 1)* activeCamera.zoom,
+                    tctx)
                 }
             }
         }
@@ -701,11 +723,17 @@ class Camera extends GameObject {
 
 function addCanvas() {
     var canvas = document.createElement('canvas');
+    var tCanvas = document.createElement('canvas');
 
     canvas.id = "gameCanvas";
     canvas.className = "gameCanvas shadow";
     canvas.width  = document.getElementById('gameSpace').clientWidth*0.8;
     canvas.height = document.getElementById('gameSpace').clientHeight * 0.98;
+
+    tCanvas.id = "tileCanvas";
+    tCanvas.className = "gameCanvas";
+    tCanvas.width  = document.getElementById('gameSpace').clientWidth*0.8;
+    tCanvas.height = document.getElementById('gameSpace').clientHeight * 0.98;
     
     canvas.addEventListener("mouseup", (e) => {
         canvasClick(canvas, e)
@@ -716,6 +744,11 @@ function addCanvas() {
     
     gameCanvas = canvas;
     ctx = gameCanvas.getContext("2d");
+
+    tileCanvas = tCanvas;
+    tctx = tileCanvas.getContext("2d");
+
+    document.getElementById("gameSpace").appendChild(tileCanvas);
     document.getElementById("gameSpace").appendChild(canvas);
 }
 

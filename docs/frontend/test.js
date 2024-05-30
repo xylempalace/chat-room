@@ -8,6 +8,8 @@ let connected = false;
 let loginState = "username";
 let userPlayer;
 let otherPlayers = [];
+let lastCameraPos = 0;
+
 //Tilemap
 const backgroundTiles = [
     0,
@@ -650,7 +652,7 @@ class Abyss {
 
     draw(delta) {
         if (this.bgImageLoaded) {
-            ctx.save();
+            tctx.save();
 
             let offsetx = this.xOffset;
             offsetx += activeCamera.pos.x * -this.moveScale;
@@ -660,11 +662,11 @@ class Abyss {
             offsety += activeCamera.pos.y * -this.moveScale;
             //offsety += this.scrollSpeedY * Date.time;
 
-            ctx.translate(offsetx, offsety);
+            tctx.translate(offsetx, offsety);
 
-            ctx.fillStyle = this.bgPattern;
-            ctx.fillRect(-offsetx, -offsety, (gameCanvas.width * 2) - offsetx, (gameCanvas.height * 2) - offsety)
-            ctx.restore();
+            tctx.fillStyle = this.bgPattern;
+            tctx.fillRect(-offsetx, -offsety, (gameCanvas.width * 2) - offsetx, (gameCanvas.height * 2) - offsety)
+            tctx.restore();
         }
     }
 }
@@ -895,6 +897,10 @@ function connect() {
     }
 }
 
+window.addEventListener("resize", (event) => {
+    lastCameraPos = 0; // Rerender the ground if there's a resize
+});
+
 function startAnimating() {
 
     let bg = new Image();
@@ -1036,13 +1042,16 @@ function update() {
 
     ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
 
-    // Draw the background abyss
-    abyssCollection.forEach((i) => {
-        i.draw(1);
-    })
-
     // Draw the tiles
-    backgroundMap.draw();
+    if (activeCamera.pos !== lastCameraPos) {
+        // Draw the background abyss
+        abyssCollection.forEach((i) => {
+            i.draw(1);
+        });
+        
+        backgroundMap.draw();
+        lastCameraPos = activeCamera.pos;
+    }
 
     // Draw the game objects
     GameObject.objs.sort(GameObject.sortVertically);

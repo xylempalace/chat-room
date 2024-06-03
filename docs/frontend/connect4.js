@@ -1,18 +1,17 @@
 function createConnect4(){
     var gameBoard = new Board(6,7);
-
 for (var i = 0; i < 6; i++){
     gameBoard.setRow(i, [new Piece(0)], () => true);
 }
 
 function moveCondition(inSpot, turn){
-return inSpot.value === "" && Resources.order === turn;
+return inSpot.value === 0 && Resources.order === turn;
 
 } 
 
 const winCondition = (gameBoard, turn) => {
 
-    ;
+   return -1;
 }
 
 
@@ -26,14 +25,40 @@ const canvas = document.getElementById("gameCanvas");
     var center = new Vector2(canvas.width / 2, canvas.height / 2);
     var buttons = [];
 
-
+// In gameBoard, 1 is red and 2 is yellow. 
     for (var i = 0; i < 7; i++){
-        let b = new Button(new Vector2(center.x + (-150 + i* 50)*activeCamera.zoom, center.y + -220 * activeCamera.zoom),40, 450, "#FFB6C1","",0,3,3,null, null);
-        buttons.push(b);
+        let b = new Button(new Vector2(center.x + (-150 + i* 50)*activeCamera.zoom, center.y + -220 * activeCamera.zoom),40, 450, "#FFB6C1","",0,3,3,null, (a, b, obj, game, index) => {
+            console.log("Button " + b + "has been pressed");
+            let col = game.gameBoard.getColumn(new Vector2(index, 6), false);
+            let count = 0;
+
+
+           while (col[count].value !== 0){
+                count++;
+            }
+
+            let pos = new Vector2(index, 6-count);
+            console.log("X value is: " + pos.x +"\n Y value is: " +  pos.y);
+            console.log("I AM THE FIRST TEST");
+            console.log("Refrence of game: " + game.gameBoard.get(pos));
+            console.log("I AM A TEST");
+            game.gameBoard.setPos(pos, new Piece(game.turn === 0 ? 1 : 2));
+          /*  if (game.gameBoard.get(pos).value !== 0 && game.gameBoard.get(pos).value === (game.turn === 0 ? 1: 2)) {
+                obj.text = game.gameBoard.get(pos).value;
+                game.switchTurn(Resources.playerNum);
+                Resources.ws.send(JSON.stringify({
+                    gameMove: [index, obj.text],
+                    id: userPlayer.username,
+                    roomID: Resources.currentRoomID
+                }));
+            }
+            */
+        });
+    
+        buttons.push(b);    
     } 
     const displayBoard = (windowState, game) => {
         for (var i = 0 ; i < game.buttons.length; i++) {
-            console.log("Button " + i + "has been drawned");
             game.buttons[i].draw(windowState, game.minPlayers); 
          }
         ctx.fillStyle = "blue";
@@ -74,6 +99,6 @@ obj.gameBoard.getColumn()
     }
 
 
-return new Game("Connect Four", 2, 2, gameBoard, new Vector2(800, 400), [winCondition], buttons, processMove,displayBoard,winText);
+return new Game("Connect Four", 2, 2, gameBoard, new Vector2(800, 400), [winCondition, moveCondition], buttons, processMove,displayBoard,winText);
 
 }

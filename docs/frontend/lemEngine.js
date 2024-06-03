@@ -164,6 +164,7 @@ class GameObject {
 class Sprite {
     id;
     image;
+    cache;
 
     /**
      * Create a new sprite object
@@ -181,6 +182,8 @@ class Sprite {
             document.body.appendChild(this.image);
         }
 
+        this.cache = new Map();
+        
         this.centeredOffset = new Vector2(
             -(this.image.width  / 2),
             -(this.image.height / 2)
@@ -194,7 +197,6 @@ class Sprite {
      * @param {Number} height 
      */
     draw (pos, width, height) {
-        console.log("Draw req: " + ctx);
         this.drawContext(pos, width, height, ctx);
     }
     
@@ -218,10 +220,41 @@ class Sprite {
     drawContext(pos, width, height, context) {
         if (this.image.width !== 0) {
             if (context !== ctx) {
-                tctx.drawImage(this.image, pos.x, pos.y, width, height);
+                //console.log(typeof this.getCached(width, height));
+                tctx.drawImage(this.getCached(width, height), pos.x, pos.y, width, height);
             } else {
+                //console.log(this.getCached(width, height).constructor.name);
                 ctx.drawImage(this.image, pos.x, pos.y, width, height);
             }
+        }
+    }
+
+    getCached(width, height) {
+        if (this.cache.has(`${width}, ${height}`)) {
+            return this.cache.get(`${width}, ${height}`);
+        } else {
+            console.log("Generating new cached size of " + width + ", " + height);
+            this.generateCachedSize(width, height);
+            return this.image;
+        }
+    }
+
+    async generateCachedSize(width, height) {
+        // Reserve the key so that the cache isn't flooded
+        this.cache.set(`${width}, ${height}`, this.image);
+
+        // Handle case when the base image isn't loaded
+        if (this.image.naturalHeight === 0) {
+            this.image.onload = (e) => {
+                ImageManipulator.manip(this.image, [`canvasScale ${width} ${height}`, `scale ${width/this.image.naturalWidth} ${height/this.image.naturalHeight}`]).then((out) => {
+                    this.cache.set(`${width}, ${height}`, out);
+                });
+            };
+        } else { // Otherwise, begin resizing immediately
+            ImageManipulator.manip(this.image, [`canvasScale ${width} ${height}`, `scale ${width/this.image.naturalWidth} ${height/this.image.naturalHeight}`]).then((out) => {
+                //console.log(out.constructor.name);
+                this.cache.set(`${width}, ${height}`, out); // Add the resized image
+            });
         }
     }
     

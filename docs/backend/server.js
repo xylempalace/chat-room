@@ -115,6 +115,8 @@ const files = {
   '/sprites/player/horns.png' : ['image/png', '../frontend/sprites/player/horns.png'],
   '/sprites/player/tail.png' : ['image/png', '../frontend/sprites/player/tail.png'],
   '/sprites/player/lil_glasses.png' : ['image/png', '../frontend/sprites/player/lil_glasses.png'],
+  '/sprites/player/sun_glasses.png' : ['image/png', '../frontend/sprites/player/sun_glasses.png'],
+  '/sprites/player/party_hat.png' : ['image/png', '../frontend/sprites/player/party_hat.png'],
 
 };
 

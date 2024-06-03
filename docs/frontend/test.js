@@ -352,6 +352,7 @@ class PlayerCosmetic {
 
     static defaultAnchor = new Vector2(0, 0);
     static headAnchor = new Vector2(0.25, -0.25);
+    static tailAnchor = new Vector2(-0.25, 0);
 
     anchor;
 
@@ -374,7 +375,10 @@ class PlayerCosmetic {
                 this.type = 'head';
                 this.anchor = PlayerCosmetic.headAnchor;
                 break;
-
+            case 'tail':
+                this.type = 'tail';
+                this.anchor = PlayerCosmetic.tailAnchor;
+                break;
             case 'body':
                 this.type = 'body';
                 this.anchor = PlayerCosmetic.defaultAnchor;
@@ -409,6 +413,24 @@ class PlayerCosmetic {
         finalString = finalString.substr(pos + 1);
 
         return finalString;
+    }
+}
+
+class PlayerBody {
+    static instances = [];
+
+    static baseDefaultAnchor = new Vector2(0, 0);
+    static baseHeadAnchor = new Vector2(0.25, -0.25);
+    static baseTailAnchor = new Vector2(-0.25, 0);
+
+    defaultAnchor;
+    headAnchor;
+    tailAnchor;
+
+    constructor (defaultAnchor = baseDefaultAnchor, headAnchor = baseHeadAnchor, tailAnchor = baseTailAnchor) {
+        this.defaultAnchor = defaultAnchor;
+        this.headAnchor = headAnchor;
+        this.tailAnchor = tailAnchor;
     }
 }
 
@@ -462,8 +484,11 @@ class Player extends GameObject {
         }
 
         else {            
-            if (cosmeticName === "horns" || cosmeticName == 'fedora') {
+            if (cosmeticName == 'horns' || cosmeticName == 'fedora' || cosmeticName == "party_hat") {
                 type = 'head';
+            }
+            if (cosmeticName === "tail") {
+                type = 'tail';
             }
             this.cosmetics.push(new PlayerCosmetic("player/" + cosmeticName + ".png", cosmeticName, type));
         }

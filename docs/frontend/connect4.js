@@ -49,6 +49,7 @@ const canvas = document.getElementById("gameCanvas");
                     roomID: Resources.currentRoomID
                 }));
                 console.log("Success!");
+                console.log("Player is sending a value of: " + game.gameBoard.get(pos).value);
             }
             
         });
@@ -64,7 +65,6 @@ const canvas = document.getElementById("gameCanvas");
         ctx.fillRect(center.x -180 * activeCamera.zoom, center.y - 140 * activeCamera.zoom, 550,450);
         for(var x = 0; x < 7; x++){
             for( var y = 0; y < 6; y++){
-                ctx.save();
                 if (gameBoard.get(new Vector2(x,y)).value === 0) {
                     ctx.fillStyle = "white";
                 } else if(gameBoard.get(new Vector2(x,y)).value === 1) {
@@ -75,11 +75,10 @@ const canvas = document.getElementById("gameCanvas");
              
                     ctx.fillStyle = "yellow";
                 }
-                console.log("The fill style is: " + ctx.fillStyle);
+                ctx.beginPath();
                 ctx.moveTo(center.x + (-300 + x * 100) * .5 * activeCamera.zoom, center.y + (-230 + y * 100) * activeCamera.zoom * .5);
                 ctx.arc(center.x + (-300 + x * 100) * .5 * activeCamera.zoom, center.y + (-230 + y * 100) * activeCamera.zoom * .5, 20    , 0, 2* Math.PI, false);
                 ctx.fill();
-                ctx.restore();
             }
         }        
     }
@@ -88,9 +87,13 @@ const canvas = document.getElementById("gameCanvas");
 
 
 const processMove = (move,obj) => {
-obj.gameBoard.set(new Vector2(move[0],move[1]),move[2]);
+    console.log("X is :" + move[0] + "Y is: " + move[1]);
+    let val = new Piece;
+    val.value = move[2] 
+obj.gameBoard.set(new Vector2(move[0],move[1]),val);
+console.log("The value of recived vector is: " + obj.gameBoard.get(new Vector2(move[0],move[1])).value);
 obj.switchTurn(Resources.playerNum);
-
+console.log("The player recieved a value of: " + move[2]);
 
 }
 

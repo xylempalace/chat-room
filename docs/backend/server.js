@@ -154,7 +154,7 @@ sockserver.on('connection', (ws, req) => {
       } else {
         console.log("Client without account disconnected");
       }
-      var del;
+      var del = null;
       for (const [key, value] of Object.entries(gameRooms)) {
         for (var i = 0; i < value[0].length; i++) {
           if (value[0][i] === ws.id) {

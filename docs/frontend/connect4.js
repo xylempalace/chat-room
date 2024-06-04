@@ -37,22 +37,20 @@ const canvas = document.getElementById("gameCanvas");
                 count++;
             }
 
-            let pos = new Vector2(index, 6-count);
-            console.log("X value is: " + pos.x +"\n Y value is: " +  pos.y);
-            console.log("I AM THE FIRST TEST");
-            console.log("Refrence of game: " + game.gameBoard.get(pos));
-            console.log("I AM A TEST");
-            game.gameBoard.setPos(pos, new Piece(game.turn === 0 ? 1 : 2));
-          /*  if (game.gameBoard.get(pos).value !== 0 && game.gameBoard.get(pos).value === (game.turn === 0 ? 1: 2)) {
-                obj.text = game.gameBoard.get(pos).value;
+            let pos = new Vector2(index, 5-count);
+
+            game.gameBoard.setPos(pos, new Piece(game.turn === 0 ? 1 : 2),game.rules[1], game.turn);
+           console.log("THe new board value is: " + game.gameBoard.get(pos).value);
+            if (game.gameBoard.get(pos).value !== 0 && game.gameBoard.get(pos).value === (game.turn === 0 ? 1: 2)) {
                 game.switchTurn(Resources.playerNum);
                 Resources.ws.send(JSON.stringify({
-                    gameMove: [index, obj.text],
+                    gameMove: [pos.x,pos.y,game.gameBoard.get(pos).value],
                     id: userPlayer.username,
                     roomID: Resources.currentRoomID
                 }));
+                console.log("Success!");
             }
-            */
+            
         });
     
         buttons.push(b);    
@@ -66,19 +64,22 @@ const canvas = document.getElementById("gameCanvas");
         ctx.fillRect(center.x -180 * activeCamera.zoom, center.y - 140 * activeCamera.zoom, 550,450);
         for(var x = 0; x < 7; x++){
             for( var y = 0; y < 6; y++){
-                if (gameBoard.get(new Vector2(x,y)).value == 0) {
+                ctx.save();
+                if (gameBoard.get(new Vector2(x,y)).value === 0) {
                     ctx.fillStyle = "white";
-                } else if(gameBoard.get(new Vector2(x,y)).value == 1) {
+                } else if(gameBoard.get(new Vector2(x,y)).value === 1) {
                     ctx.fillStyle = "red";
                 }
 
                 else{
-                    ctx.fillStyle = "blue";
+             
+                    ctx.fillStyle = "yellow";
                 }
-
+                console.log("The fill style is: " + ctx.fillStyle);
                 ctx.moveTo(center.x + (-300 + x * 100) * .5 * activeCamera.zoom, center.y + (-230 + y * 100) * activeCamera.zoom * .5);
                 ctx.arc(center.x + (-300 + x * 100) * .5 * activeCamera.zoom, center.y + (-230 + y * 100) * activeCamera.zoom * .5, 20    , 0, 2* Math.PI, false);
                 ctx.fill();
+                ctx.restore();
             }
         }        
     }
@@ -87,8 +88,8 @@ const canvas = document.getElementById("gameCanvas");
 
 
 const processMove = (move,obj) => {
-obj.gameBoard.getColumn()
-
+obj.gameBoard.set(new Vector2(move[0],move[1]),move[2]);
+obj.switchTurn(Resources.playerNum);
 
 
 }

@@ -127,21 +127,26 @@ webSocket.onmessage = (event) => {
             return element.username == obj.id;
         })
         if (p != null) {
-            p.pos.x = obj.posX;
-            p.pos.y = obj.posY;
-            p.flipped = obj.flipped;
-            console.log(typeof p.cosmetics);
-            for (let i = 1; i < obj.cosmetics.length; i++) {
-                console.log(" adding: "+ obj.cosmetics[i]);
-                p.cosmetics.push(new PlayerCosmetic(obj.cosmetics[i] + ".png", obj.cosmetics[i], "default"));
-                console.log(p.cosmetics[i].getSpritePath());
-            }
+            p.pos.x = obj.posX;      // Update x pos
+            p.pos.y = obj.posY;      // Update y pos
+            p.flipped = obj.flipped; // Update flipped status
+
+            // Update cosmetics
+            console.log(`Received: ${obj.cosmetics}`)
+            let cosmeticNames = obj.cosmetics.split(',');
+            cosmeticNames.forEach((i) => {
+                console.log(`Adding ${i}`);
+                
+                if (!(i in p.cosmetics)) { // (i in cosmetics) compares references, not the "value" of the stuff inside the list (i got the stuff to work in findcosmeticindex)
+                    p.cosmetics.push(new PlayerCosmetic("player/" + i + ".png", i));
+                }
+            })
 
         } else {
             var newPlayer = new Player(obj.id, new Vector2(obj.posX, obj.posY), obj.id, "#FF0000");
             newPlayer.flipped = obj.flipped;
             for (let i = 1; i < obj.cosmetics.length; i++) {
-                p.cosmetics.push(new PlayerCosmetic(obj.cosmetics[i] + ".png", obj.cosmetics[i], "default"));
+            //    p.cosmetics.push(new PlayerCosmetic(obj.cosmetics[i] + ".png", obj.cosmetics[i], "default"));
             }
             otherPlayers.push(newPlayer);
         } 
@@ -272,6 +277,7 @@ class PlayerCosmetic {
      * @param {String} type 
      */
     constructor (spritePath, name, type = 'default') {
+        console.log(`New spritepath: ${spritePath}`)
         this.sprite = new Sprite(spritePath);
         this.flippedSprite = this.sprite;
 
@@ -316,14 +322,14 @@ class PlayerCosmetic {
         let finalString = this.sprite.image.src;
         let pos = finalString.search("/player/");
 
-        finalString = finalString.substr(pos + 1);
+        finalString = finalString.substring(pos + 1);
 
         return finalString;
     }
 
     getSpriteName() {
-        let finalString = this.getSpritePath();
-        finalString = finalString.substring(finalString.search("r/") + 2, finalString.length - 4);
+        let finalString = this.sprite.image.src;
+        finalString = finalString.substring(finalString.lastIndexOf("/") + 1, finalString.indexOf("."));
         return finalString;
     }
 }
@@ -340,7 +346,6 @@ class Player extends GameObject {
     speechBubbles = [];
     color;
     cosmetics = [];
-    cosmeticsButWithNamesInsteadOfCosmetics = [];
     static baseCosmetics = [new PlayerCosmetic("player/base.png", "base", 'body')];
     flipped = false;
 
@@ -349,10 +354,18 @@ class Player extends GameObject {
         this.username = username;
         this.color = color;
         this.setCosmetics(cosmetics);
-        this.cosmeticsButWithNamesInsteadOfCosmetics.push("base");
     }
 
-    hasCosmeticEquipped(cosmeticName) {
+    getCosmeticsList() {
+        let finalString = "";
+        for (let i = 0; i < this.cosmetics.length; i++) {
+            finalString += this.cosmetics[i].getSpriteName() + ",";
+        }
+        return finalString.substring(0, finalString.length - 1);
+    }
+
+
+    findCosmeticIndex(cosmeticName) {
         
         cosmeticName = "player/" + cosmeticName + ".png";
         for (let i = 0; i < this.cosmetics.length; i++) {
@@ -370,6 +383,7 @@ class Player extends GameObject {
         })
     }
 
+
     /**
      * 
      * @param {String} cosmeticName 
@@ -383,41 +397,26 @@ class Player extends GameObject {
             type = 'head';
         }
 
-        if (cosmeticsList !== false) {
+     /*   if (cosmeticsList !== false && this.findCosmeticIndex(cosmeticName) !== -1) {
             cosmeticsList.push(new PlayerCosmetic("player/" + cosmeticName + ".png", cosmeticName, type));
             return;
-        }
+        }*/
 
-        if (this.cosmetics.includes(new PlayerCosmetic("player/" + cosmeticName + ".png", cosmeticName, type))) {
-            console.log("You already have that equipped!");       
+       // if (this.hasCosmeticEquipped(cosmeticName) == -1)
+        if (this.findCosmeticIndex(cosmeticName) !== -1) {
+            console.log("You already have that equipped!");
+            return; 
         }
 
         else {            
-            this.cosmetics.push(new PlayerCosmetic("player/" + cosmeticName + ".png", cosmeticName, type));
-            this.cosmeticsButWithNamesInsteadOfCosmetics.push(cosmeticName);
+            this.cosmetics.push(new PlayerCosmetic("player/" + cosmeticName + ".png", cosmeticName, type));        
         }
     }
-
-    /*
-    addCosmetic(cosmeticName, cosmeticsList) {        
-
-        //awesomeList = cosmeticsList;
-        console.log(cosmeticsList);
-
-        let type = 'default';
-       
-        if (cosmeticName === "horns" || cosmeticName == 'fedora') {
-            type = 'head';
-        }
-        //cosmeticsList.push(new PlayerCosmetic("player/" + cosmeticName + ".png", cosmeticName, type));
-    }
-    */
 
     removeCosmetic(cosmeticName) {
-        let i = this.hasCosmeticEquipped(cosmeticName);
+        let i = this.findCosmeticIndex(cosmeticName);
         if (i >= 0) {
             this.cosmetics.splice(i, 1);
-            this.cosmeticsButWithNamesInsteadOfCosmetics.splice(i, 1);
             return i;
         }
     }
@@ -474,6 +473,12 @@ class Player extends GameObject {
         this.drawPlayer();
     }
 
+    updateCosmeticsNow() {
+        for (let i = 0; i < this.cosmetics.length; i++) {
+            this.cosmetics[i].draw(this.pos, 10, false);
+        }
+    }
+
     drawSpeechBubbles() {
         if (!this.expired) {
             var curBubble;
@@ -503,8 +508,13 @@ class Player extends GameObject {
             ctx.save();
 
             let playerDrawPos = new Vector2(this.left, this.top).screenPos;
+            
             this.cosmetics.forEach((i) => {
-                i.draw(playerDrawPos, Player.playerSizeX * activeCamera.zoom, this.flipped);
+                if (i.constructor.name === "PlayerCosmetic") { // Bandaid fix
+                    i.draw(playerDrawPos, Player.playerSizeX * activeCamera.zoom, this.flipped);
+                } else {
+                    console.log(`Noncosmetic ${i} found`);
+                }
             })
 
             ctx.fillStyle = "#000000";
@@ -1103,8 +1113,10 @@ function update() {
     // Render the other players's speech bubbles
     otherPlayers.forEach((element) => {
         element.drawSpeechBubbles(gameCanvas);
+        //console.log(element.getCosmeticsList());
         element.update((Date.now()-startTime) / fpms);
     });
+
 
     // Collider rendering
    /* ctx.save();
@@ -1137,7 +1149,7 @@ function serverUpdate() {
             posX: userPlayer.pos.x,
             posY: userPlayer.pos.y,
             flipped: userPlayer.flipped,
-            cosmetics: userPlayer.cosmeticsButWithNamesInsteadOfCosmetics
+            cosmetics: userPlayer.getCosmeticsList()
         }));
     } else {
         setTimeout(() => {
@@ -1151,7 +1163,7 @@ function rgb(r, g, b){
 }
 
 function ToggleCosmetic(cosmeticName) {
-    if (userPlayer.hasCosmeticEquipped(cosmeticName) >= 0) {
+    if (userPlayer.findCosmeticIndex(cosmeticName) >= 0) {
         userPlayer.removeCosmetic(cosmeticName);
     }
 

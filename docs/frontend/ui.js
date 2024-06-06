@@ -243,6 +243,7 @@ class Game {
     processMove;
     display;
     winDisplay;
+    lastMove = null;
 
     /**
      * Game object that handles playing a game
@@ -292,7 +293,7 @@ class Game {
      * @returns whether or not a player has one
      */
     testWin() {
-        return this.rules[0](this.gameBoard, this.turn);
+        return this.rules[0](this.gameBoard, this.turn, this.lastMove);
     }
 
     processIncoming(move) {

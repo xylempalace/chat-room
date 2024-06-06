@@ -8,10 +8,80 @@ function moveCondition(inSpot, turn){
 return inSpot.value === 0 && Resources.order === turn;
 
 } 
+//return -1 if no winner found
+// return 0 if red wins
+//return 1 if yellow wins
+//return 2 if tie
 
-const winCondition = (gameBoard, turn) => {
+/*
+1. Check if lastMove is null.
+2. Check win from pos of lastMove, keep track if 0 is found.
+3. Return who wins if someone does.
+4. If 0 found, return -1, if not then return check entire gameboard for 0, if none found return 2.
+*/
 
-   return -1;
+const winCondition = (gameBoard, turn, lastMove) => {
+    if (lastMove === null) {
+        return -1;
+    }
+    const checkFor4 = (arr) => {
+        var count = 0;
+        for (var i = 0; i < arr.length;i++){
+            if (count === 0) {
+                count++;
+            } else {
+                if(arr[i].value === arr[i-1].value){
+                    count++;
+                }
+                else{
+                    count = 1;
+                }
+            } 
+            
+            if(count === 4){
+                return arr[i].value;
+
+            }
+        }
+        return null;
+    }
+    let checkStart = new Vector2(lastMove.x, lastMove.y - 3);
+    let movedBy = 0;
+    if(checkStart.y < 0){
+        movedBy = 3 + checkStart.y;
+        checkStart.y = 0;
+    }
+
+
+    let col = game.gameboard.getColumn(checkStart, true);
+    
+    let winner = checkFor4(col.slice(0, 7 - moveBy));
+
+if (winner !== null){
+    return winner -1; 
+
+}
+
+ checkStart = new Vector2(lastMove.x - 3, lastMove.y);
+ movedBy= 0;
+if(checkStart.y < 0){
+    movedBy = 3 + checkStart.y;
+    checkStart.x = 0;
+}
+
+
+
+winner = checkFor4(game.gameboard.getColumn(checkStart, true));
+
+if (winner !== null){
+return winner -1; 
+
+}
+
+
+
+
+    return -1;
 }
 
 
@@ -24,6 +94,7 @@ const canvas = document.getElementById("gameCanvas");
     var origin = new Vector2(canvas.width / 2 - width / 2, canvas.height / 2 - height / 2)
     var center = new Vector2(canvas.width / 2, canvas.height / 2);
     var buttons = [];
+    var lastMove;
 
 // In gameBoard, 1 is red and 2 is yellow. 
     for (var i = 0; i < 7; i++){
@@ -38,11 +109,11 @@ const canvas = document.getElementById("gameCanvas");
             }
 
             let pos = new Vector2(index, 5-count);
-
             game.gameBoard.setPos(pos, new Piece(game.turn === 0 ? 1 : 2),game.rules[1], game.turn);
            console.log("THe new board value is: " + game.gameBoard.get(pos).value);
             if (game.gameBoard.get(pos).value !== 0 && game.gameBoard.get(pos).value === (game.turn === 0 ? 1: 2)) {
                 game.switchTurn(Resources.playerNum);
+                game.lastMove = pos;
                 Resources.ws.send(JSON.stringify({
                     gameMove: [pos.x,pos.y,game.gameBoard.get(pos).value],
                     id: userPlayer.username,
@@ -93,6 +164,7 @@ const processMove = (move,obj) => {
 obj.gameBoard.set(new Vector2(move[0],move[1]),val);
 console.log("The value of recived vector is: " + obj.gameBoard.get(new Vector2(move[0],move[1])).value);
 obj.switchTurn(Resources.playerNum);
+obj.lastMove = new Vector2(move[0],move[1]);
 console.log("The player recieved a value of: " + move[2]);
 
 }

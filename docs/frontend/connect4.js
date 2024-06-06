@@ -24,12 +24,18 @@ const winCondition = (gameBoard, turn, lastMove) => {
     if (lastMove === null) {
         return -1;
     }
+    console.log("LastMove.x is : " + (lastMove.x) + "\nLastMove.y is: " + (lastMove.y));
     const checkFor4 = (arr) => {
         var count = 0;
         for (var i = 0; i < arr.length;i++){
+            console.log(arr[i]);
             if (count === 0) {
                 count++;
-            } else {
+            } else if(i > 0){
+                console.log("Arr value before is: " + arr[i-1]);
+                console.log("arr[0]:  " + arr[0].value);
+                console.log("arr[1]:  " + arr[1].value);
+                console.log("I value is: "+ i);
                 if(arr[i].value === arr[i-1].value){
                     count++;
                 }
@@ -46,23 +52,32 @@ const winCondition = (gameBoard, turn, lastMove) => {
         return null;
     }
     let checkStart = new Vector2(lastMove.x, lastMove.y - 3);
+    
+    //MovedBy keeps track how much you go outside of the board.
     let movedBy = 0;
+
+    let col = gameBoard.getColumn(checkStart, true);
+    console.log("Col before pop: " + col);
     if(checkStart.y < 0){
-        movedBy = 3 + checkStart.y;
+        col.pop(7 -(3 + checkStart.y));
         checkStart.y = 0;
     }
 
 
-    let col = game.gameboard.getColumn(checkStart, true);
-    
-    let winner = checkFor4(col.slice(0, 7 - moveBy));
+ 
+
+    console.log(col)
+    console.log(col.length);
+    let winner = checkFor4(col);
 
 if (winner !== null){
     return winner -1; 
 
 }
 
- checkStart = new Vector2(lastMove.x - 3, lastMove.y);
+//Checkrow for 4 in a row. 
+
+checkStart = new Vector2(lastMove.x - 3, lastMove.y);
  movedBy= 0;
 if(checkStart.y < 0){
     movedBy = 3 + checkStart.y;
@@ -71,7 +86,7 @@ if(checkStart.y < 0){
 
 
 
-winner = checkFor4(game.gameboard.getColumn(checkStart, true));
+winner = checkFor4(gameBoard.getColumn(checkStart, true));
 
 if (winner !== null){
 return winner -1; 

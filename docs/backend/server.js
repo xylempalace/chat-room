@@ -156,6 +156,7 @@ sockserver.on('connection', (ws, req) => {
       }
       var del = null;
       for (const [key, value] of Object.entries(gameRooms)) {
+        // Finds which room the player is in and removes them
         for (var i = 0; i < value[0].length; i++) {
           if (value[0][i] === ws.id) {
             value[0] = removeFromArray(value[0], i);
@@ -165,8 +166,10 @@ sockserver.on('connection', (ws, req) => {
       }
       if (del !== null) {
         if (gameRooms[del][0].length <= 0) {
+          // Deletes room if its empty
           delete gameRooms[del];
         } else if (gameRooms[del][3]) {
+          // Kicks other players out of the room if the game is already started
           sockserver.clients.forEach(client => {
             for (var i = 0; i < gameRooms[del][0].length; i++) {
               if (client.id === gameRooms[del][0][i]) {
@@ -177,12 +180,15 @@ sockserver.on('connection', (ws, req) => {
             }
           });
         } else {
+          // Changes the owner of the room if the owner was the player who left
           sockserver.clients.forEach(client => {
             if (client.id === gameRooms[del][0][0]) {
               client.send(JSON.stringify({
                 owner: true
               }));
             }
+
+            // Updates all the players in the room of the new player count
             for (var i = 0; i < gameRooms[del][0].length; i++) {
               if (client.id === gameRooms[del][0][i]) {
                 client.send(JSON.stringify({
@@ -273,6 +279,7 @@ sockserver.on('connection', (ws, req) => {
           // Deletes room if its empty
           delete gameRooms[obj.leaveRoom];
         } else if (gameRooms[obj.leaveRoom][3]) {
+          // Kicks other players out of the room if the game is already started
           sockserver.clients.forEach(client => {
             for (var i = 0; i < gameRooms[obj.leaveRoom][0].length; i++) {
               if (client.id === gameRooms[obj.leaveRoom][0][i]) {
@@ -413,6 +420,7 @@ sockserver.on('connection', (ws, req) => {
         }
       }
     } else if ("startRoom" in obj) {
+      // Runs when the owner starts the game room to tell all other clients the game has started
       sockserver.clients.forEach(client => {
         for (var i = 0; i < gameRooms[obj.roomID][0].length; i++) {
           if (client.id === gameRooms[obj.roomID][0][i]) {
@@ -424,6 +432,7 @@ sockserver.on('connection', (ws, req) => {
       });
       gameRooms[obj.roomID][3] = true;
     } else if ("gameMove" in obj) {
+      // Distributes game moves between players
       console.log(obj.gameMove + " " + obj.roomID);
       for (var i = 0; i < gameRooms[obj.roomID][0].length; i++) {
         sockserver.clients.forEach(client => {
@@ -436,6 +445,7 @@ sockserver.on('connection', (ws, req) => {
         });
       }
     } else if ("rematch" in obj) {
+      // Sends a notification between players when they are requesting a rematch
       for (var i = 0; i < gameRooms[obj.roomID][0].length; i++) {
         sockserver.clients.forEach(client => {
           if (client.id === gameRooms[obj.roomID][0][i]) {

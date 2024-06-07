@@ -117,16 +117,29 @@ webSocket.onmessage = (event) => {
         receiveMessage(`${obj.id} has disconnected!`);
     } else if ("msg" in obj) {
         // Handles recieving messages form other players and displaying them in the proper locations
-        receiveMessage(`<${obj.id}> ${obj.msg}`);
+        
         let p = otherPlayers.find((element) => {
             return element.username == obj.id;
         })
-        if (p != null) {
-            p.sayMessage(obj.msg);
+
+        // Handle the message seperately if it's a command
+        if (obj.msg.charAt(0) == "/") {
+            if (obj.id == userPlayer.username) {p = userPlayer;}
+            bodyCommand(p, obj.msg);
+        } else {
+
+            // Add the message to the chat log
+            receiveMessage(`<${obj.id}> ${obj.msg}`);
+
+            if (p != null) {
+                p.sayMessage(obj.msg);
+            }
+
+            if (userPlayer.username == obj.id) {
+                userPlayer.sayMessage(obj.msg);
+            }
         }
-        if (userPlayer.username == obj.id) {
-            userPlayer.sayMessage(obj.msg);
-        }
+        
     } else if ("joinMsg" in obj) {
         // Handles recieving join messages
         receiveMessage(obj.joinMsg);
@@ -295,18 +308,8 @@ class TextInput {
         this.textDiv.append(this.textInput);
         
         if (hasButton) {
-           /* this.textButton = document.createElement("button");
-            this.textButton.setAttribute("class", "inputButton");
-            this.textButton.addEventListener("click", () => {this.sendText()});
-
-            this.textButton.textContent = "🠊    ";
-            this.textDiv.append(this.textButton);
-            */
             this.textButton = document.getElementById("loginButton"); 
-            this.textButton.addEventListener("click", () => {this.sendText()});
-            //this.textDiv.append(this.textButton);
-            
-
+            this.textButton.addEventListener("click", () => {this.sendText()});        
         }
         
         this.constructor.textInputs.push(this);
@@ -365,29 +368,9 @@ class PlayerCosmetic {
     constructor (spritePath, name, type = 'default') {
         this.sprite = new Sprite(spritePath);
         this.flippedSprite = this.sprite;
-
-        switch (type) {
-            case 'default':
-                this.type = 'default';
-                this.anchor = PlayerCosmetic.defaultAnchor;
-                break;
-            case 'head':
-                this.type = 'head';
-                this.anchor = PlayerCosmetic.headAnchor;
-                break;
-            case 'tail':
-                this.type = 'tail';
-                this.anchor = PlayerCosmetic.tailAnchor;
-                break;
-            case 'body':
-                this.type = 'body';
-                this.anchor = PlayerCosmetic.defaultAnchor;
-                break;
-
-            default:
-                throw new Error(`Cosmetic type "${type}" is invalid`);
-                break;
-        }
+        this.type = type;
+        
+        this.anchor = this.getAnchor(PlayerBody.get("base"));
 
         this.sprite.image.onload = (e) => {
             ImageManipulator.manip(this.sprite.image, ["flipX"]).then((out) => {
@@ -396,7 +379,31 @@ class PlayerCosmetic {
         };
     }
 
-    draw(pos, size, flipped = false) {
+    getAnchor(playerBody) {
+        //console.log(playerBody);
+        switch (this.type) {
+            case 'default':
+                return playerBody.defaultAnchor;
+                break;
+            case 'head':
+                return playerBody.headAnchor;
+                break;
+            case 'tail':
+                return playerBody.tailAnchor;
+                break;
+            case 'body':
+                return PlayerCosmetic.defaultAnchor;
+                break;
+
+            default:
+                throw new Error(`Cosmetic type "${type}" is invalid`);
+                break;
+        }
+    }
+
+    draw(pos, size, flipped = false, body) {
+        this.anchor = this.getAnchor(body);
+
         if (!flipped) {
             let drawPos = new Vector2(pos.x + (size * this.anchor.x), pos.y + (size * this.anchor.y));
             this.sprite.draw(drawPos, size);
@@ -416,8 +423,10 @@ class PlayerCosmetic {
     }
 }
 
-class PlayerBody {
-    static instances = [];
+class PlayerBody extends PlayerCosmetic {
+    static _instances = [];
+    static _ids = [];
+    static _initialized = false;
 
     static baseDefaultAnchor = new Vector2(0, 0);
     static baseHeadAnchor = new Vector2(0.25, -0.25);
@@ -427,10 +436,68 @@ class PlayerBody {
     headAnchor;
     tailAnchor;
 
-    constructor (defaultAnchor = baseDefaultAnchor, headAnchor = baseHeadAnchor, tailAnchor = baseTailAnchor) {
+    constructor (id, defaultAnchor = PlayerBody.baseDefaultAnchor, headAnchor = PlayerBody.baseHeadAnchor, tailAnchor = PlayerBody.baseTailAnchor) {
+        if (!PlayerBody._initialized) {
+            PlayerBody.init();
+        }
+
+        if (PlayerBody._instances[id] !== undefined) {
+            throw new Error(`Body ID ${id} already taken, please use another ID`);
+        }
+
+        super("player/"+id+".png", id, 'body');
+
         this.defaultAnchor = defaultAnchor;
         this.headAnchor = headAnchor;
         this.tailAnchor = tailAnchor;
+
+        PlayerBody._instances[id] = this;
+        PlayerBody._ids.push(id);
+    }
+
+    static init () {
+        if (!PlayerBody._initialized) {
+            PlayerBody._initialized = true;
+            return new PlayerBody("base"); // Is this not being returned?
+        }
+
+        return (PlayerBody._instances["base"]);
+    }
+
+    /**
+     * Gets the body with the given ID
+     * @param {*} id ID of the desired body
+     * @returns Body with the coresponding ID
+     */
+    static get (id) {
+        if (id === "base") {
+            return PlayerBody.init();
+        }
+
+        if (PlayerBody._instances[id] === undefined) {
+            throw new Error(`Body ID ${id} not found`);
+        }
+
+        return PlayerBody._instances[id];
+    }
+
+    /**
+     * Tries to get the body of the given ID and, if it doesn't exist, creates a new player body
+     * @param {*} id ID of the body returned
+     * @param {Vector2} defaultAnchor Percentage offset of the default anchor
+     * @param {Vector2} headAnchor Percentage offset of the head anchor
+     * @param {Vector2} tailAnchor Percentage offset of the tail anchor
+     * @returns 
+     */
+    static getOrCreate(id, defaultAnchor = PlayerBody.baseDefaultAnchor, headAnchor = PlayerBody.baseHeadAnchor, tailAnchor = PlayerBody.baseTailAnchor) {
+        console.log(this._ids);
+        console.log(`${id} in ${this._ids}: ${PlayerBody._instances[id] !== undefined}`);
+        if (PlayerBody._instances[id] !== undefined || id == "base") {
+            console.log("a")
+            return this.get(id);
+        }
+
+        return new PlayerBody(id, defaultAnchor, headAnchor, tailAnchor);
     }
 }
 
@@ -446,7 +513,7 @@ class Player extends GameObject {
     speechBubbles = [];
     color;
     cosmetics = [];
-    static baseCosmetics = [new PlayerCosmetic("player/base.png", "base", 'body')];
+    static baseCosmetics = [PlayerBody.get("base")];
     flipped = false;
 
     constructor(id, pos, username, color, cosmetics = Player.baseCosmetics) {
@@ -545,6 +612,10 @@ class Player extends GameObject {
         }
     }
 
+    setBody(bodyID) {
+        this.cosmetics[0] = PlayerBody.get(bodyID);
+    }
+
     stopX() {
         this.velX = 0;
         this.destination.x = this.pos.x;
@@ -599,7 +670,7 @@ class Player extends GameObject {
 
             let playerDrawPos = new Vector2(this.left, this.top).screenPos;
             this.cosmetics.forEach((i) => {
-                i.draw(playerDrawPos, Player.playerSizeX * activeCamera.zoom, this.flipped);
+                i.draw(playerDrawPos, Player.playerSizeX * activeCamera.zoom, this.flipped, this.cosmetics[0]);
             })
 
             ctx.fillStyle = "#000000";
@@ -838,6 +909,7 @@ function sendMessage(msg) {
     if (msg.length > 0) {
         document.getElementById("chatInput").value = ""; 
         if (connected) {
+            
             webSocket.send(JSON.stringify({
                 id: userPlayer.username,
                 msg: `${msg}`
@@ -1226,6 +1298,14 @@ function ToggleCosmetic(cosmeticName) {
 
     else {
         userPlayer.addCosmetic(cosmeticName);
+    }
+}
+
+function bodyCommand(player, message) {
+    if (message === "/sit") {
+        player.cosmetics[0] = PlayerBody.getOrCreate("sit", PlayerBody.baseDefaultAnchor, PlayerBody.baseHeadAnchor, new Vector2(-0.25, 0.25));
+    } else if (message === "/stand") {
+        player.cosmetics[0] = PlayerBody.getOrCreate("base");
     }
 }
 

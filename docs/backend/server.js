@@ -109,6 +109,7 @@ const files = {
 
   //Player
   '/sprites/player/base.png' : ['image/png', '../frontend/sprites/player/base.png'],
+  '/sprites/player/sit.png' : ['image/png', '../frontend/sprites/player/sit.png'],
   '/sprites/player/fedora.png' : ['image/png', '../frontend/sprites/player/fedora.png'],
   '/sprites/player/flower.png' : ['image/png', '../frontend/sprites/player/flower.png'],
   '/sprites/player/big_glasses.png' : ['image/png', '../frontend/sprites/player/big_glasses.png'],

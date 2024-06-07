@@ -1253,6 +1253,8 @@ function onClick(event, canvasPos) {
                 if (gameProps[i].interactPrompt(userPlayer.pos) && gameProps[i].button.processClick(canvasPos, (condition) => {return condition;})) {
                     gameProps[i].drawMenu = true;
                     gameProps[i].window.windowState = 0;
+                    gameProps[i].game = Resources.createGame[gameProps[i].game.title]();
+                    gameProps[i].window.source = gameProps[i].game;
                     freezePlayer = true;
                     userPlayer.stop();
                     return;

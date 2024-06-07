@@ -137,8 +137,16 @@ webSocket.onmessage = (event) => {
             cosmeticNames.forEach((i) => {
                 console.log(`Adding ${i}`);
                 
-                if (!(i in p.cosmetics)) { // (i in cosmetics) compares references, not the "value" of the stuff inside the list (i got the stuff to work in findcosmeticindex)
-                    p.cosmetics.push(new PlayerCosmetic("player/" + i + ".png", i));
+                let hasCosmetic = false
+                
+                p.cosmetics.forEach((j) => {
+                    if (j.name == i) {
+                        hasCosmetic = true;
+                    }
+                })
+
+                if (!hasCosmetic) { // (i in cosmetics) compares references, not the "value" of the stuff inside the list (i got the stuff to work in findcosmeticindex)
+                    p.cosmetics.push(new PlayerCosmetic("player/" + i + ".png", i, returnCosmeticType(i)));
                 }
             })
 
@@ -301,13 +309,15 @@ class PlayerCosmetic {
                 break;
         }
 
+        this.name = name;
+
         this.sprite.image.onload = (e) => {
             ImageManipulator.manip(this.sprite.image, ["flipX"]).then((out) => {
                 this.flippedSprite = new Sprite(out);
             });
         };
     }
-
+    
     draw(pos, size, flipped = false) {
         if (!flipped) {
             let drawPos = new Vector2(pos.x + (size * this.anchor.x), pos.y + (size * this.anchor.y));
@@ -384,6 +394,7 @@ class Player extends GameObject {
     }
 
 
+
     /**
      * 
      * @param {String} cosmeticName 
@@ -391,11 +402,8 @@ class Player extends GameObject {
      */
     addCosmetic(cosmeticName, cosmeticsList = false) {
 
-        let type = 'default';
-       
-        if (cosmeticName === "horns" || cosmeticName == 'fedora') {
-            type = 'head';
-        }
+        let type = returnCosmeticType(cosmeticName);
+
 
      /*   if (cosmeticsList !== false && this.findCosmeticIndex(cosmeticName) !== -1) {
             cosmeticsList.push(new PlayerCosmetic("player/" + cosmeticName + ".png", cosmeticName, type));
@@ -1171,6 +1179,16 @@ function ToggleCosmetic(cosmeticName) {
         userPlayer.addCosmetic(cosmeticName);
     }
 }
+
+function returnCosmeticType(cosmeticName) {
+    if (cosmeticName === "horns" || cosmeticName === "fedora") {
+        return "head";
+    }
+    if (cosmeticName === "sit" || "base") {
+        return "body";
+    }
+    return "default";  
+}   
 
 function onClick(event, canvasPos) {
     if (connected) {

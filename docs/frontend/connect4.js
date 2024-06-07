@@ -24,18 +24,15 @@ const winCondition = (gameBoard, turn, lastMove) => {
     if (lastMove === null) {
         return -1;
     }
-    console.log("LastMove.x is : " + (lastMove.x) + "\nLastMove.y is: " + (lastMove.y));
+   
     const checkFor4 = (arr) => {
         var count = 0;
         for (var i = 0; i < arr.length;i++){
             console.log(arr[i]);
             if (count === 0) {
                 count++;
+                
             } else if(i > 0){
-                console.log("Arr value before is: " + arr[i-1]);
-                console.log("arr[0]:  " + arr[0].value);
-                console.log("arr[1]:  " + arr[1].value);
-                console.log("I value is: "+ i);
                 if(arr[i].value === arr[i-1].value){
                     count++;
                 }
@@ -46,37 +43,41 @@ const winCondition = (gameBoard, turn, lastMove) => {
             
             if(count === 4){
                 return arr[i].value;
-
+                console.log("Winner found!");
             }
         }
         return null;
     }
+
+
+    console.log("Last Move: " + lastMove.y);
     let checkStart = new Vector2(lastMove.x, lastMove.y - 3);
     
     //MovedBy keeps track how much you go outside of the board.
     let movedBy = 0;
 
     let col = gameBoard.getColumn(checkStart, true);
-    console.log("Col before pop: " + col);
     if(checkStart.y < 0){
-        col.pop(7 -(3 + checkStart.y));
+        movedBy = checkStart.y;
         checkStart.y = 0;
+    }
+
+    if (movedBy > 0) {
+        col.slice(0, 7 + movedBy);
     }
 
 
  
-
-    console.log(col)
-    console.log(col.length);
+    console.log(col);
     let winner = checkFor4(col);
 
 if (winner !== null){
     return winner -1; 
 
 }
-
+return -1; 
 //Checkrow for 4 in a row. 
-
+/*
 checkStart = new Vector2(lastMove.x - 3, lastMove.y);
  movedBy= 0;
 if(checkStart.y < 0){
@@ -99,8 +100,9 @@ return winner -1;
     return -1;
 }
 
+*/
 
-
+}
 
 const canvas = document.getElementById("gameCanvas");
     var dimensions = new Vector2(800, 400);
@@ -114,7 +116,11 @@ const canvas = document.getElementById("gameCanvas");
 // In gameBoard, 1 is red and 2 is yellow. 
     for (var i = 0; i < 7; i++){
         let b = new Button(new Vector2(center.x + (-150 + i* 50)*activeCamera.zoom, center.y + -220 * activeCamera.zoom),40, 450, "#FFB6C1","",0,3,3,null, (a, b, obj, game, index) => {
-            console.log("Button " + b + "has been pressed");
+            
+            if(game.winner === -1){
+            
+            
+            
             let col = game.gameBoard.getColumn(new Vector2(index, 6), false);
             let count = 0;
 
@@ -125,19 +131,17 @@ const canvas = document.getElementById("gameCanvas");
 
             let pos = new Vector2(index, 5-count);
             game.gameBoard.setPos(pos, new Piece(game.turn === 0 ? 1 : 2),game.rules[1], game.turn);
-           console.log("THe new board value is: " + game.gameBoard.get(pos).value);
             if (game.gameBoard.get(pos).value !== 0 && game.gameBoard.get(pos).value === (game.turn === 0 ? 1: 2)) {
                 game.switchTurn(Resources.playerNum);
                 game.lastMove = pos;
+                game.testWin();
                 Resources.ws.send(JSON.stringify({
                     gameMove: [pos.x,pos.y,game.gameBoard.get(pos).value],
                     id: userPlayer.username,
                     roomID: Resources.currentRoomID
                 }));
-                console.log("Success!");
-                console.log("Player is sending a value of: " + game.gameBoard.get(pos).value);
             }
-            
+        } 
         });
     
         buttons.push(b);    
@@ -173,20 +177,22 @@ const canvas = document.getElementById("gameCanvas");
 
 
 const processMove = (move,obj) => {
-    console.log("X is :" + move[0] + "Y is: " + move[1]);
     let val = new Piece;
     val.value = move[2] 
 obj.gameBoard.set(new Vector2(move[0],move[1]),val);
-console.log("The value of recived vector is: " + obj.gameBoard.get(new Vector2(move[0],move[1])).value);
 obj.switchTurn(Resources.playerNum);
 obj.lastMove = new Vector2(move[0],move[1]);
-console.log("The player recieved a value of: " + move[2]);
+obj.testWin();
 
 }
 
     const winText = (win,origin, width) => {
-
-
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(origin.x + width / 2 - 75 * activeCamera.zoom, origin.y + (200 - 28) * activeCamera.zoom, 150 * activeCamera.zoom, 40 * activeCamera.zoom);
+        ctx.fillStyle = "black";
+        ctx.font = `${25 * activeCamera.zoom}px Arial`;
+        console.log("Win is from winText: " + win);
+        ctx.fillText((win === 2 ? "Tie" : (win === 0 ? "Red wins" : "Yellow wins")), origin.x + width / 2, origin.y + 200 * activeCamera.zoom);
     }
 
 

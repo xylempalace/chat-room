@@ -58,12 +58,13 @@ function createTicTacToe() {
     
     for (var i = 0; i < 9; i++) {
         buttons.push(new Button(new Vector2(center.x + (-70 + (i % 3) * 70) * activeCamera.zoom, center.y + (-70 + Math.floor(i / 3) * 70) * activeCamera.zoom), 60, 60, "#7d7d7d", "", 30, 3, 3, null, (a, b, obj, game, index) => {
-            if (game.testWin() === -1) { 
+            if (game.winner === -1) { 
                 var pos = new Vector2(index % 3, Math.floor(index / 3));
                 game.gameBoard.setPos(pos, new Piece(game.turn === 0 ? "X": "O"), game.rules[1], game.turn);
                 if (game.gameBoard.get(pos).value !== "" && game.gameBoard.get(pos).value === (game.turn === 0 ? "X": "O")) {
                     obj.text = game.gameBoard.get(pos).value;
                     game.switchTurn(Resources.playerNum);
+                    game.testWin();
                     Resources.ws.send(JSON.stringify({
                         gameMove: [index, obj.text],
                         id: userPlayer.username,
@@ -78,6 +79,7 @@ function createTicTacToe() {
         obj.gameBoard.set(new Vector2(move[0] % 3, Math.floor(move[0] / 3)), new Piece(move[1]));
         obj.buttons[move[0]].text = move[1];
         obj.switchTurn(Resources.playerNum);
+        game.testWin();
     }
 
     const renderButtons = (windowState, game) => {

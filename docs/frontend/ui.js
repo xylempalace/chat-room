@@ -244,6 +244,7 @@ class Game {
     display;
     winDisplay;
     lastMove = null;
+    winner = -1;
 
     /**
      * Game object that handles playing a game
@@ -293,7 +294,7 @@ class Game {
      * @returns whether or not a player has one
      */
     testWin() {
-        return this.rules[0](this.gameBoard, this.turn, this.lastMove);
+        this.winner = this.rules[0](this.gameBoard, this.turn, this.lastMove);
     }
 
     processIncoming(move) {
@@ -461,7 +462,7 @@ class UiGameMenu {
             }));
         }));
 
-        this.buttons.push(new Button(new Vector2(this.center.x, this.center.y + 50 * activeCamera.zoom), 180, 40, "#20ff00", "REMATCH", 30, 3, 3, () => this.source.testWin() !== -1 && (Resources.rematch.length !== Resources.playerNum || !Resources.rematch[Resources.order]), () => {
+        this.buttons.push(new Button(new Vector2(this.center.x, this.center.y + 50 * activeCamera.zoom), 180, 40, "#20ff00", "REMATCH", 30, 3, 3, () => this.source.winner !== -1 && (Resources.rematch.length !== Resources.playerNum || !Resources.rematch[Resources.order]), () => {
             Resources.ws.send(JSON.stringify({
                 rematch: Resources.order,
                 roomID: Resources.currentRoomID
@@ -479,7 +480,7 @@ class UiGameMenu {
            this.buttons[i].draw(this.windowState, this.source.minPlayers); 
         }
         if (this.windowState === 3) {    
-            var win = this.source.testWin();
+            var win = this.source.winner;
             if (win !== -1) {
                 this.source.winDisplay(win, this.origin, this.width);
             } else {

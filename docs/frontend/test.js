@@ -149,8 +149,20 @@ webSocket.onmessage = (event) => {
             return element.username == obj.id;
         })
         if (p != null) {
-            p.pos.x = obj.posX;
-            p.pos.y = obj.posY;
+            let distX = Math.abs(obj.posX - p.pos.x);
+            let distY = Math.abs(obj.posY - p.pos.y);
+
+            // Check if the position has significantly changed
+            if (distX > 0.5 || distY > 0.5) {
+                // If the new position and the previous position are significantly different, then warp to the position
+                if ((distX * distX) + (distY * distY) >= 100) {
+                    p.warpTo(new Vector2(obj.posX, obj.posY));
+                } else {
+                    // Otherwise, just interpolate position
+                    p.walkTo(new Vector2(obj.posX, obj.posY));
+                }
+            }
+
             p.flipped = obj.flipped;
         } else {
             var newPlayer = new Player(obj.id, new Vector2(obj.posX, obj.posY), obj.id, "#FF0000");
@@ -603,7 +615,10 @@ class Player extends GameObject {
         let angle = Math.atan2(this.destination.y-this.pos.y, this.destination.x-this.pos.x);
         this.velX = Math.cos(angle)*this.constructor.playerMoveSpeed;
         this.velY = Math.sin(angle)*this.constructor.playerMoveSpeed;
-        
+
+        // Stand the player
+        this.cosmetics[0] = PlayerBody.getOrCreate("base");
+
         this.flipped = this.velX < 0;
     }
     

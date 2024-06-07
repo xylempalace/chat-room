@@ -1,4 +1,5 @@
 class Resources {
+    // Allows for information from test.js to be accessible by code in ui.js
     static ws;
     static player;
     static currentRoomID;
@@ -131,6 +132,7 @@ class Board {
      * @param {Vector2} fromPos the position of the first object to be swapped
      * @param {Vector2} toPos the position of the second object to be swapped
      * @param condition the function that determines whether or not to swap the objects
+     * @param {number} turn the number that corresponds to whose turn it is
      */
     swap(fromPos, toPos, condition, turn) {
         if (condition(this.get(fromPos), this.get(toPos), turn)) {
@@ -140,6 +142,13 @@ class Board {
         }
     }
 
+    /**
+     * Sets all the objects in a row on the board to specified object
+     * @param {number} row the index of the row to be modified 
+     * @param objs array that hold the replacement objects 
+     * @param condition the function that determines whether or not to modify the row
+     * @param {number} turn the number that corresponds to whose turn it is
+     */
     setRow(row, objs, condition, turn) {
         for (var i = 0; i < this.columns; i++) {
             if (condition(this.get(new Vector2(i, row)), turn)) {
@@ -148,6 +157,13 @@ class Board {
         }
     }
 
+    /**
+     * Sets all the objects in a column on the board to specified object
+     * @param {number} column the index of the column to be modified 
+     * @param objs array that hold the replacement objects 
+     * @param condition the function that determines whether or not to modify the column
+     * @param {number} turn the number that corresponds to whose turn it is
+     */
     setColumn(column, objs, condition, turn) {
         for (var i = 0; i < this.rows; i++) {
             if (condition(this.get(new Vector2(column, i)), turn)) {
@@ -272,15 +288,8 @@ class Game {
     }
 
     /**
-     * starting game
-     * @param {number} players amount of players playing
-     */
-    startGame(players) {
-        this.players = players;
-    }
-
-    /**
      * Switches turn
+     * @param {number} players the number of people playing
      */
     switchTurn(players) {
         this.turn++;
@@ -296,6 +305,10 @@ class Game {
         return this.rules[0](this.gameBoard, this.turn);
     }
 
+    /**
+     * Processes incoming moves by running the processMove function
+     * @param move the move sent by the opponent through the server 
+     */
     processIncoming(move) {
         this.processMove(move, this);
     }
@@ -382,8 +395,11 @@ class UiGameMenu {
         }));
         // Button for joining a room by its id
         this.buttons.push(new Button(new Vector2(this.center.x + 130 * activeCamera.zoom, this.center.y), 240, 40, "#20ff00", "JOIN CODE", 30, 10, 11, null, () => {
+            // New div for input
             var gameDiv = document.createElement("div");
             gameDiv.setAttribute("id", "gameDiv");
+
+            // Creating new input with all settings and params
             var input = document.createElement("input");
             input.style.left = `${this.center.x - 100}px`;
             input.style.top = `${this.center.y - 25}px`;
@@ -392,11 +408,14 @@ class UiGameMenu {
             input.id = "joinCode";
             input.classList.add("joinCode");
             gameDiv.appendChild(input);
+
+            // Creating the enter button with all settings and params
             var textButton = document.createElement("button");
             textButton.style.left = `${this.center.x - 100}px`;
             textButton.style.top = `${this.center.y - 36.7}px`;
             textButton.setAttribute("class", "joinButton");
             textButton.addEventListener("click", () => {
+                // Code to run on click of button
                 var input = document.getElementById("joinCode");
                 if (input.value.length === 5) {
                     Resources.ws.send(JSON.stringify({
@@ -406,6 +425,8 @@ class UiGameMenu {
             });
             textButton.textContent = "🠊";
             gameDiv.append(textButton);
+
+            // Adding the div to the html
             document.getElementById("gameSpace").appendChild(gameDiv);
         }));
         
@@ -414,7 +435,7 @@ class UiGameMenu {
         
         // Toggle for switching to private room
         this.buttons.push(new Button(new Vector2(this.center.x, this.center.y - 50 * activeCamera.zoom), 180, 40, "#ffb300", "PUBLIC", 30, 20, 21, null));
-        // Room creation button
+        // Room creation button for public rooms
         this.buttons.push(new Button(new Vector2(this.center.x, this.center.y + 50 * activeCamera.zoom), 180, 40, "#20ff00", "CREATE", 30, 20, 2, null, (playersMin, playersMax) => {
             Resources.ws.send(JSON.stringify({
                 newRoom: "public",
@@ -425,7 +446,7 @@ class UiGameMenu {
         
         // Toggle for switching to public room
         this.buttons.push(new Button(new Vector2(this.center.x, this.center.y - 50 * activeCamera.zoom), 180, 40, "#00a2ff", "PRIVATE", 30, 21, 20, null));
-        // Room creation button
+        // Room creation button for private rooms
         this.buttons.push(new Button(new Vector2(this.center.x, this.center.y + 50 * activeCamera.zoom), 180, 40, "#20ff00", "CREATE", 30, 21, 2, null, (playersMin, playersMax) => {
             Resources.ws.send(JSON.stringify({
                 newRoom: "private",
@@ -434,12 +455,14 @@ class UiGameMenu {
             }));
         }));
 
+        // Allows the owner to change to private room from public after room creation
         this.buttons.push(new Button(new Vector2(this.center.x, this.center.y - 50 * activeCamera.zoom), 180, 40, "#ffb300", "PUBLIC", 30, 1, 4, () => Resources.owner && Resources.currentRoomID.includes("pub-"), () => {
             Resources.ws.send(JSON.stringify({
                 updateRoom: Resources.currentRoomID,
                 new: "priv-"
             }));
         }));
+        // Allows the owner to change to public room from private after room creation
         this.buttons.push(new Button(new Vector2(this.center.x, this.center.y - 50 * activeCamera.zoom), 180, 40, "#00a2ff", "PRIVATE", 30, 1, 4, () => Resources.owner && Resources.currentRoomID.includes("priv-"), () => {
             Resources.ws.send(JSON.stringify({
                 updateRoom: Resources.currentRoomID,
@@ -447,6 +470,7 @@ class UiGameMenu {
             }));
         }));
 
+        // Allows owner to start the room by pressing this button
         this.buttons.push(new Button(new Vector2(this.center.x, this.center.y + 50 * activeCamera.zoom), 180, 40, "#20ff00", "PLAY", 30, 1, 3, (playersMin) => Resources.owner && Resources.playerNum >= playersMin, () => {
             Resources.ws.send(JSON.stringify({
                 startRoom: true,
@@ -454,6 +478,7 @@ class UiGameMenu {
             }));
         }));
 
+        // Allows players to rematch if all players hit the button
         this.buttons.push(new Button(new Vector2(this.center.x, this.center.y + 50 * activeCamera.zoom), 180, 40, "#20ff00", "REMATCH", 30, 3, 3, () => this.source.testWin() !== -1 && (Resources.rematch.length !== Resources.playerNum || !Resources.rematch[Resources.order]), () => {
             Resources.ws.send(JSON.stringify({
                 rematch: Resources.order,
@@ -468,22 +493,31 @@ class UiGameMenu {
    draw() {
         ctx.save();
         ctx.textAlign = 'center';
+        // Draws buttons
         for (var i = 0 ; i < this.buttons.length; i++) {
            this.buttons[i].draw(this.windowState, this.source.minPlayers); 
         }
+
+        // Draws game ui and button
         if (this.windowState === 3) {    
             var win = this.source.testWin();
             if (win !== -1) {
+                // When the game is over
                 this.source.winDisplay(win, this.origin, this.width);
             } else {
+                // While the game is running
                 this.source.display(this.windowState, this.source);
             }
         }
+
         ctx.fillStyle = "black";
+        // Draws the game code while the players are still waiting for more people
         if (this.windowState === 1) {
             ctx.font = `${25 * activeCamera.zoom}px Arial`;
             ctx.fillText(Resources.currentRoomID.substring(Resources.currentRoomID.indexOf("-") + 1), this.origin.x + this.width / 2, this.origin.y + 100 * activeCamera.zoom);
         }
+
+        // Writes the name of the game at the top of the popup
         ctx.font = `${30 * activeCamera.zoom}px Arial`;
         ctx.fillText(this.title, this.origin.x + this.width / 2, this.origin.y + 50 * activeCamera.zoom);
         ctx.restore();
@@ -519,9 +553,12 @@ class UiGameMenu {
                 }
             }
 
+            // Processes clicks for game buttons 
             if (this.source.buttons !== null) {
                 for (var i = 0; i < this.source.buttons.length; i++) {
+                    // Figures out if the button is even visible
                     if (this.source.buttons[i].windowState === this.windowState && (this.source.buttons[i].extraCondition === null || this.source.buttons[i].extraCondition(this.source.minPlayers))) {
+                        // Checks if the button was clicked and runs any code specific to the button
                         var nextState = this.source.buttons[i].processClick(position, (condition, nextState, windowState) => {
                             if (condition) {
                                 return nextState;
@@ -559,8 +596,8 @@ class Button {
      * @param {string} fontSize the font size of the text
      * @param {number} state the state number of the game window when this button should draw
      * @param {number} nextState the state the game window should switch upon click 
-     * @param {Function} processButton specialized code to run when pressed
      * @param extraCondition a function that tells the button to display when the specified condition is met
+     * @param {Function} processButton specialized code to run when pressed
      */
     constructor(origin, width, height, color, text, fontSize, state, nextState, extraCondition, processButton = null) {
         this.width = width * activeCamera.zoom;
@@ -578,20 +615,24 @@ class Button {
     /**
      * Draws the button if the game window state matches the button's state
      * @param {number} state checked against the button's state 
+     * @param {number} playersMin the minimum number of players allowed in the game
      */
     draw(state, playersMin) {
+        // Checks if the buttons should be visible
         if ((this.windowState === null || state === this.windowState) && (this.extraCondition === null || this.extraCondition(playersMin))) {
             ctx.fillStyle = this.color;
+            // Draws button background
             ctx.fillRect(this.origin.x, this.origin.y, this.width, this.height);
             ctx.textAlign = 'center';
             ctx.fillStyle = "black";
+            // Draws button text
             ctx.font = `${this.fontSize * activeCamera.zoom}px Arial`;
             ctx.fillText(this.text, this.origin.x + this.width / 2, this.origin.y + this.height / 2 + 10 * activeCamera.zoom);
         }
     }
 
     /**
-     * 
+     * Figures out what to do when the button is clicked
      * @param {Vector2} position takes in the position of the mouse click
      * @param {Function} execute passed in function that determines what is done with the click
      * @returns returns output of the execute function
@@ -599,11 +640,14 @@ class Button {
     processClick(position, execute, min, max, game, index) {
         var input = document.getElementById("gameDiv");
         if (input !== null && this.windowState !== null) {
+            // Gets rid of the input for join codes when the player moves on
             input.remove();
         }
+        // Runs the check if the button was clicked
         var condition = position.x >= this.origin.x && position.y >= this.origin.y && position.x <= this.origin.x + this.width && position.y <= this.origin.y + this.height;
         
         if (condition && this.process !== null) {
+            // Runs the extra button code if it has it
             this.process(min, max, this, game, index);
         }
         return execute(condition, this.nextState, this.windowState);

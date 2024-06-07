@@ -186,12 +186,17 @@ webSocket.onmessage = (event) => {
             const textBox = textInputs.find((element) => element.textInput.getAttribute("placeholder") == "Username");
             setUser(obj.usr, textBox);
         }
-    } else if ("joinRoom" in obj) {
+    } 
+    
+    if ("joinRoom" in obj) {
         var input = document.getElementById("gameDiv");
         if (input !== null) {
+            // Removes the join code input element
             input.remove();
         }
+
         if (obj.joinRoom === "error") {
+            // Moves the player back a screen if they failed to join a valid room
             for (var i = 0; i < gameProps.length; i++) {
                 if (gameProps[i].drawMenu) {
                     gameProps[i].window.windowState = 10;
@@ -200,6 +205,7 @@ webSocket.onmessage = (event) => {
             receiveMessage("No rooms available");
             console.log("error");
         } else {
+            // Puts them in the waiting room if they successfully joined a room
             Resources.currentRoomID = obj.joinRoom;
             console.log(Resources.currentRoomID);
             for (var i = 0; i < gameProps.length; i++) {
@@ -209,41 +215,56 @@ webSocket.onmessage = (event) => {
             }
         }
     }
+
     if ("owner" in obj) {
+        // Stores if this client is the owner of the current room
         Resources.owner = obj.owner;
     }
+
     if ("order" in obj) {
+        // Stores which spot this client is in the turn order
         Resources.order = obj.order;
     }
+
     if ("playerNum" in obj) {
+        // Stores the number of players in the room
         Resources.playerNum = obj.playerNum;
     }
+
     if ("startRoom" in obj) {
+        // Moves into the playing game state when the room starts
         for (var i = 0; i < gameProps.length; i++) {
             if (gameProps[i].drawMenu) {
                 gameProps[i].window.windowState = 3;
             }
         }
     }
+
     if ("gameMove" in obj) {
+        // Processes incoming moves from the server
         console.log(Resources.currentRoomID);
         if (obj.id !== userPlayer.username) {
             for (var i = 0; i < gameProps.length; i++) {
                 if (gameProps[i].drawMenu) {
-                    gameProps[i].window.source.processIncoming(obj.gameMove, gameProps[i].window.source);
+                    gameProps[i].window.source.processIncoming(obj.gameMove);
                 }
             }
         }
     }
+
     if ("rematch" in obj) {
-        console.log(Resources.currentRoomID);
+        // rematches players when all agree
         if (Resources.rematch.length !== Resources.playerNum) {
+            // Resets rematch list which tracks how many players have agreed to rematch
             Resources.rematch = [];
-            for (var i = 0; i < Resources.playerNum; i++) {
+            for (var i = 0; i < Resourcesd.playerNum; i++) {
                 Resources.rematch.push(false);
             }
         }
+        // Sets the specified spot in the rematch list to true
         Resources.rematch[obj.rematch] = true;
+
+        // Determines if the rematch is fully complete
         var rematch = true;
         for (var i = 0; i < Resources.rematch.length; i++) {
             if (!Resources.rematch[i]) {
@@ -251,7 +272,9 @@ webSocket.onmessage = (event) => {
                 break;
             }
         }
+
         if (rematch) {
+            // Runs when the rematch process is complete and starts a new game while switching who goes first
             Resources.order++;
             Resources.order %= Resources.playerNum;
             Resources.rematch = [];
@@ -262,7 +285,9 @@ webSocket.onmessage = (event) => {
             }
         }
     }
+
     if ("kick" in obj) {
+        // Removes a player from the game if a player left
         for (var i = 0; i < gameProps.length; i++) {
             gameProps[i].drawMenu = false;
             freezePlayer = false;
@@ -1310,10 +1335,13 @@ function bodyCommand(player, message) {
 }
 
 function onClick(event, canvasPos) {
+    // Processes screen clicks
     if (connected) {
         if (freezePlayer) {
+            // Checks if the player is frozen
             for (var i = 0; i < gameProps.length; i++) {
                 if (gameProps[i].window.processClick(canvasPos)) {
+                    // Runs when a player closes the game menu
                     gameProps[i].drawMenu = false;
                     freezePlayer = false;
                     var input = document.getElementById("gameDiv");
@@ -1329,15 +1357,21 @@ function onClick(event, canvasPos) {
                 }
             }
         } else {
+            // Runs when the player is mobile
             for (var i = 0; i < gameProps.length; i++) {
+                // Checks if they are opening a game menu
                 if (gameProps[i].interactPrompt(userPlayer.pos) && gameProps[i].button.processClick(canvasPos, (condition) => {return condition;})) {
+                    // freezes the player and opens the menu
                     gameProps[i].drawMenu = true;
                     gameProps[i].window.windowState = 0;
+                    gameProps[i].game = Resources.createGame[gameProps[i].game.title]();
+                    gameProps[i].window.source = gameProps[i].game;
                     freezePlayer = true;
                     userPlayer.stop();
                     return;
                 }
             }
+            // Moves the player to the mouse if no buttons were clicked
             userPlayer.walkTo(canvasPos.screenToWorldPos());
         }
     }

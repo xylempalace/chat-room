@@ -164,9 +164,11 @@ webSocket.onmessage = (event) => {
             }
 
             p.flipped = obj.flipped;
+            bodyCommand(p, obj.command);
         } else {
             var newPlayer = new Player(obj.id, new Vector2(obj.posX, obj.posY), obj.id, "#FF0000");
             newPlayer.flipped = obj.flipped;
+            bodyCommand(newPlayer, obj.command);
             otherPlayers.push(newPlayer);
         }
     } else if ("invalidName" in obj || obj.invalidName) {
@@ -487,6 +489,7 @@ class PlayerBody extends PlayerCosmetic {
         this.defaultAnchor = defaultAnchor;
         this.headAnchor = headAnchor;
         this.tailAnchor = tailAnchor;
+        this.id = id;
 
         PlayerBody._instances[id] = this;
         PlayerBody._ids.push(id);
@@ -527,10 +530,7 @@ class PlayerBody extends PlayerCosmetic {
      * @returns 
      */
     static getOrCreate(id, defaultAnchor = PlayerBody.baseDefaultAnchor, headAnchor = PlayerBody.baseHeadAnchor, tailAnchor = PlayerBody.baseTailAnchor) {
-        console.log(this._ids);
-        console.log(`${id} in ${this._ids}: ${PlayerBody._instances[id] !== undefined}`);
         if (PlayerBody._instances[id] !== undefined || id == "base") {
-            console.log("a")
             return this.get(id);
         }
 
@@ -796,10 +796,10 @@ class SpeechBubble {
             ctx.fillText(this.message[i], posX, (posY - (this.constructor.fontHeight * (this.message.length - i))) + initOffset);
         }
 
-        SpeechBubbleSprite2.drawCentered(new Vector2(posX, posY), this.constructor.maxWidth, (this.message.length * this.constructor.fontHeight) * 1.5 + 10);
+        // SpeechBubbleSprite2.drawCentered(new Vector2(posX, posY), this.constructor.maxWidth, (this.message.length * this.constructor.fontHeight) * 1.5 + 10);
         
-        let testNineSlice = new NineSlicedSprite("SpeechBubble.png")
-        testNineSlice.draw(new Vector2(posX, posY), 200);
+        // let testNineSlice = new NineSlicedSprite("SpeechBubble.png")
+        // testNineSlice.draw(new Vector2(posX, posY), 200);
 
         ctx.textAlign = prevAlign;
         ctx.font = prevFont;
@@ -1318,7 +1318,8 @@ function serverUpdate() {
             id: userPlayer.username,
             posX: userPlayer.pos.x,
             posY: userPlayer.pos.y,
-            flipped: userPlayer.flipped
+            flipped: userPlayer.flipped,
+            command: userPlayer.cosmetics[0].id == "sit" ? "/sit" : "/stand"
         }));
     } else {
         setTimeout(() => {

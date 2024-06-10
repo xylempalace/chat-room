@@ -221,7 +221,8 @@ sockserver.on('connection', (ws, req) => {
             id: obj.id,
             posX: obj.posX,
             posY: obj.posY,
-            flipped: obj.flipped
+            flipped: obj.flipped,
+            command: obj.command
           }));
         });
       }
